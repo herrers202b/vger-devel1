@@ -1,0 +1,41 @@
+version: "3.3"
+
+# container networks to set up
+networks:
+  django_db_net:
+    external: false
+
+# the containers to spin up
+services:
+  django:
+    build: ./docker/django
+    restart: 'unless-stopped'
+    depends_on:
+      - db
+    networks:
+      - django_db_net
+    user: "${HOST_USER_ID}:${HOST_GROUP_ID}"
+    volumes:
+      - ./src:/src
+    working_dir: /src/vger
+    #    command: ["/src/wait-for-it.sh", "db:3306", "--", "python", "manage.py", "runserver", "0.0.0.0:8000"]
+    command: python manage.py runserver 0.0.0.0:8000
+    ports:
+      - "8000:8000"
+
+  db:
+    image: mariadb:latest
+    user: "${HOST_USER_ID}:${HOST_GROUP_ID}"
+    volumes:
+      - ./data:/var/lib/mysql
+    restart: always
+    environment:
+      - MYSQL_ROOT_PASSWORD=this_is_a_bad_password
+      - MYSQL_USER=django
+      - MYSQL_PASSWORD=django
+      - MYSQL_DATABASE=vger
+    networks:
+      - django_db_net
+#If you're using windows powershell please comment out lines 17 and 28 and use 
+#$Env:<variable-name> = "<new-value>" as template to enter your docker-compose
+#commands. Ex) $Env:HOST_USER_ID = "ID -u"
