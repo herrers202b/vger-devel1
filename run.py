@@ -11,7 +11,8 @@ def usage():
             "\tadmin [name]\t- creates a new superuser [with given name]\n" + 
             "\tinspectdb \t- inspects the django database setups\n" + 
             "\town \t\t- changes current user to new owner of all subdirectors\n" + 
-            "\tstartapp 'name'\t- creates a new app subdirectory with given name (required) ")
+            "\tstartapp 'name'\t- creates a new app subdirectory with given name (required) " +
+            "\ttest \t\t- runs all test files in project apps, optional app name to test specific app\n")
 
 import sys
 import os
@@ -61,8 +62,15 @@ def main():
         else:
             usage()
 
-    else:
+    #runs the projects test files
+    elif 'test'.strip() in sys.argv:
+        if len(sys.argv) == 3:
+            os.system("sudo docker-compose run django python3 manage.py test " + sys.argv[2])
+        else:
+            os.system("sudo docker-compose run django python3 manage.py test")
+    else:   
         usage()
+
 
 
 # end program    
