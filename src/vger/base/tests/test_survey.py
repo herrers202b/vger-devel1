@@ -27,6 +27,12 @@ except ImportError:
 
 #=======================================================================
 
+
+#|SurveyQuestion
+# This class currently does:
+#   1. Creates a survey question object and adds that to the test database
+#   2. Retrieves the just created survey question and asserts that it contains the proper fields
+# |#
 class SurveyQuestion(TestCase):
     def setUp(self):
         survey_question.objects.create(question="What is your favorite color", answer="Y")
@@ -37,6 +43,13 @@ class SurveyQuestion(TestCase):
         self.assertEqual(q.question, "What is your favorite color")
         self.assertEqual(q.answer, "Y")
 
+
+#|Survey
+# This class currently does:
+#   1. Creates a survey question, user, and survey and adds those things to the survey object
+#   2. adds the survey object and user to the test database
+#   3. Gets the created survey and tests if it contains the proper question
+# |#
 class Survey(TestCase):
     def setUp(self):
         sq = survey_question(question="Should this test break?", answer="N")
