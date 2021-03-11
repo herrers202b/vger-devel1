@@ -21,7 +21,7 @@ def main():
     
     # Starts the server
     if 'up'.strip() in sys.argv:
-        os.system("python manage.py collectstatic --noinput --clear")
+        os.system("sudo docker-compose run django manage.py collectstatic --noinput --clear")
         if '-d'.strip() in sys.argv:
             os.system("sudo docker-compose up -d")
         else:
