@@ -3,7 +3,7 @@ from django.urls import reverse, resolve
 try:
     from ..views import home
 except ImportError:
-    print("The home view is not implemented for testing import!")
+    raise ImportError("The home view is not implemented for testing import!")
 
 
 
