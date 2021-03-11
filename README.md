@@ -13,11 +13,11 @@ college students about their covid-19 experience and its relations to their educ
 
 The only dependecy required before running is docker which will subsequently build the images required for running
 
-- Docker
+* Docker
 
-- Django
+    * Django
 
-- Mariadb
+    * Mariadb
 
   
 
