@@ -5,7 +5,7 @@ import os
 def usage():
     print("Usage: run.py\n" + 
             "\tmigrate \t- makes migrations and applies them\n" + 
-            "\trun [-d] \t- spins up the djangosite [runs quietly]\n" + 
+            "\tup [-d] \t- spins up the djangosite [runs quietly]\n" + 
             "\tdown \t\t- brings the docker container down\n" +
             "\tbuild \t\t- builds docker-compose images\n" + 
             "\tadmin [name]\t- creates a new superuser [with given name]\n" + 
