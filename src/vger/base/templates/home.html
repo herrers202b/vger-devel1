@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% block content %}
+<!--INSERT PAGE CONTENT BETWEEN HERE-->
+<body>
+    <h1>Welcome to Virtual Guide for Educational Readiness (VGER)</h1>
+
+    <p><em>This survey will help you assess your readiness for online learning</em></p>
+
+    <h2>For Admin</h2>
+    <ul>
+        <li>Create or manage your survey here</li>
+        <li>Compare previous versions of surveys</li>
+    </ul>
+
+    <h2>For Advisors</h2>
+    <ul>
+        <li>View your advisees results here</li>
+    </ul>
+    
+    <p><a href="{% url 'login' %}">Login</a> to manage survey</p>
+    
+</body>
+<!--AND HERE-->
+{% endblock content %}
