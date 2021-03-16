@@ -57,8 +57,8 @@ this is to help navigate project functionality.
 **build** 
 > builds docker-compose images
 
-**admin [name]** 
-> creates a new superuser [with given name]
+**admin ** 
+> creates a new superuser
 
 **inspectdb** 
 > inspects the django database setups
