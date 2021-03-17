@@ -43,7 +43,11 @@ class Question(models.Model):
     questionText = models.CharField(max_length=100, help_text="Please enter a prompt. ex) I know how to install software on my computer.")
     #Score attained from radio buttons
     score = models.IntegerField(choices=QUESTION_WEIGHTS, blank=True, default='2', help_text="Results of question")
-    #Untested character model
+    def __str__(self):
+        return f'({self.questionText})'
+    
+
+#Untested character model
 class Category(models.Model):
     """
     Category Model
@@ -65,8 +69,13 @@ class Category(models.Model):
     lowWeightText = models.CharField(max_length=50, help_text="Please enter flavor text for the low weight of the category, ex) Not like me at all")
     highWeightText = models.CharField(max_length=50, help_text="Please enter flavor text for the high weight of the category, ex) Extremely like me")
     question = models.ForeignKey("Question", verbose_name=("Question"), on_delete=models.CASCADE)
+
+    def __str__(self):
+        return f'({self.titleOfCategory})'
+    
+#Untested survey model
 class Survey(models.Model):
-        """
+    """
     Survey model
 
     The model for the survey category
@@ -91,4 +100,6 @@ class Survey(models.Model):
     titleOfSurvey = models.CharField(max_length=50, help_text="Please enter a name for the survey")
     directions = models.CharField(max_length=500, help_text="Please enter any directions to take the survey")
     category = models.ForeignKey("Category", verbose_name=("Category"), default=None, on_delete=models.CASCADE)
-    #User
+    
+    def __str__(self):
+        return f'({self.titleOfSurvey})'
