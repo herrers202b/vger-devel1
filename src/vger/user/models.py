@@ -19,3 +19,10 @@ class UserModels(models.Model):
     def create(cls, account_type, user):
         inf = cls(account_type=account_type, user=user)
         return inf
+
+class Student(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+
+class Advisor(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    advisees = models.ForeignKey(Student, on_delete=models.CASCADE)
