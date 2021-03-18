@@ -27,16 +27,7 @@
   </style>
     <nav class=navbar>
       <ul class=navset>
-        <li class=navlist><a class=navlink href="{% url 'home-page' %}">Home</a></li>
-        {% if user.is_authenticated %}
-        <li class=navlist><a class=navlink href="{% url 'logout' %}">Logout</a></li>
-        <li class=navlist><a class=navlink href="{% url 'profile' %}">Profile</a></li>
-        {% else %}
-        <li class=navlist><a class=navlink href="{% url 'login' %}">Login</a></li>
-        <li class=navlist><a class=navlink href="{% url 'register' %}">Register</a></li>
-        {% endif %}
-        <li class=navlist><a class=navlink href="{% url 'survey-page' %}">Survey</a></li>
-        <li class=navlist><a class=navlink href="{% url 'results-page' %}">Results</a></li>
+        <li class=navlist><a class=navlink href="{% url 'survey' %}">Home</a></li>
       </ul>
     <!-- Implement Nav bar here-->
     </nav>

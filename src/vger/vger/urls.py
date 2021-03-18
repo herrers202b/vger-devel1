@@ -16,6 +16,11 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 
+from base import urls
+from base import views
+#from base import templates
+
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('survey/', views.SurveyListView.as_view(), name='survey'),
 ]

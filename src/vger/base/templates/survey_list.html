@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+
+{% block content %}
+  <h1>Survey List</h1>
+  {% if survey_list %}
+  <ul>
+    {% for survey in survey_list %}
+      <li>
+        <a href="{{ survey.get_absolute_url }}">{{ survey.titleOfSurvey }}</a> 
+      </li>
+    {% endfor %}
+  </ul>
+  {% else %}
+    <p>There are no surveys in the database.</p>
+  {% endif %} 
+{% endblock %}
