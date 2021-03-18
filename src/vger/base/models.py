@@ -1,4 +1,6 @@
 from django.db import models
+#Used to generate URLs by reversing the URL patterns
+from django.urls import reverse
 import uuid
 # Create your models here.
 
@@ -89,6 +91,11 @@ class Survey(models.Model):
     """String for representing the Survey object."""
     def __str__(self):
         return f'{self.titleOfSurvey}'
+    
+    def get_absolute_url(self):
+        """Returns the url to access a detailed record for this survey"""
+        return reverse("survey-detail", args=[str(self.id)])
+    
 
 #Untested survey instance model
 class SurveyInstance(models.Model):

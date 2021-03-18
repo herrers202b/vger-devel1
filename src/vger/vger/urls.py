@@ -18,9 +18,9 @@ from django.urls import path
 
 from base import urls
 from base import views
-#from base import templates
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('survey/', views.SurveyListView.as_view(), name='survey'),
+    path('survey/<int:pk>', views.SurveyDetailView.as_view(), name='survey-detail'),
 ]
