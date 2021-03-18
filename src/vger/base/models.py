@@ -35,7 +35,7 @@ class Question(models.Model):
     )
     questionText = models.CharField(max_length=100, help_text="Please enter a prompt. ex) I know how to install software on my computer.")
     score = models.IntegerField(choices=QUESTION_WEIGHTS, blank=True, null=True, help_text="Results of question")
-    category = models.ForeignKey("Category", verbose_name=("Parent Category"), default=None, null=True, on_delete=models.CASCADE)
+    category = models.ForeignKey("Category", verbose_name=("Parent Category"), related_name=("questions"), default=None, null=True, on_delete=models.CASCADE)
 
     """String for representing the Question object."""
     def __str__(self):
@@ -64,7 +64,7 @@ class Category(models.Model):
     titleOfCategory = models.CharField(max_length=100, help_text="Please enter a title for this category, ex) Computer Skills.")
     lowWeightText = models.CharField(max_length=50, default="Not like me at all", help_text="Please enter flavor text for the low weight of the category, ex) Not like me at all")
     highWeightText = models.CharField(max_length=50, default="Extremely like me", help_text="Please enter flavor text for the high weight of the category, ex) Extremely like me")
-    survey = models.ForeignKey("Survey", verbose_name=("Parent Survey"), default=None, null=True, on_delete=models.CASCADE)
+    survey = models.ForeignKey("Survey", verbose_name=("Parent Survey"), related_name=("categories"), default=None, null=True, on_delete=models.CASCADE)
 
     """String for representing the Category object."""
     def __str__(self):

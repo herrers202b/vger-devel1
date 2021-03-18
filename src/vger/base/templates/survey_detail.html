@@ -6,6 +6,13 @@
   <p><strong>Description:</strong> {{survey_detail.directions }}</p>
 
   <h4>Details</h4>
-  
-  </div>
+  <!--https://stackoverflow.com/questions/6704749/relatedmanager-object-is-not-iterable-django-->
+  <!--https://stackoverflow.com/questions/37346173/django-select-related -->
+  <!------Remove the () from the end of all to get relational queires to work-->
+  {% for Category in survey_detail.categories.all %}
+    <p>Title: {{ Category.titleOfCategory }} </p>
+    {% for Question in Category.questions.all %}
+        <p>Question: {{Question.questionText}} </p>
+    {% endfor %}
+  {% endfor %}
 {% endblock %}
