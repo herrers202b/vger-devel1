@@ -1,4 +1,5 @@
 from django.db import models
+import uuid
 # Create your models here.
 
 #Untested question model
@@ -88,3 +89,26 @@ class Survey(models.Model):
     """String for representing the Survey object."""
     def __str__(self):
         return f'{self.titleOfSurvey}'
+
+#Untested survey instance model
+class SurveyInstance(models.Model):
+    """
+    SurveyInstance model
+
+    The model for a specific instance of a survey
+
+    Parameters
+    ----------
+    id : UUIDField
+        Unique id of the survey instance
+    survey : Forign Key
+        survey is the forign key into a specific survey
+        with which we wish to instantiate 
+    """
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, help_text='Unique ID for this survey')
+    survey = models.ForeignKey('Survey', on_delete=models.RESTRICT, null=True)
+    
+    def __str__(self):
+        """String for representing the Survey Instance Object"""
+        return f'{self.id} ({self.survey.titleOfSurvey})'
+    
