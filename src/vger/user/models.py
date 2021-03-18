@@ -26,3 +26,6 @@ class Student(models.Model):
 class Advisor(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     advisees = models.ForeignKey(Student, on_delete=models.CASCADE)
+
+class Administrator(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
