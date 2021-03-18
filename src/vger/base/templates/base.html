@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+  <style>
+    .navbar {
+      padding-bottom: 5%;
+    }
+    .navset {
+      position: fixed;
+      list-style-type: none; 
+      margin: 0; 
+      padding-bottom: 0;
+    }
+    .navlist {
+      float: left;
+    }
+    .navlink {
+      text-align: center;
+      padding: 8px;
+      border: 1px;
+      display: block;
+      width: 85px;
+    }
+    li a:hover {
+      background-color: #555;
+      color: white;
+    }
+  </style>
+    <nav class=navbar>
+      <ul class=navset>
+        <li class=navlist><a class=navlink href="{% url 'survey' %}">Home</a></li>
+      </ul>
+    <!-- Implement Nav bar here-->
+    </nav>
+    <div class="container">
+        <div class="card border-0 shadow my-5">
+          <div class="card-body p-5">
+            <body style="background-color: rgb(255, 255, 255);">
+                <section style="margin-top: 10px">
+                    {% block content %}{% endblock %}
+                </section>      
+            </body>
+            <div style="height: 700px"></div>
+            
+            <!-- END -->
+          </div>
+          <footer>
+            <!--Implement Footer Here!-->
+          </footer>
+        </div>
+      </div>
+
+</html>

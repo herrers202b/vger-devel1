@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% block content %}
+
+<body>
+    <h2>{{Survey.titleOfSurvey}} </h2>
+    <p>{{Survey.directions}} </p>
+    <p>{{SurveyInstance.id}} </p>
+
+    {% for Category in Survey %}
+
+        {% for Question in Category %}
+        <li>{{Question.questionText}}</li>
+        <li>{{Question.score}}</li>
+        {% endfor %}
+
+    {% endfor %}
+
+</body>
+{%endblock content%}
+
