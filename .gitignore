@@ -10,3 +10,6 @@ media
 
 # database data
 data/
+
+# Mac stuff most of you won't need
+.DS_Strore
