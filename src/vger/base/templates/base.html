@@ -28,6 +28,11 @@
     <nav class=navbar>
       <ul class=navset>
         <li class=navlist><a class=navlink href="{% url 'home-page' %}">Home</a></li>
+        {% if user.is_authenticated %}
+        <li class=navlist><a class=navlink href="{% url 'logout' %}">Logout</a></li>
+        {% else %}
+        <li class=navlist><a class=navlink href="{% url 'login' %}">Login</a></li>
+        {% endif %}
         <li class=navlist><a class=navlink href="{% url 'survey' %}">Survey List</a></li>
       </ul>
     <nav class=navbar>
