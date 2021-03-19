@@ -2,6 +2,7 @@ from django.shortcuts import render
 from .models import Survey, Category, Question, SurveyInstance
 from django.views import generic
 
+
 # Create your views here.
 
 class SurveyListView(generic.ListView):
@@ -65,3 +66,6 @@ class SurveyDetailView(generic.DetailView):
         """
         Survey = get_object_or_404(Survey, pk=primary_key) 
         return render(request, 'base/templates/survey_detail.html', context={'survey': survey})
+
+    def home(request):
+        return render(request, 'home.html')

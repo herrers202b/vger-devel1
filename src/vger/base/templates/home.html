@@ -1,24 +1,30 @@
 {% extends "base.html" %}
 {% block content %}
 <!--INSERT PAGE CONTENT BETWEEN HERE-->
-<body>
-    <h1>Welcome to Virtual Guide for Educational Readiness (VGER)</h1>
+<body style="background-color: gray;">
+    <h1 style="color:#b5121b;">Welcome to the Remote Learning Survey!</h1>
 
-    <p><em>This survey will help you assess your readiness for online learning</em></p>
+    <p><em>Answer a series of questions to help determine which situation suits you best!</em></p>
 
-    <h2>For Admin</h2>
+    <h2 style="color:#b5121b;"> For Students</h2>
     <ul>
-        <li>Create or manage your survey here</li>
-        <li>Compare previous versions of surveys</li>
+        <li>Login to take a new survey!</li>
+        <li>You may also see previous scores and compare those results</li>
+        <li>If you would like, you can download your survey results</li>
+    </ul>
+    <h2 style="color:#b5121b;">For Advisors</h2>
+    <ul>
+        <li>Login to view students results/score breakdown</li>
     </ul>
 
-    <h2>For Advisors</h2>
+    <h2 style="color:#b5121b;">For Admins</h2>
     <ul>
-        <li>View your advisees results here</li>
-    </ul>
-    
-    <p><a href="{% url 'login' %}">Login</a> to manage survey</p>
-    
+        <li>Login to publish a new survey</li>
+        <li>You can check on the current and/or previous versions of the survey</li>
+        <li>You may also update questions and/or gather questions from other surveys</li>
+
+        <p> Login to take a survey and/or see scores.</p>
+
 </body>
 <!--AND HERE-->
 {% endblock content %}
