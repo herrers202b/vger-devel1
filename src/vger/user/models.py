@@ -21,14 +21,14 @@ class UserModels(models.Model):
         inf = cls(account_type=account_type, user=user)
         return inf
       
-# Student model: exists to create a relationship between advisors and advisees
-class Student(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
-
 # Advisor model: Can view completed surveys of only their advisees
 class Advisor(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-    advisees = models.ForeignKey(Student, on_delete=models.CASCADE)
+
+# Student model: exists to create a relationship between advisors and advisees
+class Student(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    advisor = models.ForeignKey(Advisor, on_delete=models.CASCADE)
 
 # Administrator model: Model for use for user accounts to have survey edit
 # access, separate from site backend administration
