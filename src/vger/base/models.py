@@ -26,6 +26,8 @@ class Question(models.Model):
          Used to link questions to categories
     """
     #Choices bank with weights and questions
+    #This is Chris wondering if we need these weights,
+    #because of how the survey page works (if it works)
     QUESTION_WEIGHTS = (
         (0,'weight 0'),
         (1,'weight 1'),
@@ -111,9 +113,14 @@ class SurveyInstance(models.Model):
     survey : Forign Key
         survey is the forign key into a specific survey
         with which we wish to instantiate 
+    date : DateField
+        time at which survey is submitted
+        
     """
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, help_text='Unique ID for this survey')
     survey = models.ForeignKey('Survey', on_delete=models.RESTRICT, null=True)
+    date = models.DateField(_("Date taken"), auto_now=False, auto_now_add=True)
+    models.TimeField(_("Time taken"), auto_now=False, auto_now_add=True)
     
     def __str__(self):
         """String for representing the Survey Instance Object"""

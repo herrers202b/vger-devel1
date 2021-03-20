@@ -10,6 +10,17 @@
 
         {% for Question in Category %}
         <li>{{Question.questionText}}</li>
+        <!--Radio dial example I got from https://www.w3schools.com/tags/att_input_type_radio.asp-->
+        <input type="radio" id="weight 0" name="How likely" value='0'>
+        <label for="weight 0"> Not like me at all</label><br>
+        <input type="radio" id="weight 1" name="How likely" value='1'>
+        <label for="weight 1"> Rarely me</label><br>
+        <input type="radio" id="weight 2" name="How likely" value='2'>
+        <label for="weight 2">Sometimes me</label><br>
+        <input type="radio" id="weight 3" name="How likely" value='3'>
+        <label for="weight 3">Kinda like me</label><br>
+        <input type="radio" id="weight 4" name="How likely" value='4'>
+        <label for="weight 4">Definitely me</label><br>
         <li>{{Question.score}}</li>
         {% endfor %}
 
@@ -17,4 +28,3 @@
 
 </body>
 {%endblock content%}
-
