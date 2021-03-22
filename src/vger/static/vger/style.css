@@ -5,3 +5,31 @@ body {
     color: #000000;
     background-color: gray;
 }
+
+.navbar {
+    padding-bottom: 5%;
+}
+
+.navset {
+    position: fixed;
+    list-style-type: none; 
+    margin: 0; 
+    padding-bottom: 0;
+}
+
+.navlist {
+    float: left;
+}
+
+.navlink {
+    text-align: center;
+    padding: 8px;
+    border: 1px;
+    display: block;
+    width: 85px;
+}
+
+li a:hover {
+    background-color: #555;
+    color: white;
+}
