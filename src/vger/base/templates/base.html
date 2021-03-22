@@ -6,8 +6,8 @@
     }
     .navset {
       position: fixed;
-      list-style-type: none; 
-      margin: 0; 
+      list-style-type: none;
+      margin: 0;
       padding-bottom: 0;
     }
     .navlist {
@@ -28,6 +28,7 @@
     <nav class=navbar>
       <ul class=navset>
         <li class=navlist><a class=navlink href="{% url 'home-page' %}">Home</a></li>
+        <li class=navlist><a class=navlink href="{% url 'register' %}">Register</a></li>
         {% if user.is_authenticated %}
         <li class=navlist><a class=navlink href="{% url 'logout' %}">Logout</a></li>
         {% else %}
@@ -44,10 +45,10 @@
             <body style="background-color: rgb(255, 255, 255);">
                 <section style="margin-top: 10px">
                     {% block content %}{% endblock %}
-                </section>      
+                </section>
             </body>
             <div style="height: 700px"></div>
-            
+
             <!-- END -->
           </div>
           <footer>

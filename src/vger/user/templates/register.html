@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+{% block content %}
+<!--INSERT PAGE CONTENT BETWEEN HERE-->
+<form method = "POST" action="">
+  <fieldset>
+    <legend>Register</legend>
+  {% csrf_token %}
+  {{form.username.label}}
+  {{form.username}}
+
+  {{form.email.label}}
+  {{form.email}}
+
+  {{form.password1.label}}
+  {{form.password1}}
+
+  {{form.password2.label}}
+  {{form.password2}}
+  </fieldset>
+
+  <input type="submit" name="Create User">
+</form>
+
+{{form.errors}}
+
+<div class="borter-top pt-3">
+       <small class="text-muted">
+           Already Have An account? <a class="ml-2" href="{% url 'login' %}">Log in</a>
+       </small>
+
+   </div>
+<!--AND HERE-->
+{% endblock content %}
