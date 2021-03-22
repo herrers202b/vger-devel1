@@ -1,11 +1,14 @@
 {% extends "base.html" %}
+{% load static %}
 {% block content %}
 <!--INSERT PAGE CONTENT BETWEEN HERE-->
-<body style="background-color: gray;">
+<body>
     <h1 style="color:#b5121b;">Welcome to the Remote Learning Survey!</h1>
 
     <p><em>Answer a series of questions to help determine which situation suits you best!</em></p>
-
+    <br />
+    <img src="{% static 'vger/pdamBear.png' %}" alt="It's a bear" />
+    <br />
     <h2 style="color:#b5121b;"> For Students</h2>
     <ul>
         <li>Login to take a new survey!</li>
@@ -24,7 +27,7 @@
         <li>You may also update questions and/or gather questions from other surveys</li>
 
         <p> Login to take a survey and/or see scores.</p>
-
+        
 </body>
 <!--AND HERE-->
 {% endblock content %}
