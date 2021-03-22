@@ -68,6 +68,14 @@ def main():
             os.system("sudo docker-compose run django python3 manage.py test " + sys.argv[2])
         else:
             os.system("sudo docker-compose run django python3 manage.py test")
+    elif 'pab'.strip() in sys.argv:
+        os.system("git branch -r | grep -v '\->' | while read remote; do git branch --track \"${remote#origin/}\" \"$remote\"; done")
+
+    elif 'kill'.strip() in sys.argv:
+        os.system("sudo docker kill $(sudo docker ps -a -q)")
+        os.system("sudo docker rm $(sudo docker ps -a -q)")
+    
+    
     else:   
         usage()
 
