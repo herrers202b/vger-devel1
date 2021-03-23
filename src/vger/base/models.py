@@ -15,8 +15,8 @@ class Question(models.Model):
     ----------
     questionText : str
         questionText serves as the text of our question or general prompt
-    score : int 
-        score will be the selected weight for our question or prompt, should
+    ansser : int 
+        answer will be the selected weight for our question or prompt, should
         be on a scale of 0-4
     QUESTION_WEIGHTS : choice
         QUESTION_WEIGHTS will be a choice/radio button that allows the user
@@ -24,6 +24,9 @@ class Question(models.Model):
     category : forign key
         category is our forign key to the category model.
          Used to link questions to categories
+    questionNumber : int
+        the number of the question the user will be adding to
+        the catergory
     """
     #Choices bank with weights and questions
     QUESTION_WEIGHTS = (
@@ -34,9 +37,9 @@ class Question(models.Model):
         (4,'weight 4'),
     )
     questionText = models.CharField(max_length=100, help_text="Please enter a prompt. ex) I know how to install software on my computer.")
-    score = models.IntegerField(choices=QUESTION_WEIGHTS, blank=True, null=True, help_text="Results of question")
+    answer = models.IntegerField(choices=QUESTION_WEIGHTS, blank=True, null=True, help_text="Results of question")
     category = models.ForeignKey("Category", verbose_name=("Parent Category"), related_name=("questions"), default=None, null=True, on_delete=models.CASCADE)
-
+    questionNumber = models.IntegerField(default='1', help_text="Please enter a question number")
     """String for representing the Question object."""
     def __str__(self):
         return f'{self.questionText}'
