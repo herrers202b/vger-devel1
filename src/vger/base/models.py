@@ -84,10 +84,12 @@ class Survey(models.Model):
     directions : str
         directions will allow an admin to write any specific
         directions for their survey 
+    created : DateTimeField
+        created is a timestamp for the date the survey was created
     """
     titleOfSurvey = models.CharField(max_length=50, help_text="Please enter a name for the survey")
     directions = models.CharField(max_length=500, help_text="Please enter any directions to take the survey")
-    
+    created = models.DateTimeField(auto_now_add=True)
     """String for representing the Survey object."""
     def __str__(self):
         return f'{self.titleOfSurvey}'
