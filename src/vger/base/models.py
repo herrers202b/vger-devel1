@@ -86,10 +86,15 @@ class Survey(models.Model):
         directions for their survey 
     created : DateTimeField
         created is a timestamp for the date the survey was created
+    lastUpdated : DateTimeField  
+        lastUpdated is a timestamp for the last time a save() call
+        was made in this model
     """
     titleOfSurvey = models.CharField(max_length=50, help_text="Please enter a name for the survey")
     directions = models.CharField(max_length=500, help_text="Please enter any directions to take the survey")
     created = models.DateTimeField(auto_now_add=True)
+    lastUpdated = models.DateTimeField(auto_now=True)
+
     """String for representing the Survey object."""
     def __str__(self):
         return f'{self.titleOfSurvey}'
@@ -97,6 +102,7 @@ class Survey(models.Model):
     def get_absolute_url(self):
         """Returns the url to access a detailed record for this survey"""
         return reverse("survey-detail", args=[str(self.id)])
+
     
 
 #Untested survey instance model
