@@ -19,25 +19,24 @@
         <body>
           <!-- navbar -->
           <nav class="navbar navbar-default">
-            <div class="container-fluid">
-              <ul class="nav nav-pills">
-                <li class="nav-item">
-                  <a class="nav-link" href="{% url 'home-page' %}">Home</a>
-                </li>
-                {% if user.is_authenticated %}
-                <li class="nav-item">
-                  <a class="nav-link" href="{% url 'logout' %}">Logout</a>
-                </li>
-                {% else %}
-                <li class="nav-item">
-                  <a class="nav-link" href="{% url 'login' %}">Login</a>
-                </li>
-                {% endif %}
-                <li class="nav-item">
-                  <a class="nav-link" href="{% url 'survey' %}">Survey List</a>
-                </li>
-              </ul>
-            </div>
+            <span class="navbar-brand mb-0 h1">SUNY Potsdam VGER</span>
+            <ul class="nav nav-pills">
+              <li class="nav-item">
+                <a class="nav-link" href="{% url 'home-page' %}">Home</a>
+              </li>
+              {% if user.is_authenticated %}
+              <li class="nav-item">
+                <a class="nav-link" href="{% url 'logout' %}">Logout</a>
+              </li>
+              {% else %}
+              <li class="nav-item">
+                <a class="nav-link" href="{% url 'login' %}">Login</a>
+              </li>
+              {% endif %}
+              <li class="nav-item">
+                <a class="nav-link" href="{% url 'survey' %}">Survey List</a>
+              </li>
+            </ul>
           </nav>
 
           <!-- page content -->
