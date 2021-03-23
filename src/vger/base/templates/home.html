@@ -6,9 +6,9 @@
     <h1>Welcome to the Remote Learning Survey!</h1>
 
     <p><em>Answer a series of questions to help determine which situation suits you best!</em></p>
-    <br />
-    <img src="{% static 'vger/pdamBear.png' %}" alt="It's a bear" />
-    <br />
+   
+    <img src="{% static 'vger/pdamBear.png' %}" alt="Potsdam Bear Logo" class="float-right"/>
+    
     <h2 > For Students</h2>
     <ul>
         <li>Login to take a new survey!</li>
@@ -26,7 +26,7 @@
         <li>You can check on the current and/or previous versions of the survey</li>
         <li>You may also update questions and/or gather questions from other surveys</li>
 
-        <p> Login to take a survey and/or see scores.</p>
+        <p><a href="{% url 'login' %}">Login</a> to take a survey and/or see scores.</p>
         
 </body>
 <!--AND HERE-->

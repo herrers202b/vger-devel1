@@ -1,33 +1,46 @@
 {% extends 'base.html' %}
 {% block content %}
 <!--INSERT PAGE CONTENT BETWEEN HERE-->
-<form method = "POST" action="">
+<form method="POST" action="">
   <fieldset>
-    <legend>Register</legend>
-  {% csrf_token %}
-  {{form.username.label}}
-  {{form.username}}
+    <div class="row spacer">
+      <legend>Register:</legend>
+    </div>
 
-  {{form.email.label}}
-  {{form.email}}
+    <div class="row spacer">
+      {% csrf_token %}
+      {{form.username.label}}
+      {{form.username}}
+    </div>
 
-  {{form.password1.label}}
-  {{form.password1}}
+    <div class="row spacer">
+      {{form.email.label}}
+      {{form.email}}
+    </div>
 
-  {{form.password2.label}}
-  {{form.password2}}
+    <div class="row spacer">
+      {{form.password1.label}}
+      {{form.password1}}
+    </div>
+
+    <div class="row spacer">
+      {{form.password2.label}}
+      {{form.password2}}
+    </div>
   </fieldset>
 
-  <input type="submit" name="Create User">
+  <div class="row spacer">
+    <input type="submit" name="Create User">
+  </div>
 </form>
 
 {{form.errors}}
 
-<div class="borter-top pt-3">
-       <small class="text-muted">
-           Already Have An account? <a class="ml-2" href="{% url 'login' %}">Log in</a>
-       </small>
+<div class="borter-top pt-3 row spacer">
+  <small class="text-muted">
+    Already Have An account? <a class="ml-2" href="{% url 'login' %}">Log in</a>
+  </small>
 
-   </div>
+</div>
 <!--AND HERE-->
 {% endblock content %}

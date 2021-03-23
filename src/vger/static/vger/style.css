@@ -12,3 +12,7 @@ h1, h2, h3, h4, h5, h6 {
 .nav-link {
     color: #8a1538;
 }
+
+.spacer{margin-top: 5px;}
+
+.row{margin-top: 10px;}
