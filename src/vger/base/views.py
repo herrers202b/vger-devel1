@@ -1,9 +1,46 @@
 from django.shortcuts import render
 from .models import Survey, Category, Question, SurveyInstance
 from django.views import generic
+from django.urls import reverse
+from django.shortcuts import redirect
+
+
+
+@staticmethod
+def getNextStage(current_stage, survey):
+    n_categories = Category.objects.filter(survey=survey).count()
+
+    if current_stage == n_categories:
+        return None
+    return n_categories + 1
 
 
 # Create your views here.
+class SurveyTakingView(generic.FormView):
+    #TODO: make survey taking template
+    template = ''
+    survey = None
+    form_class = None
+
+    def dispatch(self, request, *args, **kwargs):
+        survey_id = request.session.get("survey_id", None)
+        self.survey = Survey.objects.get(id=survey_id)
+        self.request = request
+        return super().dispatch(request, *args, **kwargs)
+    
+    def form_valid(self, form):
+        self.request.session["survey_id"] = form.instance.survey_id
+        current_stage = form.cleaned_data.get("stage")
+        new_stage = getNextStage(current_stage, self.survey)
+        form.instance.stage = new_stage
+
+        if new_stage == None:
+            return redirect(reverse('/'))
+        return redirect(reverse("survey:survey"))#?
+    
+    def get_form_class(self):
+        stage = self.survey.stage if self.survey else 0
+        return super().get_form_class()
 
 class SurveyListView(generic.ListView):
     """
