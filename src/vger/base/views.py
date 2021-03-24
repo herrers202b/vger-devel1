@@ -69,3 +69,19 @@ class SurveyDetailView(generic.DetailView):
 
 def home(request):
     return render(request, 'home.html')
+
+def results(request):
+    """
+    results
+
+    num_instances : the object will return the number of 
+        times user has taken survey 
+    """
+    num_instances = SurveyInstance.objects.all().count()
+    instance_hash = SurveyInstance.hash()
+
+    context = {
+        'num_instances': num_instances,
+        'instance_hash': instance_hash,
+    }
+    return render(request, 'results.html', context=context)

@@ -2,6 +2,21 @@
 {% block content %}
 
 <body>
-<!--Idek where to begin with this one-->
-</bodt>
+<h1>Results</h1>
+<p>Here's your survey results</p>
+
+{% for Category in Survey %}
+<p>Category: {{Category.titleOfCategory}}
+
+    {% for Question in Category %}
+    <li>For: {{Question.questionText}}</li>
+    <li>You answered: {{Question.score}}</li>
+    {% endfor %}
+
+{% endfor %}
+
+<p>Would you like to take this survey again?</p>
+ <a href="{{ survey.get_absolute_url }}">{{ survey.titleOfSurvey }}</a> 
+
+</body>
 {% endblock content %}

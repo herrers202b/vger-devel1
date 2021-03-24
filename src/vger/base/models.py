@@ -15,8 +15,8 @@ class Question(models.Model):
     ----------
     questionText : str
         questionText serves as the text of our question or general prompt
-    score : int 
-        score will be the selected weight for our question or prompt, should
+    ansser : int 
+        answer will be the selected weight for our question or prompt, should
         be on a scale of 0-4
     QUESTION_WEIGHTS : choice
         QUESTION_WEIGHTS will be a choice/radio button that allows the user
@@ -24,10 +24,11 @@ class Question(models.Model):
     category : forign key
         category is our forign key to the category model.
          Used to link questions to categories
+    questionNumber : int
+        the number of the question the user will be adding to
+        the catergory
     """
     #Choices bank with weights and questions
-    #This is Chris wondering if we need these weights,
-    #because of how the survey page works (if it works)
     QUESTION_WEIGHTS = (
         (0,'weight 0'),
         (1,'weight 1'),
@@ -38,7 +39,7 @@ class Question(models.Model):
     questionText = models.CharField(max_length=100, help_text="Please enter a prompt. ex) I know how to install software on my computer.")
     score = models.IntegerField(choices=QUESTION_WEIGHTS, blank=True, null=True, help_text="Results of question")
     category = models.ForeignKey("Category", verbose_name=("Parent Category"), related_name=("questions"), default=None, null=True, on_delete=models.CASCADE)
-
+    questionNumber = models.IntegerField(default='1', help_text="Please enter a question number")
     """String for representing the Question object."""
     def __str__(self):
         return f'{self.questionText}'
@@ -86,10 +87,17 @@ class Survey(models.Model):
     directions : str
         directions will allow an admin to write any specific
         directions for their survey 
+    created : DateTimeField
+        created is a timestamp for the date the survey was created
+    lastUpdated : DateTimeField  
+        lastUpdated is a timestamp for the last time a save() call
+        was made in this model
     """
     titleOfSurvey = models.CharField(max_length=50, help_text="Please enter a name for the survey")
     directions = models.CharField(max_length=500, help_text="Please enter any directions to take the survey")
-    
+    created = models.DateTimeField(auto_now_add=True)
+    lastUpdated = models.DateTimeField(auto_now=True)
+
     """String for representing the Survey object."""
     def __str__(self):
         return f'{self.titleOfSurvey}'
@@ -97,6 +105,7 @@ class Survey(models.Model):
     def get_absolute_url(self):
         """Returns the url to access a detailed record for this survey"""
         return reverse("survey-detail", args=[str(self.id)])
+
     
 
 #Untested survey instance model
@@ -113,14 +122,9 @@ class SurveyInstance(models.Model):
     survey : Forign Key
         survey is the forign key into a specific survey
         with which we wish to instantiate 
-    date : DateField
-        time at which survey is submitted
-        
     """
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, help_text='Unique ID for this survey')
     survey = models.ForeignKey('Survey', on_delete=models.RESTRICT, null=True)
-    date = models.DateField(_("Date taken"), auto_now=False, auto_now_add=True)
-    models.TimeField(_("Time taken"), auto_now=False, auto_now_add=True)
     
     def __str__(self):
         """String for representing the Survey Instance Object"""
