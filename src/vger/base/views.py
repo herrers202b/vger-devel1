@@ -9,11 +9,52 @@ from django.urls import reverse_lazy
 from django.contrib.auth.decorators import login_required, permission_required
 #Generic imports
 from django.views import generic
+<<<<<<< HEAD
+from django.urls import reverse
+from django.shortcuts import redirect
+
+
+
+@staticmethod
+def getNextStage(current_stage, survey):
+    n_categories = Category.objects.filter(survey=survey).count()
+
+    if current_stage == n_categories:
+        return None
+    return n_categories + 1
+
+=======
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
 #Model imports
 from .models import Survey, Category, Question, SurveyInstance
+>>>>>>> 1ffa3f9ec054cec507ac20ddf95c18ba4dc300e5
 
 # Create your views here.
+class SurveyTakingView(generic.FormView):
+    #TODO: make survey taking template
+    template = ''
+    survey = None
+    form_class = None
+
+    def dispatch(self, request, *args, **kwargs):
+        survey_id = request.session.get("survey_id", None)
+        self.survey = Survey.objects.get(id=survey_id)
+        self.request = request
+        return super().dispatch(request, *args, **kwargs)
+    
+    def form_valid(self, form):
+        self.request.session["survey_id"] = form.instance.survey_id
+        current_stage = form.cleaned_data.get("stage")
+        new_stage = getNextStage(current_stage, self.survey)
+        form.instance.stage = new_stage
+
+        if new_stage == None:
+            return redirect(reverse('/'))
+        return redirect(reverse("survey:survey"))#?
+    
+    def get_form_class(self):
+        stage = self.survey.stage if self.survey else 0
+        return super().get_form_class()
 
 class SurveyListView(generic.ListView):
     """
