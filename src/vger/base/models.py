@@ -43,6 +43,7 @@ class Question(models.Model):
     """String for representing the Question object."""
     def __str__(self):
         return f'{self.questionText}'
+
     
 
 #Untested character model
@@ -72,6 +73,10 @@ class Category(models.Model):
     """String for representing the Category object."""
     def __str__(self):
         return f'{self.titleOfCategory}'
+    
+    def get_absolute_url(self):
+        """Returns the url to access a detailed record for this category"""
+        return reverse("category-detail", args=[str(self.id)])
     
 #Untested survey model
 class Survey(models.Model):

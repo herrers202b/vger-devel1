@@ -1,6 +1,6 @@
 from django.shortcuts import render
 #Form imports
-from base.forms import SurveyModelFrom
+from base.forms import SurveyModelFrom, CategoryModelForm
 from django.shortcuts import get_object_or_404
 from django.http import HttpResponseRedirect
 from django.urls import reverse
@@ -77,6 +77,44 @@ class SurveyDetailView(generic.DetailView):
         Survey = get_object_or_404(Survey, pk=primary_key) 
         return render(request, 'base/templates/survey_detail.html', context={'survey': survey})
 
+class CategoryDetailView(generic.DetailView):
+    """
+    CategoryDetailView
+
+    Class used to show the specific details of a given category
+
+    Category : model
+        the model we will use for this class
+    
+    'category_detail' : context_object_name
+        the name we reference when querying the html
+
+    'category_detail.html' : template_name
+        the name of the template we are using
+        to generate this view
+     
+    """
+    from django.shortcuts import get_object_or_404
+
+    model = Category
+    context_object_name = 'category_detail'
+    template_name = 'category_detail.html'
+
+    def category_detail_view(request, primary_key):
+        """
+        category_detail_view
+
+        Method, adapted from Django tutorial, will check
+        to see if a category exists.
+
+        Survey : the obeject we will either retrieve 
+            or 404 error
+        
+        method returns the appropriate render
+        """
+        Category = get_object_or_404(Category, pk=primary_key)
+        return render(request, 'base/templates/category_detail.html', context={'category': category})
+
 #HTML Render request?
 def home(request):
     return render(request, 'home.html')
@@ -102,7 +140,7 @@ class SurveyCreate(CreateView):
     template_name = 'survey_form.html' 
 
 class SurveyUpdate(UpdateView):
-     """
+    """
     SurveyUpdate View
     
     Method builds off the generics provided by django to
@@ -115,13 +153,12 @@ class SurveyUpdate(UpdateView):
         The name of the template we want Djagno 
         to use when creating this view.
     """
-    
     model = Survey
     fields = ['titleOfSurvey', 'directions']
     template_name = 'survey_form.html' 
 
 class SurveyDelete(DeleteView):
-     """
+    """
     SurveyDelete View
     
     Method builds off the generics provided by django to
@@ -141,26 +178,86 @@ class SurveyDelete(DeleteView):
     template_name = 'survey_form_confirm_delete.html' 
     success_url = reverse_lazy('survey')
 
-
-
-"""
-def take_survey(request, pk):
-    #View function for taking a survey
-    Survey = get_object_or_404(Survey, pk=pk)
-
-    #If this is a POST request then process the From data
-    if request.method == 'POST':
-
-        #Create a form instance and populate it with data from the request
-        form = SurveyModelFrom(request.POST)
-        #Check if the form is valid:
-        if form.is_valid():
-            #Process data 
-            #do nothing for now
-            #Redirect to new url -> results
-            return HttpResponseRedirect(reverse('results'))
-    #If this is a GET(or any other method) create the default form
-    #else:
-        #Do nothing here
-    return render(request, 'take_survey.html', context)
+#Class templated for creating, updating, and deleting categories
+#Still needs permissions!
+class CategoryCreate(CreateView):
     """
+    CategoryCreate View
+    
+    Method builds off the generics provided by django to
+    offer a user the ability to create a category. 
+
+    Category : model
+        Category is the model used in this form
+    
+    category_form_confirm_delete.html : template_name
+        The name of the template we want Djagno 
+        to use when creating this view.
+    """    
+    model = Category
+    template_name = 'category_form.html'
+    fields = ['titleOfCategory','lowWeightText', 'highWeightText']
+
+    def get_success_url(self):
+        """
+        get_success_url
+
+        Method sets the success url when we add a category
+        """
+        return reverse('survey')
+    
+    def form_valid(self, form):
+        """
+        form_valid
+
+        Method links the survey id to this category
+        """
+        form.instance.survey_id = self.kwargs.get('pk')
+        return super(CategoryCreate, self).form_valid(form)
+
+class CategoryUpdate(UpdateView):
+    """
+    CategoryUpdate View
+    
+    Method builds off the generics provided by django to
+    offer a user the ability to update a category
+
+    Category : model
+        Category is the model used in this form
+    
+    category_form.html : template_name
+        The name of the template we want Djagno 
+        to use when creating this view.
+    """
+    model = Category
+    template_name = 'category_form.html'
+    fields = ['titleOfCategory','lowWeightText', 'highWeightText']
+
+    def get_success_url(self):
+        """
+        get_success_url
+
+        Method sets the success url when we add a category
+        """
+        return reverse('survey')  
+
+class CategoryDelete(DeleteView):
+    """
+    CategoryDelete View
+    
+    Method builds off the generics provided by django to
+    offer a user the ability to delete a category. 
+    On submission we go back to the survey detail page
+    On cancel we return to the previous window
+
+    Category : model
+        Category is the model used in this form
+    
+    category_form_confirm_delete.html : template_name
+        The name of the template we want Djagno 
+        to use when creating this view.
+    
+    """
+    model = Category
+    template_name = 'category_form_confirm_delete.html' 
+    success_url = reverse_lazy('survey')

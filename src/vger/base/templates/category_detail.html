@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+
+{% block content %}
+  <h1>Title: {{category_detail.titleOfCategory }}</h1>
+
+  <h4>Questions:</h4>
+  <!--https://stackoverflow.com/questions/6704749/relatedmanager-object-is-not-iterable-django-->
+  <!--https://stackoverflow.com/questions/37346173/django-select-related -->
+  <!------Remove the () from the end of all to get relational queires to work-->
+  {% for Question in category_detail.all %}
+    <div style="margin-left:20px;margin-top:20px">
+        <p>Question: {{Question.questionText}} </p>
+    </div>
+  {% endfor %}
+  <a href="{{ category_detail.survey.get_absolute_url }}">Return</a>
+  <a href="{{ category_detail.get_absolute_url }}/update-category">Update Category</a> 
+  <a href="{{ category_detail.get_absolute_url }}/delete-category">Delete Category</a> 
+  <a href="{{ category_detail.get_absolute_url }}">Create Question</a>  
+{% endblock %}
