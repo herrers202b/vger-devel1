@@ -11,6 +11,10 @@
     {% endfor %}
   </ul>
   {% else %}
-    <p>There are no surveys in the database.</p>
+    <p>There are no surveys in the database, 
+    would you like to 
+      <a class=navlink href="{% url 'survey-create' %}">create a survey</a>
+    </p>
   {% endif %} 
+  <a class=navlink href="{% url 'survey-create' %}">Create new survey.</a>
 {% endblock %}

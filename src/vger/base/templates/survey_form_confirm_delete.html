@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<h1>Delete Survey</h1>
+
+<p>Are you sure you want to delete {{ survey.titleOfSurvey }}?</p>
+
+<form action="" method="POST">
+  {% csrf_token %}
+  <input type="submit" value="Yes, delete.">
+  <button onclick="window.history.back();" class="btn btn-default" type="button">Cancel</button
+</form>
+
+{% endblock %}
