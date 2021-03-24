@@ -1,7 +1,17 @@
 from django.shortcuts import render
-from .models import Survey, Category, Question, SurveyInstance
+#Form imports
+from base.forms import SurveyModelFrom
+from django.shortcuts import get_object_or_404
+from django.http import HttpResponseRedirect
+from django.urls import reverse
+from django.urls import reverse_lazy
+#Authentication imports
+from django.contrib.auth.decorators import login_required, permission_required
+#Generic imports
 from django.views import generic
-
+from django.views.generic.edit import CreateView, UpdateView, DeleteView
+#Model imports
+from .models import Survey, Category, Question, SurveyInstance
 
 # Create your views here.
 
@@ -67,5 +77,43 @@ class SurveyDetailView(generic.DetailView):
         Survey = get_object_or_404(Survey, pk=primary_key) 
         return render(request, 'base/templates/survey_detail.html', context={'survey': survey})
 
+#HTML Render request?
 def home(request):
     return render(request, 'home.html')
+
+class SurveyCreate(CreateView):
+    model = Survey
+    fields = ['titleOfSurvey', 'directions']
+    template_name = 'survey_form.html' 
+
+class SurveyUpdate(UpdateView):
+    model = Survey
+    fields = ['titleOfSurvey', 'directions']
+    template_name = 'survey_form.html' 
+
+class SurveyDelete(DeleteView):
+    model = Survey
+    template_name = 'survey_form_conform_delete.html' 
+    success_url = reverse_lazy('home')
+
+"""
+def take_survey(request, pk):
+    #View function for taking a survey
+    Survey = get_object_or_404(Survey, pk=pk)
+
+    #If this is a POST request then process the From data
+    if request.method == 'POST':
+
+        #Create a form instance and populate it with data from the request
+        form = SurveyModelFrom(request.POST)
+        #Check if the form is valid:
+        if form.is_valid():
+            #Process data 
+            #do nothing for now
+            #Redirect to new url -> results
+            return HttpResponseRedirect(reverse('results'))
+    #If this is a GET(or any other method) create the default form
+    #else:
+        #Do nothing here
+    return render(request, 'take_survey.html', context)
+    """
