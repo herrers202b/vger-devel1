@@ -81,20 +81,67 @@ class SurveyDetailView(generic.DetailView):
 def home(request):
     return render(request, 'home.html')
 
+#Class templated for creating, updating, and deleting surveys
+#Still needs permissions!
 class SurveyCreate(CreateView):
+    """
+    SurveyCreate View
+    
+    Method builds off the generics provided by django to
+    offer a user the ability to create a survey
+
+    Survey : model
+        Survey is the model used in this form
+
+    survey_form.html : template_name
+        The name of the template we want Djagno 
+        to use when creating this view.
+    """
     model = Survey
     fields = ['titleOfSurvey', 'directions']
     template_name = 'survey_form.html' 
 
 class SurveyUpdate(UpdateView):
+     """
+    SurveyUpdate View
+    
+    Method builds off the generics provided by django to
+    offer a user the ability to update a survey
+
+    Survey : model
+        Survey is the model used in this form
+    
+    survey_form.html : template_name
+        The name of the template we want Djagno 
+        to use when creating this view.
+    """
+    
     model = Survey
     fields = ['titleOfSurvey', 'directions']
     template_name = 'survey_form.html' 
 
 class SurveyDelete(DeleteView):
+     """
+    SurveyDelete View
+    
+    Method builds off the generics provided by django to
+    offer a user the ability to delete a survey. 
+    On submission we go back to the survey list page
+    On cancel we return to the previous window
+
+    Survey : model
+        Survey is the model used in this form
+    
+    survey_form_confirm_delete.html : template_name
+        The name of the template we want Djagno 
+        to use when creating this view.
+    
+    """
     model = Survey
     template_name = 'survey_form_confirm_delete.html' 
     success_url = reverse_lazy('survey')
+
+
 
 """
 def take_survey(request, pk):

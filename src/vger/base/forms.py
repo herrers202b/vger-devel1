@@ -1,7 +1,7 @@
 from django.forms import ModelForm
 from base.models import Survey
 
-#his will forgo cleaning data for the time being
+#This will forgo cleaning data for the time being
 class SurveyModelFrom(ModelForm):
     """SurveyForm Class to handle data input"""
     class Meta:
