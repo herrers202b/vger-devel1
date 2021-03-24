@@ -7,7 +7,6 @@ class FillSurvey(forms.ModelForm, id):
     survey = SurveyInstance.objects.get(id=id).survey
 
     categories = Category.objects.filter(survey=survey)
-from django.forms import ModelForm
 
 
 #This will forgo cleaning data for the time being
