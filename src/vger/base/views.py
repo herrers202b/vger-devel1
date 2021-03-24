@@ -93,8 +93,8 @@ class SurveyUpdate(UpdateView):
 
 class SurveyDelete(DeleteView):
     model = Survey
-    template_name = 'survey_form_conform_delete.html' 
-    success_url = reverse_lazy('home')
+    template_name = 'survey_form_confirm_delete.html' 
+    success_url = reverse_lazy('survey')
 
 """
 def take_survey(request, pk):
