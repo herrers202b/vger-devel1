@@ -5,11 +5,6 @@ urlpatterns = [
     path('survey/', views.SurveyListView.as_view(), name='survey'),
     path('survey/<slug:surveySlug>', views.SurveyDetailView.as_view(), name='survey-detail'),
     path('', views.home, name='home-page'),
-    # needs hash symbol
-    path('survey/results/', views.results, name='results-page'),
-    path('survey/take/<int:pk>', views.generateNewSurvey, name='gen-survey'),
-    path('survey/take/<slug:session_hash>', views.welcomeSurvey, name='welcome-to-survey'),
-    path('survey/take/<slug:session_hash>/page=<int:page>', views.takeSurvey, name='take-survey'),
     path('survey/create/', views.SurveyCreate.as_view(), name='survey-create'),
     path('survey/<slug:surveySlug>/update/', views.SurveyUpdate.as_view(), name='survey-update'),
     path('survey/<slug:surveySlug>/delete/', views.SurveyDelete.as_view(), name='survey-delete'),
@@ -22,4 +17,7 @@ urlpatterns = [
     path('survey/<slug:surveySlug>/category/<slug:categorySlug>/question/<slug:questionSlug>/update-question/', views.QuestionUpdate.as_view(), name='question-update'),
     path('survey/<slug:surveySlug>/category/<slug:categorySlug>/question/<slug:questionSlug>/delete-question/', views.QuestionDelete.as_view(), name='question-delete'),
 
+    path('survey/take/<int:pk>', views.generateNewSurvey, name='gen-survey'),
+    path('survey/take/<slug:session_hash>', views.welcomeSurvey, name='welcome-to-survey'),
+    path('survey/take/<slug:session_hash>/page=<int:page>', views.takeSurvey, name='take-survey')
 ]

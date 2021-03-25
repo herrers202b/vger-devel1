@@ -2,14 +2,15 @@ from django.db import models
 #Used to generate URLs by reversing the URL patterns
 from django.urls import reverse
 import uuid
-import hashlib, random, sys
-from django.contrib.auth.models import User
 from django.template.defaultfilters import slugify
 
+import hashlib, random, sys
+from django.contrib.auth.models import User
 # Create your models here.
 
 #Untested question model
 class Question(models.Model):
+    
     """
     Question Model
 
@@ -61,7 +62,9 @@ class Question(models.Model):
 
     def save(self, *args, **kwargs):
         if not self.questionSlug:
-            self.questionSlug = slugify(self.questionNumber)
+            hash = hashlib.sha1()
+            hash.update(str(random.randint(0,sys.maxsize)).encode('utf-8'))
+            self.questionSlug = slugify(hash.hexdigest())
         return super().save(*args, **kwargs)
 
 #Untested character model
@@ -146,15 +149,14 @@ class Survey(models.Model):
     def get_absolute_url(self):
         """Returns the url to access a detailed record for this survey"""
         return reverse("survey-detail", kwargs={'surveySlug': self.surveySlug})
+    
+    def get_creation_url(self):
+        return reverse("gen-survey", args=[str(self.pk)])
 
     def save(self, *args, **kwargs):
         if not self.surveySlug:
             self.surveySlug = slugify(self.titleOfSurvey)
         return super().save(*args, **kwargs)
-    
-    def get_creation_url(self):
-        return reverse("gen-survey", args=[str(self.id)])
-
     
 
 
