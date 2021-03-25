@@ -4,6 +4,8 @@ from django.urls import reverse
 import uuid
 import hashlib, random, sys
 from django.contrib.auth.models import User
+from django.template.defaultfilters import slugify
+
 # Create your models here.
 
 #Untested question model
@@ -29,6 +31,8 @@ class Question(models.Model):
     questionNumber : int
         the number of the question the user will be adding to
         the catergory
+    questionSlug : slugField
+        this is our unique slug that we will use to create URLs from 
     """
     #Choices bank with weights and questions
     QUESTION_WEIGHTS = (
@@ -42,10 +46,23 @@ class Question(models.Model):
     answer = models.IntegerField(choices=QUESTION_WEIGHTS, blank=True, null=True, help_text="Results of question")
     category = models.ForeignKey("Category", verbose_name=("Parent Category"), related_name=("questions"), default=None, null=True, on_delete=models.CASCADE)
     questionNumber = models.IntegerField(default='1', help_text="Please enter a question number")
+    questionSlug = models.SlugField(null=False, unique=True)
+
+
     """String for representing the Question object."""
     def __str__(self):
-        return f'{self.questionText}'
-    
+        return f'{self.questionNumber}'
+
+    def get_absolute_url(self):
+        """Returns the url to access a detailed record for this survey"""
+        return reverse("question-detail", kwargs={'questionSlug': self.questionSlug,
+                                                    'categorySlug': self.category.categorySlug,
+                                                    'surveySlug': self.category.survey.surveySlug})
+
+    def save(self, *args, **kwargs):
+        if not self.questionSlug:
+            self.questionSlug = slugify(self.questionNumber)
+        return super().save(*args, **kwargs)
 
 #Untested character model
 class Category(models.Model):
@@ -65,19 +82,29 @@ class Category(models.Model):
     survey : forign key
         survey will be our forign key to the survey model such 
         that we can link categoies of surveys.
+    categorySlug : slugField
+        this is our unique slug that we will use to create URLs from 
     """
     titleOfCategory = models.CharField(max_length=100, help_text="Please enter a title for this category, ex) Computer Skills.")
     lowWeightText = models.CharField(max_length=50, default="Not like me at all", help_text="Please enter flavor text for the low weight of the category, ex) Not like me at all")
     highWeightText = models.CharField(max_length=50, default="Extremely like me", help_text="Please enter flavor text for the high weight of the category, ex) Extremely like me")
     survey = models.ForeignKey("Survey", verbose_name=("Parent Survey"), related_name=("categories"), default=None, null=True, on_delete=models.CASCADE)
+    categorySlug = models.SlugField(null=False, unique=True)
 
     """String for representing the Category object."""
     def __str__(self):
         return f'{self.titleOfCategory}'
     
+    def get_absolute_url(self):
+        """Returns the url to access a detailed record for this survey"""
+        return reverse("category-detail", kwargs={'categorySlug': self.categorySlug,
+                                                    'surveySlug': self.survey.surveySlug})
 
-
-
+    def save(self, *args, **kwargs):
+        if not self.categorySlug:
+            self.categorySlug = slugify(self.titleOfCategory)
+        return super().save(*args, **kwargs)
+    
 #Untested survey model
 class Survey(models.Model):
     """
@@ -97,12 +124,15 @@ class Survey(models.Model):
     lastUpdated : DateTimeField  
         lastUpdated is a timestamp for the last time a save() call
         was made in this model
+    surveySlug : slugField
+        this is our unique slug that we will use to create URLs from 
     """
     
     titleOfSurvey = models.CharField(max_length=50, help_text="Please enter a name for the survey")
     directions = models.CharField(max_length=500, help_text="Please enter any directions to take the survey")
     created = models.DateTimeField(auto_now_add=True)
     lastUpdated = models.DateTimeField(auto_now=True)
+    surveySlug = models.SlugField(null=False, unique=True)
 
     #This is to discern wether the model is being used as a template to take or a survey being taken 
     assigned = models.BooleanField(default=False)
@@ -111,10 +141,16 @@ class Survey(models.Model):
     def __str__(self):
         return f'{self.titleOfSurvey}'
     
+    #Replacing pk with slug for tutorial go here:
+    #https://learndjango.com/tutorials/django-slug-tutorial
     def get_absolute_url(self):
         """Returns the url to access a detailed record for this survey"""
-        return reverse("survey-detail", args=[str(self.id)])
+        return reverse("survey-detail", kwargs={'surveySlug': self.surveySlug})
 
+    def save(self, *args, **kwargs):
+        if not self.surveySlug:
+            self.surveySlug = slugify(self.titleOfSurvey)
+        return super().save(*args, **kwargs)
     
     def get_creation_url(self):
         return reverse("gen-survey", args=[str(self.id)])

@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+
+{% block content %}
+  <h1>Title: {{category_detail.titleOfCategory }}</h1>
+
+  <h4>Questions:</h4>
+
+  {% for Question in category_detail.questions.all %}
+    <div style="margin-left:20px;margin-top:20px">
+        <a href="{{ Question.get_absolute_url }}">Question: {{Question.questionText}}?</a> 
+    </div>
+  {% endfor %}
+  <p> </p>
+  <a href="{{ category_detail.survey.get_absolute_url }}">Return</a>
+  <a href="{{ category_detail.get_absolute_url }}/update-category">Update Category</a> 
+  <a href="{{ category_detail.get_absolute_url }}/delete-category">Delete Category</a> 
+  <a href="{{ category_detail.get_absolute_url }}/create-question">Create Question</a>  
+{% endblock %}

@@ -10,7 +10,10 @@
         <div class="form-group">
             <button  type="submit">
                 Next Page
-            </button>
+            </button >
+            <form method="get" action="{{ survey.get_exit_url }}">
+                <button type="submit">Finish Survey and weep</button>
+            </form>
         </div>
     </form>
     
