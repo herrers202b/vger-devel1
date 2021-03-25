@@ -18,6 +18,7 @@ from .forms import SurveyCategoryForm
 
 
 
+import hashlib, random, sys
 
 
 # Create your views here.
@@ -454,6 +455,7 @@ class QuestionCreate(CreateView):
         of the survey passed in with our kwargs
         """
         form.instance.category = Category.objects.get(categorySlug=self.kwargs['categorySlug'])
+        print(form.cleaned_data)
         return super(QuestionCreate, self).form_valid(form)
 
 class QuestionUpdate(UpdateView):
@@ -530,7 +532,14 @@ class QuestionDelete(DeleteView):
                                                     'categorySlug': self.object.category.categorySlug})
     success_url = get_success_url
     
+###############################################################################
+def create_session_hash():
+            hash = hashlib.sha1()
+            hash.update(str(random.randint(0,sys.maxsize)).encode('utf-8'))
+            return hash.hexdigest()
+##############################################################################33
 def generateNewSurvey(request, pk):
+    request.session['session_category'] = None
     #need to check if user had a survey
     if not request.user.is_authenticated:
         return redirect('/login/')
@@ -539,20 +548,25 @@ def generateNewSurvey(request, pk):
     #TODO: if survey is already in the survey_instance with user ask if they want to continue the old one
     new_survey.pk = None
     new_survey.assigned = True
+    new_survey.surveySlug = create_session_hash()
     new_survey.save()
+
     for c_item in categories:
         questions = Question.objects.filter(category=c_item)
         c_item.pk = None
         c_item.survey = new_survey
+        c_item.categorySlug = create_session_hash()
         c_item.save()
         for q_item in questions:
             q_item.pk = None
             q_item.category = c_item
+            q_item.questionSlug = create_session_hash()
             q_item.save()
         
 
     survey_instance = SurveyInstance.objects.create(survey=new_survey, user=request.user)
     survey_instance.save()
+    
     return redirect(survey_instance.get_welcome_url())
 
 def welcomeSurvey(request, session_hash):
@@ -582,8 +596,9 @@ def takeSurvey(request, session_hash, page):
                 si = SurveyInstance.objects.get(session_hash=session_hash)
                 category = Category.objects.get(survey=si.survey, titleOfCategory=session_category[0])
                 questions = Question.objects.filter(category=category) 
-
+                print(questions)
                 for (q, a) in form.category_answers():
+                    print("q", q)
                     model_question = questions.get(questionText=q)
                     model_question.answer = a
                     model_question.save()

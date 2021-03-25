@@ -10,6 +10,9 @@ class SurveyCategoryForm(forms.Form):
         super(SurveyCategoryForm, self).__init__(*args, **kwargs)
         category = Category.objects.filter(titleOfCategory=toc).first()
         questions = Question.objects.filter(category=category)
+        print("toc", toc)
+        print("category", category)
+        print("questions", questions)
         #TODO: Assign weights from the question in for loop
         QUESTION_WEIGHTS = (
             (0,'weight 0'),
@@ -19,7 +22,7 @@ class SurveyCategoryForm(forms.Form):
             (4,'weight 4'),
         )
         for i, question in enumerate(questions):
-            self.fields['custom_%s' % i] = forms.ChoiceField(choices=QUESTION_WEIGHTS, label=question)
+            self.fields['custom_%s' % i] = forms.ChoiceField(choices=QUESTION_WEIGHTS, label=question.questionText)
         
     def category_answers(self):
         for name, value in self.cleaned_data.items():

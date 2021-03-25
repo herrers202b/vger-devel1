@@ -10,6 +10,7 @@ from django.contrib.auth.models import User
 
 #Untested question model
 class Question(models.Model):
+    
     """
     Question Model
 
@@ -61,7 +62,9 @@ class Question(models.Model):
 
     def save(self, *args, **kwargs):
         if not self.questionSlug:
-            self.questionSlug = slugify(self.questionNumber)
+            hash = hashlib.sha1()
+            hash.update(str(random.randint(0,sys.maxsize)).encode('utf-8'))
+            self.questionSlug = slugify(hash.hexdigest())
         return super().save(*args, **kwargs)
 
 #Untested character model
@@ -148,7 +151,7 @@ class Survey(models.Model):
         return reverse("survey-detail", kwargs={'surveySlug': self.surveySlug})
     
     def get_creation_url(self):
-        return reverse("gen-survey", args=[str(self.id)])
+        return reverse("gen-survey", args=[str(self.pk)])
 
     def save(self, *args, **kwargs):
         if not self.surveySlug:
