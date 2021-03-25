@@ -16,7 +16,7 @@
 
     {% for Question in Category.questions.all %}
         <div style="margin-left:20px;margin-top:20px">
-          <a href="{{ Question.get_absolute_url }}">Question: {{Question.questionText}}</a> 
+          <a href="{{ Question.get_absolute_url }}">Question: {{Question.questionText}}?</a> 
         </div>
     {% endfor %}
     </div>

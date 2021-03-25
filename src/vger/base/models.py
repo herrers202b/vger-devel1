@@ -29,6 +29,8 @@ class Question(models.Model):
     questionNumber : int
         the number of the question the user will be adding to
         the catergory
+    questionSlug : slugField
+        this is our unique slug that we will use to create URLs from 
     """
     #Choices bank with weights and questions
     QUESTION_WEIGHTS = (
@@ -78,6 +80,8 @@ class Category(models.Model):
     survey : forign key
         survey will be our forign key to the survey model such 
         that we can link categoies of surveys.
+    categorySlug : slugField
+        this is our unique slug that we will use to create URLs from 
     """
     titleOfCategory = models.CharField(max_length=100, help_text="Please enter a title for this category, ex) Computer Skills.")
     lowWeightText = models.CharField(max_length=50, default="Not like me at all", help_text="Please enter flavor text for the low weight of the category, ex) Not like me at all")
@@ -118,6 +122,8 @@ class Survey(models.Model):
     lastUpdated : DateTimeField  
         lastUpdated is a timestamp for the last time a save() call
         was made in this model
+    surveySlug : slugField
+        this is our unique slug that we will use to create URLs from 
     """
     titleOfSurvey = models.CharField(max_length=50, help_text="Please enter a name for the survey")
     directions = models.CharField(max_length=500, help_text="Please enter any directions to take the survey")
