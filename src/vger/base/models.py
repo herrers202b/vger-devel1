@@ -4,6 +4,8 @@ from django.urls import reverse
 import uuid
 from django.template.defaultfilters import slugify
 
+import hashlib, random, sys
+from django.contrib.auth.models import User
 # Create your models here.
 
 #Untested question model
@@ -125,12 +127,16 @@ class Survey(models.Model):
     surveySlug : slugField
         this is our unique slug that we will use to create URLs from 
     """
+    
     titleOfSurvey = models.CharField(max_length=50, help_text="Please enter a name for the survey")
     directions = models.CharField(max_length=500, help_text="Please enter any directions to take the survey")
     created = models.DateTimeField(auto_now_add=True)
     lastUpdated = models.DateTimeField(auto_now=True)
     surveySlug = models.SlugField(null=False, unique=True)
 
+    #This is to discern wether the model is being used as a template to take or a survey being taken 
+    assigned = models.BooleanField(default=False)
+    finished = models.BooleanField(default=False)
     """String for representing the Survey object."""
     def __str__(self):
         return f'{self.titleOfSurvey}'
@@ -140,6 +146,9 @@ class Survey(models.Model):
     def get_absolute_url(self):
         """Returns the url to access a detailed record for this survey"""
         return reverse("survey-detail", kwargs={'surveySlug': self.surveySlug})
+    
+    def get_creation_url(self):
+        return reverse("gen-survey", args=[str(self.id)])
 
     def save(self, *args, **kwargs):
         if not self.surveySlug:
@@ -147,8 +156,14 @@ class Survey(models.Model):
         return super().save(*args, **kwargs)
     
 
+
 #Untested survey instance model
 class SurveyInstance(models.Model):
+    @staticmethod
+    def create_session_hash():
+            hash = hashlib.sha1()
+            hash.update(str(random.randint(0,sys.maxsize)).encode('utf-8'))
+            return hash.hexdigest()  
     """
     SurveyInstance model
 
@@ -158,14 +173,24 @@ class SurveyInstance(models.Model):
     ----------
     id : UUIDField
         Unique id of the survey instance
-    survey : Forign Key
+    survey : Foriegn Key
         survey is the forign key into a specific survey
         with which we wish to instantiate 
     """
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4, help_text='Unique ID for this survey')
+    session_hash = models.CharField(max_length=40, unique=True, default=create_session_hash.__func__)
     survey = models.ForeignKey('Survey', on_delete=models.RESTRICT, null=True)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, null=False)
     
     def __str__(self):
         """String for representing the Survey Instance Object"""
-        return f'{self.id} ({self.survey.titleOfSurvey})'
+        return f'{self.session_hash})'
+    
+    def get_welcome_url(self):
+        return reverse("welcome-to-survey", args=[str(self.session_hash)])
+
+    def get_absolute_url(self):
+        return reverse("take-survey", args=[str(self.session_hash), 0])
+    
+    def get_exit_url(self):
+        return reverse("results-page", args=[str(self.session_hash)])
     

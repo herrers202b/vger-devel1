@@ -5,16 +5,23 @@
   {% if survey_list %}
   <ul>
     {% for survey in survey_list %}
+      {% if survey.assigned == False %}
       <li>
         <a href="{{ survey.get_absolute_url }}">{{ survey.titleOfSurvey }}</a> 
+        {% if user.is_authenticated %}
+        <form method="get" action="{{ survey.get_creation_url }}">
+          <button type="submit">Take Survey</button>
+        </form>
+        {% endif %}
       </li>
+      {% endif %}
     {% endfor %}
   </ul>
   {% else %}
     <p>There are no surveys in the database, 
     would you like to 
-      <a class=navlink href="{% url 'survey-create' %}">create a survey</a>
+      
     </p>
   {% endif %} 
-  <a class=navlink href="{% url 'survey-create' %}">Create new survey.</a>
+  
 {% endblock %}
