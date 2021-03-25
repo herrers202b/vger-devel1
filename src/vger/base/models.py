@@ -103,13 +103,10 @@ class Survey(models.Model):
     directions = models.CharField(max_length=500, help_text="Please enter any directions to take the survey")
     created = models.DateTimeField(auto_now_add=True)
     lastUpdated = models.DateTimeField(auto_now=True)
-<<<<<<< HEAD
 
-=======
     #This is to discern wether the model is being used as a template to take or a survey being taken 
     assigned = models.BooleanField(default=False)
     finished = models.BooleanField(default=False)
->>>>>>> survey-filling-dev
     """String for representing the Survey object."""
     def __str__(self):
         return f'{self.titleOfSurvey}'
