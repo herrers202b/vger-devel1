@@ -18,7 +18,7 @@ services:
     volumes:
       - ./src:/src
     working_dir: /src/vger
-    command: ["/src/wait-for-it.sh", "db:3306", "--", "python", "manage.py", "runserver", "0.0.0.0:8000"]
+            #command: ["/src/wait-for-it.sh", "db:3306", "--", "python", "manage.py", "runserver", "0.0.0.0:8000"]
     command: python manage.py runserver 0.0.0.0:8000
     ports:
       - "8000:8000"
