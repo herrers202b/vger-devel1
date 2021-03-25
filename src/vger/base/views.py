@@ -162,6 +162,8 @@ def results(request, session_hash):
     num_instances : the object will return the number of 
         times user has taken survey 
     """
+    context_object_name = 'results-page'
+    template_name = 'results.html'
 
     si = SurveyInstance.objects.get(session_hash=session_hash)
     survey_name = SurveyInstance.survey.objects.get(session_hash=session_hash)
