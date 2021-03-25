@@ -13,8 +13,15 @@ from django.views import generic
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
 #Model imports
 from .models import Survey, Category, Question, SurveyInstance
+from django.shortcuts import redirect
+from .forms import SurveyCategoryForm
+
+
+
+
 
 # Create your views here.
+
 
 class SurveyListView(generic.ListView):
     """
@@ -176,7 +183,6 @@ class QuestionDetailView(generic.DetailView):
         Question = get_object_or_404(Category, slug=slug)
         return render(request, 'base/templates/question_detail.html', context={'question': question})
 
-#HTML Render request?
 def home(request):
     return render(request, 'home.html')
 
@@ -223,10 +229,6 @@ class SurveyUpdate(UpdateView):
     
     Method builds off the generics provided by django to
     offer a user the ability to update a survey
-
-    Survey : model
-        Survey is the model used in this form
-    
     survey_form.html : template_name
         The name of the template we want Djagno 
         to use when creating this view.
@@ -527,3 +529,83 @@ class QuestionDelete(DeleteView):
         return reverse('category-detail', kwargs={'surveySlug': self.object.category.survey.surveySlug,
                                                     'categorySlug': self.object.category.categorySlug})
     success_url = get_success_url
+    
+def generateNewSurvey(request, pk):
+    #need to check if user had a survey
+    if not request.user.is_authenticated:
+        return redirect('/login/')
+    new_survey = Survey.objects.get(pk=pk)
+    categories = Category.objects.filter(survey=new_survey)
+    #TODO: if survey is already in the survey_instance with user ask if they want to continue the old one
+    new_survey.pk = None
+    new_survey.assigned = True
+    new_survey.save()
+    for c_item in categories:
+        questions = Question.objects.filter(category=c_item)
+        c_item.pk = None
+        c_item.survey = new_survey
+        c_item.save()
+        for q_item in questions:
+            q_item.pk = None
+            q_item.category = c_item
+            q_item.save()
+        
+
+    survey_instance = SurveyInstance.objects.create(survey=new_survey, user=request.user)
+    survey_instance.save()
+    return redirect(survey_instance.get_welcome_url())
+
+def welcomeSurvey(request, session_hash):
+    request.session['session_hash'] = session_hash
+    SI = SurveyInstance.objects.get(session_hash=session_hash)
+    context = {
+        'Survey' : SI.survey,
+        'SI' : SI
+    }
+    return render(request, 'welcome_to_survey.html', context)
+
+def takeSurvey(request, session_hash, page):
+    session_category = request.session.get('session_category', None)
+    print(session_category)
+    if session_category == None or session_category == []:
+        session_category = []
+        si = SurveyInstance.objects.get(session_hash=session_hash)
+        categories = Category.objects.filter(survey=si.survey)
+        for cat in categories:
+            session_category.append(cat.titleOfCategory)
+        request.session['session_category'] = session_category
+
+    elif len(session_category) != 0:
+        if request.method == 'POST':
+            form = SurveyCategoryForm(request.POST, instance=session_category[0])
+            if form.is_valid():
+                si = SurveyInstance.objects.get(session_hash=session_hash)
+                category = Category.objects.get(survey=si.survey, titleOfCategory=session_category[0])
+                questions = Question.objects.filter(category=category) 
+
+                for (q, a) in form.category_answers():
+                    model_question = questions.get(questionText=q)
+                    model_question.answer = a
+                    model_question.save()
+
+
+            # for i, question in enumerate(questions):
+              
+            del session_category[0]
+
+        request.session['session_category'] = session_category
+    if len(session_category) == 0:
+        #TODO: exit survey
+        si = SurveyInstance.objects.get(session_hash=request.session['session_hash'])
+        si.survey.finished = True
+        si.save()
+        return render(request, 'home.html')
+        print("TODO")
+
+    print(session_category)
+    #print(request.session['session_category'])
+    #TODO: if post save questions
+    form = SurveyCategoryForm(instance=session_category[0])
+
+    return render(request, 'take_survey.html', {'toc': session_category[0], 'form' : form})
+

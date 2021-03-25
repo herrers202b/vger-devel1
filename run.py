@@ -76,7 +76,8 @@ def main():
         os.system("sudo docker kill $(sudo docker ps -a -q)")
         os.system("sudo docker rm $(sudo docker ps -a -q)")
     
-    
+    elif 'dbflush'.strip() in sys.argv:
+        os.system("sudo docker-compose run django python3 manage.py flush")
     else:   
         usage()
 
