@@ -115,25 +115,46 @@ def welcomeSurvey(request, session_hash):
 
 def takeSurvey(request, session_hash, page):
     session_category = request.session.get('session_category', None)
+    print(session_category)
     if session_category == None or session_category == []:
+        session_category = []
         si = SurveyInstance.objects.get(session_hash=session_hash)
-        sc = Category.objects.filter(survey=si.survey)
-        for cat in sc:
+        categories = Category.objects.filter(survey=si.survey)
+        for cat in categories:
             session_category.append(cat.titleOfCategory)
         request.session['session_category'] = session_category
+
     elif len(session_category) != 0:
-        del session_category[0]
+        if request.method == 'POST':
+            form = SurveyCategoryForm(request.POST, instance=session_category[0])
+            if form.is_valid():
+                si = SurveyInstance.objects.get(session_hash=session_hash)
+                category = Category.objects.get(survey=si.survey, titleOfCategory=session_category[0])
+                questions = Question.objects.filter(category=category) 
+
+                for (q, a) in form.category_answers():
+                    model_question = questions.get(questionText=q)
+                    model_question.answer = a
+                    model_question.save()
+
+
+            # for i, question in enumerate(questions):
+              
+            del session_category[0]
+
         request.session['session_category'] = session_category
-    else:
+    if len(session_category) == 0:
         #TODO: exit survey
         si = SurveyInstance.objects.get(session_hash=request.session['session_hash'])
-        return redirect(si.get_exit_url())
+        si.survey.finished = True
+        si.save()
+        return render(request, 'home.html')
         print("TODO")
 
     print(session_category)
     #print(request.session['session_category'])
     #TODO: if post save questions
-    form = SurveyCategoryForm(titleOfCategory=session_category[0])
+    form = SurveyCategoryForm(instance=session_category[0])
 
-    return render(request, 'home.html')
+    return render(request, 'take_survey.html', {'toc': session_category[0], 'form' : form})
 
