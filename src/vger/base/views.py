@@ -1,13 +1,10 @@
+from django.db.models.query_utils import Q
 from django.shortcuts import render
 from .models import Survey, Category, Question, SurveyInstance
 from django.views import generic
 from django.urls import reverse
 from django.shortcuts import redirect
 from .forms import SurveyCategoryForm
-
-
-
-
 
 # Create your views here.
 
@@ -77,22 +74,6 @@ class SurveyDetailView(generic.DetailView):
 def home(request):
     return render(request, 'home.html')
 
-def results(request):
-    """
-    results
-
-    num_instances : the object will return the number of 
-        times user has taken survey 
-    """
-    num_instances = SurveyInstance.objects.all().count()
-    instance_hash = SurveyInstance.hash()
-
-    context = {
-        'num_instances': num_instances,
-        'instance_hash': instance_hash,
-    }
-    return render(request, 'results.html', context=context)
-
 def generateNewSurvey(request, pk):
     #need to check if user had a survey
     if not request.user.is_authenticated:
@@ -152,3 +133,25 @@ def takeSurvey(request, session_hash, page):
 
     return render(request, 'home.html')
 
+def results(request, session_hash):
+    """
+    results
+
+    num_instances : the object will return the number of 
+        times user has taken survey 
+    """
+
+    si = SurveyInstance.objects.get(session_hash=session_hash)
+    survey_name = SurveyInstance.survey.objects.get(session_hash=session_hash)
+    categories = Category.objects.get.all(survey=si.survey)
+    questions = Question.objects.get.all(category=categories.titleOfCategory)
+    answers = Question.answer.object.get
+
+    context = {
+        'Name of survey': survey_name,
+        'instance_hash': si,
+        'categories': categories,
+        'questions': questions,
+        'answers': answers,
+    }
+    return render(request, 'results.html', context=context)
