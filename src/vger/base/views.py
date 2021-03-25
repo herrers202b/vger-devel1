@@ -79,13 +79,19 @@ def home(request):
 
 
 def generateNewSurvey(request, pk):
-    #need to check if user had a survey
+    """
+    generateNewSurvey
+
+    
+    #TODO: need to check if user had a survey
+    #TODO: if survey is already in the survey_instance with user ask if they want to continue the old one
+    """
+    
     if not request.user.is_authenticated:
         return redirect('/login/')
     new_survey = Survey.objects.get(pk=pk)
     categories = Category.objects.filter(survey=new_survey)
     
-    #TODO: if survey is already in the survey_instance with user ask if they want to continue the old one
     new_survey.pk = None
     new_survey.assigned = True
     new_survey.save()
@@ -112,10 +118,9 @@ def welcomeSurvey(request, session_hash):
         'SI' : SI
     }
     return render(request, 'welcome_to_survey.html', context)
-
+#TODO: Handle return session accessing
 def takeSurvey(request, session_hash, page):
     session_category = request.session.get('session_category', None)
-    print(session_category)
     if session_category == None or session_category == []:
         session_category = []
         si = SurveyInstance.objects.get(session_hash=session_hash)
@@ -137,9 +142,6 @@ def takeSurvey(request, session_hash, page):
                     model_question.answer = a
                     model_question.save()
 
-
-            # for i, question in enumerate(questions):
-              
             del session_category[0]
 
         request.session['session_category'] = session_category
@@ -151,7 +153,6 @@ def takeSurvey(request, session_hash, page):
         return render(request, 'home.html')
         print("TODO")
 
-    print(session_category)
     #print(request.session['session_category'])
     #TODO: if post save questions
     form = SurveyCategoryForm(instance=session_category[0])
