@@ -181,6 +181,8 @@ class SurveyCreate(CreateView):
         to use when creating this view.
     """
     model = Survey
+    slug_field = 'surveySlug'
+    slug_url_kwarg = 'surveySlug'
     fields = ['titleOfSurvey', 'directions']
     template_name = 'survey_form.html' 
 
@@ -199,6 +201,8 @@ class SurveyUpdate(UpdateView):
         to use when creating this view.
     """
     model = Survey
+    slug_field = 'surveySlug'
+    slug_url_kwarg = 'surveySlug'
     fields = ['titleOfSurvey', 'directions']
     template_name = 'survey_form.html' 
 
@@ -222,6 +226,8 @@ class SurveyDelete(DeleteView):
     
     """
     model = Survey
+    slug_field = 'surveySlug'
+    slug_url_kwarg = 'surveySlug'
     template_name = 'survey_form_confirm_delete.html' 
     success_url = reverse_lazy('survey')
 
@@ -242,6 +248,8 @@ class CategoryCreate(CreateView):
         to use when creating this view.
     """    
     model = Category
+    slug_field = 'categorySlug'
+    slug_url_kwarg = 'categorySlug'
     template_name = 'category_form.html'
     fields = ['titleOfCategory','lowWeightText', 'highWeightText']
 
@@ -281,6 +289,8 @@ class CategoryUpdate(UpdateView):
         to use when creating this view.
     """
     model = Category
+    slug_field = 'categorySlug'
+    slug_url_kwarg = 'categorySlug'
     template_name = 'category_form.html'
     fields = ['titleOfCategory','lowWeightText', 'highWeightText']
 
@@ -310,6 +320,8 @@ class CategoryDelete(DeleteView):
     
     """
     model = Category
+    slug_field = 'categorySlug'
+    slug_url_kwarg = 'categorySlug'
     template_name = 'category_form_confirm_delete.html' 
     success_url = reverse_lazy('survey')
 
@@ -328,6 +340,8 @@ class QuestionCreate(CreateView):
         to use when creating this view.
     """    
     model = Question
+    slug_field = 'questionSlug'
+    slug_url_kwarg = 'questionSlug'
     template_name = 'question_form.html'
     fields = ['questionText','answer', 'questionNumber']
 
@@ -337,8 +351,7 @@ class QuestionCreate(CreateView):
 
         Method sets the success url when we add a category
         """
-        return reverse("category-detail", kwargs={'categorySlug': self.category.categorySlug,
-                                                    'surveySlug': self.category.survey.surveySlug}) 
+        return reverse("survey") 
 
     
     def form_valid(self, form):
@@ -351,6 +364,7 @@ class QuestionCreate(CreateView):
         """
         form.instance.category = Category.objects.get(categorySlug=self.kwargs['categorySlug'])
         return super(QuestionCreate, self).form_valid(form)
+
 class QuestionUpdate(UpdateView):
     """
     QuestionUpdate View
@@ -366,6 +380,8 @@ class QuestionUpdate(UpdateView):
         to use when creating this view.
     """
     model = Question
+    slug_field = 'questionSlug'
+    slug_url_kwarg = 'questionSlug'
     template_name = 'question_form.html'
     fields = ['questionText','answer', 'questionNumber']
 
@@ -375,7 +391,27 @@ class QuestionUpdate(UpdateView):
 
         Method sets the success url when we add a category
         """
-        return reverse("question-detail", kwargs={'questionSlug': self.questionSlug,
-                                                    'categorySlug': self.category.categorySlug,
-                                                    'surveySlug': self.category.survey.surveySlug}) 
+        return reverse("survey") 
 
+class QuestionDelete(DeleteView):
+    """
+    QuestionDelete View
+    
+    Method builds off the generics provided by django to
+    offer a user the ability to delete a question. 
+    On submission we go back to the category detail page
+    On cancel we return to the previous window
+
+    Question : model
+        Question is the model used in this form
+    
+    question_form_confirm_delete.html : template_name
+        The name of the template we want Djagno 
+        to use when creating this view.
+    
+    """
+    model = Question
+    slug_field = 'questionSlug'
+    slug_url_kwarg = 'questionSlug'
+    template_name = 'question_form_confirm_delete.html' 
+    success_url = reverse_lazy('survey')
