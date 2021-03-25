@@ -1,60 +1,16 @@
 from django.shortcuts import render
-#Form imports
-from base.forms import SurveyModelFrom
-from django.shortcuts import get_object_or_404
-from django.http import HttpResponseRedirect
-from django.urls import reverse
-from django.urls import reverse_lazy
-#Authentication imports
-from django.contrib.auth.decorators import login_required, permission_required
-#Generic imports
+from .models import Survey, Category, Question, SurveyInstance
 from django.views import generic
-<<<<<<< HEAD
 from django.urls import reverse
 from django.shortcuts import redirect
+from .forms import SurveyCategoryForm
 
 
 
-@staticmethod
-def getNextStage(current_stage, survey):
-    n_categories = Category.objects.filter(survey=survey).count()
 
-    if current_stage == n_categories:
-        return None
-    return n_categories + 1
-
-=======
-from django.views.generic.edit import CreateView, UpdateView, DeleteView
-#Model imports
-from .models import Survey, Category, Question, SurveyInstance
->>>>>>> 1ffa3f9ec054cec507ac20ddf95c18ba4dc300e5
 
 # Create your views here.
-class SurveyTakingView(generic.FormView):
-    #TODO: make survey taking template
-    template = ''
-    survey = None
-    form_class = None
 
-    def dispatch(self, request, *args, **kwargs):
-        survey_id = request.session.get("survey_id", None)
-        self.survey = Survey.objects.get(id=survey_id)
-        self.request = request
-        return super().dispatch(request, *args, **kwargs)
-    
-    def form_valid(self, form):
-        self.request.session["survey_id"] = form.instance.survey_id
-        current_stage = form.cleaned_data.get("stage")
-        new_stage = getNextStage(current_stage, self.survey)
-        form.instance.stage = new_stage
-
-        if new_stage == None:
-            return redirect(reverse('/'))
-        return redirect(reverse("survey:survey"))#?
-    
-    def get_form_class(self):
-        stage = self.survey.stage if self.survey else 0
-        return super().get_form_class()
 
 class SurveyListView(generic.ListView):
     """
@@ -118,90 +74,66 @@ class SurveyDetailView(generic.DetailView):
         Survey = get_object_or_404(Survey, pk=primary_key) 
         return render(request, 'base/templates/survey_detail.html', context={'survey': survey})
 
-#HTML Render request?
 def home(request):
     return render(request, 'home.html')
 
-#Class templated for creating, updating, and deleting surveys
-#Still needs permissions!
-class SurveyCreate(CreateView):
-    """
-    SurveyCreate View
+
+def generateNewSurvey(request, pk):
+    #need to check if user had a survey
+    if not request.user.is_authenticated:
+        return redirect('/login/')
+    new_survey = Survey.objects.get(pk=pk)
+    categories = Category.objects.filter(survey=new_survey)
     
-    Method builds off the generics provided by django to
-    offer a user the ability to create a survey
+    #TODO: if survey is already in the survey_instance with user ask if they want to continue the old one
+    new_survey.pk = None
+    new_survey.assigned = True
+    new_survey.save()
+    for c_item in categories:
+        questions = Question.objects.filter(category=c_item)
+        c_item.pk = None
+        c_item.survey = new_survey
+        c_item.save()
+        for q_item in questions:
+            q_item.pk = None
+            q_item.category = c_item
+            q_item.save()
+        
 
-    Survey : model
-        Survey is the model used in this form
+    survey_instance = SurveyInstance.objects.create(survey=new_survey, user=request.user)
+    survey_instance.save()
+    return redirect(survey_instance.get_welcome_url())
 
-    survey_form.html : template_name
-        The name of the template we want Djagno 
-        to use when creating this view.
-    """
-    model = Survey
-    fields = ['titleOfSurvey', 'directions']
-    template_name = 'survey_form.html' 
+def welcomeSurvey(request, session_hash):
+    request.session['session_hash'] = session_hash
+    SI = SurveyInstance.objects.get(session_hash=session_hash)
+    context = {
+        'Survey' : SI.survey,
+        'SI' : SI
+    }
+    return render(request, 'welcome_to_survey.html', context)
 
-class SurveyUpdate(UpdateView):
-     """
-    SurveyUpdate View
-    
-    Method builds off the generics provided by django to
-    offer a user the ability to update a survey
+def takeSurvey(request, session_hash, page):
+    session_category = request.session.get('session_category', None)
+    if session_category == None or session_category == []:
+        si = SurveyInstance.objects.get(session_hash=session_hash)
+        sc = Category.objects.filter(survey=si.survey)
+        for cat in sc:
+            session_category.append(cat.titleOfCategory)
+        request.session['session_category'] = session_category
+    elif len(session_category) != 0:
+        del session_category[0]
+        request.session['session_category'] = session_category
+    else:
+        #TODO: exit survey
+        si = SurveyInstance.objects.get(session_hash=request.session['session_hash'])
+        return redirect(si.get_exit_url())
+        print("TODO")
 
-    Survey : model
-        Survey is the model used in this form
-    
-    survey_form.html : template_name
-        The name of the template we want Djagno 
-        to use when creating this view.
-    """
-    
-    model = Survey
-    fields = ['titleOfSurvey', 'directions']
-    template_name = 'survey_form.html' 
+    print(session_category)
+    #print(request.session['session_category'])
+    #TODO: if post save questions
+    form = SurveyCategoryForm(titleOfCategory=session_category[0])
 
-class SurveyDelete(DeleteView):
-     """
-    SurveyDelete View
-    
-    Method builds off the generics provided by django to
-    offer a user the ability to delete a survey. 
-    On submission we go back to the survey list page
-    On cancel we return to the previous window
+    return render(request, 'home.html')
 
-    Survey : model
-        Survey is the model used in this form
-    
-    survey_form_confirm_delete.html : template_name
-        The name of the template we want Djagno 
-        to use when creating this view.
-    
-    """
-    model = Survey
-    template_name = 'survey_form_confirm_delete.html' 
-    success_url = reverse_lazy('survey')
-
-
-
-"""
-def take_survey(request, pk):
-    #View function for taking a survey
-    Survey = get_object_or_404(Survey, pk=pk)
-
-    #If this is a POST request then process the From data
-    if request.method == 'POST':
-
-        #Create a form instance and populate it with data from the request
-        form = SurveyModelFrom(request.POST)
-        #Check if the form is valid:
-        if form.is_valid():
-            #Process data 
-            #do nothing for now
-            #Redirect to new url -> results
-            return HttpResponseRedirect(reverse('results'))
-    #If this is a GET(or any other method) create the default form
-    #else:
-        #Do nothing here
-    return render(request, 'take_survey.html', context)
-    """

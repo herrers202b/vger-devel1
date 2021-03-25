@@ -5,7 +5,7 @@ urlpatterns = [
     path('survey/', views.SurveyListView.as_view(), name='survey'),
     path('survey/<int:pk>', views.SurveyDetailView.as_view(), name='survey-detail'),
     path('', views.home, name='home-page'),
-    path('survey/create/', views.SurveyCreate.as_view(), name='survey-create'),
-    path('survey/<int:pk>/update/', views.SurveyUpdate.as_view(), name='survey-update'),
-    path('survey/<int:pk>/delete/', views.SurveyDelete.as_view(), name='survey-delete'),
+    path('survey/take/<int:pk>', views.generateNewSurvey, name='gen-survey'),
+    path('survey/take/<slug:session_hash>', views.welcomeSurvey, name='welcome-to-survey'),
+    path('survey/take/<slug:session_hash>/page=<int:page>', views.takeSurvey, name='take-survey')
 ]
