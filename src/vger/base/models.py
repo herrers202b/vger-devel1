@@ -2,6 +2,8 @@ from django.db import models
 #Used to generate URLs by reversing the URL patterns
 from django.urls import reverse
 import uuid
+from django.template.defaultfilters import slugify
+
 # Create your models here.
 
 #Untested question model
@@ -40,11 +42,23 @@ class Question(models.Model):
     answer = models.IntegerField(choices=QUESTION_WEIGHTS, blank=True, null=True, help_text="Results of question")
     category = models.ForeignKey("Category", verbose_name=("Parent Category"), related_name=("questions"), default=None, null=True, on_delete=models.CASCADE)
     questionNumber = models.IntegerField(default='1', help_text="Please enter a question number")
+    questionSlug = models.SlugField(null=False, unique=True)
+
+
     """String for representing the Question object."""
     def __str__(self):
-        return f'{self.questionText}'
+        return f'{self.questionNumber}'
 
-    
+    def get_absolute_url(self):
+        """Returns the url to access a detailed record for this survey"""
+        return reverse("question-detail", kwargs={'questionSlug': self.questionSlug,
+                                                    'categorySlug': self.category.categorySlug,
+                                                    'surveySlug': self.category.survey.surveySlug})
+
+    def save(self, *args, **kwargs):
+        if not self.questionSlug:
+            self.questionSlug = slugify(self.questionNumber)
+        return super().save(*args, **kwargs)
 
 #Untested character model
 class Category(models.Model):
@@ -69,14 +83,21 @@ class Category(models.Model):
     lowWeightText = models.CharField(max_length=50, default="Not like me at all", help_text="Please enter flavor text for the low weight of the category, ex) Not like me at all")
     highWeightText = models.CharField(max_length=50, default="Extremely like me", help_text="Please enter flavor text for the high weight of the category, ex) Extremely like me")
     survey = models.ForeignKey("Survey", verbose_name=("Parent Survey"), related_name=("categories"), default=None, null=True, on_delete=models.CASCADE)
+    categorySlug = models.SlugField(null=False, unique=True)
 
     """String for representing the Category object."""
     def __str__(self):
         return f'{self.titleOfCategory}'
     
     def get_absolute_url(self):
-        """Returns the url to access a detailed record for this category"""
-        return reverse("category-detail", args=[str(self.id)])
+        """Returns the url to access a detailed record for this survey"""
+        return reverse("category-detail", kwargs={'categorySlug': self.categorySlug,
+                                                    'surveySlug': self.survey.surveySlug})
+
+    def save(self, *args, **kwargs):
+        if not self.categorySlug:
+            self.categorySlug = slugify(self.titleOfCategory)
+        return super().save(*args, **kwargs)
     
 #Untested survey model
 class Survey(models.Model):
@@ -102,15 +123,22 @@ class Survey(models.Model):
     directions = models.CharField(max_length=500, help_text="Please enter any directions to take the survey")
     created = models.DateTimeField(auto_now_add=True)
     lastUpdated = models.DateTimeField(auto_now=True)
+    surveySlug = models.SlugField(null=False, unique=True)
 
     """String for representing the Survey object."""
     def __str__(self):
         return f'{self.titleOfSurvey}'
     
+    #Replacing pk with slug for tutorial go here:
+    #https://learndjango.com/tutorials/django-slug-tutorial
     def get_absolute_url(self):
         """Returns the url to access a detailed record for this survey"""
-        return reverse("survey-detail", args=[str(self.id)])
+        return reverse("survey-detail", kwargs={'surveySlug': self.surveySlug})
 
+    def save(self, *args, **kwargs):
+        if not self.surveySlug:
+            self.surveySlug = slugify(self.titleOfSurvey)
+        return super().save(*args, **kwargs)
     
 
 #Untested survey instance model

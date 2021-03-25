@@ -5,56 +5,16 @@ from django.shortcuts import get_object_or_404
 from django.http import HttpResponseRedirect
 from django.urls import reverse
 from django.urls import reverse_lazy
+from django.utils.text import slugify
 #Authentication imports
 from django.contrib.auth.decorators import login_required, permission_required
 #Generic imports
 from django.views import generic
-<<<<<<< HEAD
-from django.urls import reverse
-from django.shortcuts import redirect
-
-
-
-@staticmethod
-def getNextStage(current_stage, survey):
-    n_categories = Category.objects.filter(survey=survey).count()
-
-    if current_stage == n_categories:
-        return None
-    return n_categories + 1
-
-=======
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
 #Model imports
 from .models import Survey, Category, Question, SurveyInstance
->>>>>>> 1ffa3f9ec054cec507ac20ddf95c18ba4dc300e5
 
 # Create your views here.
-class SurveyTakingView(generic.FormView):
-    #TODO: make survey taking template
-    template = ''
-    survey = None
-    form_class = None
-
-    def dispatch(self, request, *args, **kwargs):
-        survey_id = request.session.get("survey_id", None)
-        self.survey = Survey.objects.get(id=survey_id)
-        self.request = request
-        return super().dispatch(request, *args, **kwargs)
-    
-    def form_valid(self, form):
-        self.request.session["survey_id"] = form.instance.survey_id
-        current_stage = form.cleaned_data.get("stage")
-        new_stage = getNextStage(current_stage, self.survey)
-        form.instance.stage = new_stage
-
-        if new_stage == None:
-            return redirect(reverse('/'))
-        return redirect(reverse("survey:survey"))#?
-    
-    def get_form_class(self):
-        stage = self.survey.stage if self.survey else 0
-        return super().get_form_class()
 
 class SurveyListView(generic.ListView):
     """
@@ -102,6 +62,8 @@ class SurveyDetailView(generic.DetailView):
     model = Survey
     context_object_name = 'survey_detail'
     template_name = 'survey_detail.html' 
+    slug_field = 'surveySlug'
+    slug_url_kwarg = 'surveySlug'
 
     def survey_detail_view(request, primary_key):
         """
@@ -115,8 +77,8 @@ class SurveyDetailView(generic.DetailView):
         
         method returns the appropriate render
         """
-        Survey = get_object_or_404(Survey, pk=primary_key) 
-        return render(request, 'base/templates/survey_detail.html', context={'survey': survey})
+        Survey = get_object_or_404(Survey, slug=slug) 
+        return render(request, 'base/templates/survey_detail.html', context={'survey': Survey})
 
 class CategoryDetailView(generic.DetailView):
     """
@@ -140,6 +102,8 @@ class CategoryDetailView(generic.DetailView):
     model = Category
     context_object_name = 'category_detail'
     template_name = 'category_detail.html'
+    slug_field = 'categorySlug'
+    slug_url_kwarg = 'categorySlug'
 
     def category_detail_view(request, primary_key):
         """
@@ -148,13 +112,53 @@ class CategoryDetailView(generic.DetailView):
         Method, adapted from Django tutorial, will check
         to see if a category exists.
 
-        Survey : the obeject we will either retrieve 
+        Category : the obeject we will either retrieve 
             or 404 error
         
         method returns the appropriate render
         """
-        Category = get_object_or_404(Category, pk=primary_key)
+        Category = get_object_or_404(Category, slug=slug)
         return render(request, 'base/templates/category_detail.html', context={'category': category})
+
+class QuestionDetailView(generic.DetailView):
+    """
+    QuestionDetailView
+
+    Class used to show the specific details of a given question
+
+    Question : model
+        the model we will use for this class
+    
+    'question_detail' : context_object_name
+        the name we reference when querying the html
+
+    'question_detail.html' : template_name
+        the name of the template we are using
+        to generate this view
+     
+    """
+    from django.shortcuts import get_object_or_404
+
+    model = Question
+    context_object_name = 'question_detail'
+    template_name = 'question_detail.html'
+    slug_field = 'questionSlug'
+    slug_url_kwarg = 'questionSlug'
+
+    def question_detail_view(request, primary_key):
+        """
+        question_detail_view
+
+        Method, adapted from Django tutorial, will check
+        to see if a question exists.
+
+        Question : the obeject we will either retrieve 
+            or 404 error
+        
+        method returns the appropriate render
+        """
+        Question = get_object_or_404(Category, slug=slug)
+        return render(request, 'base/templates/question_detail.html', context={'question': question})
 
 #HTML Render request?
 def home(request):
@@ -198,6 +202,8 @@ class SurveyUpdate(UpdateView):
     fields = ['titleOfSurvey', 'directions']
     template_name = 'survey_form.html' 
 
+    
+
 class SurveyDelete(DeleteView):
     """
     SurveyDelete View
@@ -231,7 +237,7 @@ class CategoryCreate(CreateView):
     Category : model
         Category is the model used in this form
     
-    category_form_confirm_delete.html : template_name
+    category_form.html : template_name
         The name of the template we want Djagno 
         to use when creating this view.
     """    
@@ -251,10 +257,14 @@ class CategoryCreate(CreateView):
         """
         form_valid
 
-        Method links the survey id to this category
+        This method is used on HTTP Post,
+        we will set our 'Parent Survey' to that
+        of the survey passed in with our kwargs
         """
-        form.instance.survey_id = self.kwargs.get('pk')
+
+        form.instance.survey = Survey.objects.get(surveySlug=self.kwargs['surveySlug'])
         return super(CategoryCreate, self).form_valid(form)
+        
 
 class CategoryUpdate(UpdateView):
     """
@@ -302,3 +312,70 @@ class CategoryDelete(DeleteView):
     model = Category
     template_name = 'category_form_confirm_delete.html' 
     success_url = reverse_lazy('survey')
+
+class QuestionCreate(CreateView):
+    """
+    QuestionCreate View
+    
+    Method builds off the generics provided by django to
+    offer a user the ability to create a question. 
+
+    Question : model
+        Question is the model used in this form
+    
+    question_form.html : template_name
+        The name of the template we want Djagno 
+        to use when creating this view.
+    """    
+    model = Question
+    template_name = 'question_form.html'
+    fields = ['questionText','answer', 'questionNumber']
+
+    def get_success_url(self):
+        """
+        get_success_url
+
+        Method sets the success url when we add a category
+        """
+        return reverse("category-detail", kwargs={'categorySlug': self.category.categorySlug,
+                                                    'surveySlug': self.category.survey.surveySlug}) 
+
+    
+    def form_valid(self, form):
+        """
+        form_valid
+
+        This method is used on HTTP Post,
+        we will set our 'Parent Category' to that
+        of the survey passed in with our kwargs
+        """
+        form.instance.category = Category.objects.get(categorySlug=self.kwargs['categorySlug'])
+        return super(QuestionCreate, self).form_valid(form)
+class QuestionUpdate(UpdateView):
+    """
+    QuestionUpdate View
+    
+    Method builds off the generics provided by django to
+    offer a user the ability to update a category
+
+    Question : model
+        Question is the model used in this form
+    
+    question_form.html : template_name
+        The name of the template we want Djagno 
+        to use when creating this view.
+    """
+    model = Question
+    template_name = 'question_form.html'
+    fields = ['questionText','answer', 'questionNumber']
+
+    def get_success_url(self):
+        """
+        get_success_url
+
+        Method sets the success url when we add a category
+        """
+        return reverse("question-detail", kwargs={'questionSlug': self.questionSlug,
+                                                    'categorySlug': self.category.categorySlug,
+                                                    'surveySlug': self.category.survey.surveySlug}) 
+
