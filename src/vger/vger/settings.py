@@ -121,6 +121,10 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 
+STATICFILES_DIRS = [
+    BASE_DIR / "static"
+]
+
 # Account Redirect
 
 LOGIN_REDIRECT_URL = '/'
