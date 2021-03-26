@@ -10,8 +10,10 @@
 <p>Category: {{category.titleOfCategory}}
 
     {% for question in questions %}
+    {% if question.category == category %}
     <li>For: {{question.questionText}}</li>
     <li>You answered: {{question.answer}}</li>
+    {% endif %}
     {% endfor %}
 
 {% endfor %}
