@@ -1,3 +1,4 @@
+from django.db.models.query import QuerySet
 from django.shortcuts import render
 #Form imports
 from base.forms import SurveyModelFrom, CategoryModelForm
@@ -614,7 +615,7 @@ def takeSurvey(request, session_hash, page):
         si = SurveyInstance.objects.get(session_hash=request.session['session_hash'])
         si.survey.finished = True
         si.save()
-        return render(request, 'home.html')
+        return redirect(si.get_exit_url())
         print("TODO")
 
     print(session_category)
@@ -624,3 +625,27 @@ def takeSurvey(request, session_hash, page):
 
     return render(request, 'take_survey.html', {'toc': session_category[0], 'form' : form})
 
+def results(request, session_hash):
+    """
+    results
+
+    num_instances : the object will return the number of 
+        times user has taken survey 
+    """
+    context_object_name = 'results-page'
+    template_name = 'results.html'
+
+    si = SurveyInstance.objects.get(session_hash=session_hash)
+    survey_name = si.survey.titleOfSurvey
+    categories = Category.objects.filter(survey=si.survey)
+    questions = []
+    for category in categories: 
+        questions += list(Question.objects.filter(category=category))
+
+    context = {
+        'Name_of_survey': survey_name,
+        'instance_hash': si,
+        'categories': categories,
+        'questions': questions,
+    }
+    return render(request, 'results.html', context=context)

@@ -6,18 +6,20 @@
 <h1>Results</h1>
 <p>Here's your survey results</p>
 
-{% for Category in Survey %}
-<p>Category: {{Category.titleOfCategory}}
+{% for category in categories %}
+<p>Category: {{category.titleOfCategory}}
 
-    {% for Question in Category %}
-    <li>For: {{Question.questionText}}</li>
-    <li>You answered: {{Question.answers}}</li>
+    {% for question in questions %}
+    <li>For: {{question.questionText}}</li>
+    <li>You answered: {{question.answer}}</li>
     {% endfor %}
 
 {% endfor %}
 
-<p>Would you like to take this survey again?</p>
- <a href="{{ survey.get_absolute_url }}">{{ survey.titleOfSurvey }}</a> 
-
+<!--<p>Would you like to take this survey again?</p>
+    <a href="{{ survey.get_absolute_url }}">{{ survey.titleOfSurvey }}</a> 
+    <form method="get" action="{{ survey.get_creation_url }}">
+        <button type="submit">Take Survey Again</button>
+    </form>-->
 </body>
 {% endblock content %}
