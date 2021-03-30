@@ -4,6 +4,7 @@ from django.shortcuts import render
 from base.forms import SurveyModelFrom, CategoryModelForm
 from django.shortcuts import get_object_or_404
 from django.http import HttpResponseRedirect
+from django.http import HttpResponseNotAllowed
 from django.urls import reverse
 from django.urls import reverse_lazy
 from django.utils.text import slugify
@@ -12,6 +13,8 @@ from django.contrib.auth.decorators import login_required, permission_required
 #Generic imports
 from django.views import generic
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
+
+from user.models import Administrator, Advisor, Student
 #Model imports
 from .models import Survey, Category, Question, SurveyInstance
 from django.shortcuts import redirect
@@ -23,7 +26,34 @@ import hashlib, random, sys
 
 
 # Create your views here.
+def check_permissions(request, accountType, url):
+    """
+    check_permissions
 
+    Queries for all of one type of user and checks them against the current user.
+    If the user is authenticated they are directed to the page they were 
+    looking for. Otherwise they are told they do not have permission to view the page.
+    """
+    if not request.user.is_authenticated:
+            return redirect('/login/')
+    if accountType == Advisor:
+        advisory_query = Advisor.objects.all()
+        for advisor in advisory_query:
+            if advisor.user == request.user:
+                return render(request, url)
+        return HttpResponseNotAllowed('<h1>You do not have permission to access this page</h1>')
+    elif accountType == Administrator:
+        admin_query = Administrator.objects.all()
+        for admin in admin_query:
+            if admin.user == request.user:
+                return render(request, url)
+        return HttpResponseNotAllowed('<h1>You do not have permission to access this page</h1>')
+    else:
+        student_query = Student.objects.all()
+        for student in student_query:
+            if student.user == request.user:
+                return render(request, url)
+        return HttpResponseNotAllowed('<h1>You do not have permission to access this page</h1>')
 
 class SurveyListView(generic.ListView):
     """
