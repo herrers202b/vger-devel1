@@ -10,17 +10,16 @@ from django.urls import reverse_lazy
 from django.utils.text import slugify
 #Authentication imports
 from django.contrib.auth.decorators import login_required, permission_required
+from django.contrib.auth.mixins import LoginRequiredMixin
 #Generic imports
 from django.views import generic
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
-
+#User imports
 from user.models import Administrator, Advisor, Student
 #Model imports
 from .models import Survey, Category, Question, SurveyInstance
 from django.shortcuts import redirect
 from .forms import SurveyCategoryForm
-
-
 
 import hashlib, random, sys
 
@@ -55,7 +54,7 @@ def check_permissions(request, accountType, url):
                 return render(request, url)
         return HttpResponseNotAllowed('<h1>You do not have permission to access this page</h1>')
 
-class SurveyListView(generic.ListView):
+class SurveyListView(LoginRequiredMixin, generic.ListView):
     """
     SurveyListView
 
@@ -72,12 +71,15 @@ class SurveyListView(generic.ListView):
     'survey_list.html'
         the name of our html file that contains
         the template we will use
+    '/login/' 
+        redirect url for login required permission
     """
     model = Survey
     context_object_name = 'survey_list'
     template_name = 'survey_list.html' 
+    login_url = '/login/'
 
-class SurveyDetailView(generic.DetailView):
+class SurveyDetailView(LoginRequiredMixin, generic.DetailView):
     """
     SurveyDetailView
 
@@ -100,7 +102,9 @@ class SurveyDetailView(generic.DetailView):
 
     'surveySlug' : slug_url_kwarg
         slug keyword arguments for this view
-    
+        
+    '/login/' 
+        redirect url for login required permission
     """
     from django.shortcuts import get_object_or_404
 
@@ -109,6 +113,7 @@ class SurveyDetailView(generic.DetailView):
     template_name = 'survey_detail.html' 
     slug_field = 'surveySlug'
     slug_url_kwarg = 'surveySlug'
+    login_url = '/login/'
 
     def survey_detail_view(request, primary_key):
         """
@@ -121,11 +126,14 @@ class SurveyDetailView(generic.DetailView):
             or 404 error
         
         method returns the appropriate render
+            
+        '/login/' 
+            redirect url for login required permission
         """
         Survey = get_object_or_404(Survey, slug=slug) 
         return render(request, 'base/templates/survey_detail.html', context={'survey': Survey})
 
-class CategoryDetailView(generic.DetailView):
+class CategoryDetailView(LoginRequiredMixin, generic.DetailView):
     """
     CategoryDetailView
 
@@ -146,6 +154,9 @@ class CategoryDetailView(generic.DetailView):
 
     'categorySlug' : slug_url_kwarg
         slug keyword arguments for this view
+    
+    '/login/' 
+        redirect url for login required permission    
     """
     from django.shortcuts import get_object_or_404
 
@@ -154,6 +165,7 @@ class CategoryDetailView(generic.DetailView):
     template_name = 'category_detail.html'
     slug_field = 'categorySlug'
     slug_url_kwarg = 'categorySlug'
+    login_url = '/login/'
 
     def category_detail_view(request, primary_key):
         """
@@ -170,7 +182,7 @@ class CategoryDetailView(generic.DetailView):
         Category = get_object_or_404(Category, slug=slug)
         return render(request, 'base/templates/category_detail.html', context={'category': category})
 
-class QuestionDetailView(generic.DetailView):
+class QuestionDetailView(LoginRequiredMixin, generic.DetailView):
     """
     QuestionDetailView
 
@@ -191,6 +203,9 @@ class QuestionDetailView(generic.DetailView):
 
     'questionSlug' : slug_url_kwarg
         slug keyword arguments for this view
+
+    '/login/' 
+        redirect url for login required permission 
     """
     from django.shortcuts import get_object_or_404
 
@@ -199,6 +214,7 @@ class QuestionDetailView(generic.DetailView):
     template_name = 'question_detail.html'
     slug_field = 'questionSlug'
     slug_url_kwarg = 'questionSlug'
+    login_url = '/login/'
 
     def question_detail_view(request, primary_key):
         """
@@ -220,7 +236,7 @@ def home(request):
 
 #Class templated for creating, updating, and deleting surveys
 #Still needs permissions!
-class SurveyCreate(CreateView):
+class SurveyCreate(LoginRequiredMixin, CreateView):
     """
     SurveyCreate View
     
@@ -239,12 +255,16 @@ class SurveyCreate(CreateView):
 
     'surveySlug' : slug_url_kwarg
         slug keyword arguments for this view
+
+    '/login/' 
+        redirect url for login required permission 
     """
     model = Survey
     slug_field = 'surveySlug'
     slug_url_kwarg = 'surveySlug'
     fields = ['titleOfSurvey', 'directions']
     template_name = 'survey_form.html' 
+    login_url = '/login/'
 
     def get_success_url(self):
         """
@@ -255,7 +275,7 @@ class SurveyCreate(CreateView):
         """
         return reverse('survey-detail', kwargs={'surveySlug': self.object.surveySlug})        
 
-class SurveyUpdate(UpdateView):
+class SurveyUpdate(LoginRequiredMixin, UpdateView):
     """
     SurveyUpdate View
     
@@ -270,12 +290,16 @@ class SurveyUpdate(UpdateView):
 
     'surveySlug' : slug_url_kwarg
         slug keyword arguments for this view
+
+    '/login/' 
+        redirect url for login required permission 
     """
     model = Survey
     slug_field = 'surveySlug'
     slug_url_kwarg = 'surveySlug'
     fields = ['titleOfSurvey', 'directions']
-    template_name = 'survey_form.html' 
+    template_name = 'survey_form.html'
+    login_url = '/login/' 
 
     def get_success_url(self):
         """
@@ -286,7 +310,7 @@ class SurveyUpdate(UpdateView):
         """
         return reverse('survey-detail', kwargs={'surveySlug': self.object.surveySlug})
 
-class SurveyDelete(DeleteView):
+class SurveyDelete(LoginRequiredMixin, DeleteView):
     """
     SurveyDelete View
     
@@ -307,6 +331,9 @@ class SurveyDelete(DeleteView):
 
     'surveySlug' : slug_url_kwarg
         slug keyword arguments for this view
+
+    '/login/' 
+        redirect url for login required permission 
     """
     model = Survey
     slug_field = 'surveySlug'
@@ -314,10 +341,11 @@ class SurveyDelete(DeleteView):
     template_name = 'survey_form_confirm_delete.html' 
     #forgo success url method since we are at the top of the tree
     success_url = reverse_lazy('survey')
+    login_url = '/login/'
 
 #Class templated for creating, updating, and deleting categories
 #Still needs permissions!
-class CategoryCreate(CreateView):
+class CategoryCreate(LoginRequiredMixin, CreateView):
     """
     CategoryCreate View
     
@@ -336,12 +364,16 @@ class CategoryCreate(CreateView):
 
     'categorySlug' : slug_url_kwarg
         slug keyword arguments for this view
+
+    '/login/' 
+        redirect url for login required permission 
     """    
     model = Category
     slug_field = 'categorySlug'
     slug_url_kwarg = 'categorySlug'
     template_name = 'category_form.html'
     fields = ['titleOfCategory','lowWeightText', 'highWeightText']
+    login_url = '/login/'
 
     def get_success_url(self):
         """
@@ -366,7 +398,7 @@ class CategoryCreate(CreateView):
         return super(CategoryCreate, self).form_valid(form)
         
 
-class CategoryUpdate(UpdateView):
+class CategoryUpdate(LoginRequiredMixin, UpdateView):
     """
     CategoryUpdate View
     
@@ -385,12 +417,16 @@ class CategoryUpdate(UpdateView):
 
     'categorySlug' : slug_url_kwarg
         slug keyword arguments for this view
+
+    '/login/' 
+        redirect url for login required permission 
     """
     model = Category
     slug_field = 'categorySlug'
     slug_url_kwarg = 'categorySlug'
     template_name = 'category_form.html'
     fields = ['titleOfCategory','lowWeightText', 'highWeightText']
+    login_url = '/login/'
 
     def get_success_url(self):
         """
@@ -402,7 +438,7 @@ class CategoryUpdate(UpdateView):
         return reverse('category-detail', kwargs={'surveySlug': self.object.survey.surveySlug,
                                                     'categorySlug': self.object.categorySlug}) 
 
-class CategoryDelete(DeleteView):
+class CategoryDelete(LoginRequiredMixin, DeleteView):
     """
     CategoryDelete View
     
@@ -423,12 +459,16 @@ class CategoryDelete(DeleteView):
 
     'categorySlug' : slug_url_kwarg
         slug keyword arguments for this view
+
+    '/login/' 
+        redirect url for login required permission 
     
     """
     model = Category
     slug_field = 'categorySlug'
     slug_url_kwarg = 'categorySlug'
     template_name = 'category_form_confirm_delete.html' 
+    login_url = '/login/'
 
     def get_success_url(self):
         """
@@ -440,7 +480,7 @@ class CategoryDelete(DeleteView):
         return reverse('survey-detail', kwargs={'surveySlug': self.object.survey.surveySlug})
     success_url = get_success_url
 
-class QuestionCreate(CreateView):
+class QuestionCreate(LoginRequiredMixin, CreateView):
     """
     QuestionCreate View
     
@@ -459,12 +499,16 @@ class QuestionCreate(CreateView):
 
     'questionSlug' : slug_url_kwarg
         slug keyword arguments for this view
+
+    '/login/' 
+        redirect url for login required permission 
     """    
     model = Question
     slug_field = 'questionSlug'
     slug_url_kwarg = 'questionSlug'
     template_name = 'question_form.html'
     fields = ['questionText','answer', 'questionNumber']
+    login_url = '/login/'
 
     def get_success_url(self):
         """
@@ -488,8 +532,9 @@ class QuestionCreate(CreateView):
         form.instance.category = Category.objects.get(categorySlug=self.kwargs['categorySlug'])
         print(form.cleaned_data)
         return super(QuestionCreate, self).form_valid(form)
+        
 
-class QuestionUpdate(UpdateView):
+class QuestionUpdate(LoginRequiredMixin, UpdateView):
     """
     QuestionUpdate View
     
@@ -508,12 +553,16 @@ class QuestionUpdate(UpdateView):
 
     'questionSlug' : slug_url_kwarg
         slug keyword arguments for this view
+
+    '/login/' 
+        redirect url for login required permission 
     """
     model = Question
     slug_field = 'questionSlug'
     slug_url_kwarg = 'questionSlug'
     template_name = 'question_form.html'
     fields = ['questionText','answer', 'questionNumber']
+    login_url = '/login/'
 
     def get_success_url(self):
         """
@@ -526,7 +575,7 @@ class QuestionUpdate(UpdateView):
                                                     'categorySlug': self.object.category.categorySlug,
                                                     'questionSlug': self.object.questionSlug})
 
-class QuestionDelete(DeleteView):
+class QuestionDelete(LoginRequiredMixin, DeleteView):
     """
     QuestionDelete View
     
@@ -547,11 +596,16 @@ class QuestionDelete(DeleteView):
 
     'questionSlug' : slug_url_kwarg
         slug keyword arguments for this view
+
+    '/login/' 
+        redirect url for login required permission 
     """
     model = Question
     slug_field = 'questionSlug'
     slug_url_kwarg = 'questionSlug'
     template_name = 'question_form_confirm_delete.html' 
+    login_url = '/login/'
+
     def get_success_url(self):
         """
         get_success_url
