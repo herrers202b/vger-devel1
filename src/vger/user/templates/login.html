@@ -19,6 +19,12 @@
         {{ form.password|as_crispy_field }}
       </div>
     </div>
+
+    <div class="form-row">
+      <div class="form-group col-mb-6 mb-0">
+        {{ form|as_crispy_errors }}
+      </div>
+    </div>
   </fieldset>
 
   <button type="submit" class="btn btn-primary">
