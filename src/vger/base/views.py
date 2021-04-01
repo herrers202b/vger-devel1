@@ -10,7 +10,7 @@ from django.urls import reverse_lazy
 from django.utils.text import slugify
 #Authentication imports
 from django.contrib.auth.decorators import login_required, permission_required
-from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
 #Generic imports
 from django.views import generic
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
@@ -235,8 +235,7 @@ def home(request):
     return render(request, 'home.html')
 
 #Class templated for creating, updating, and deleting surveys
-#Still needs permissions!
-class SurveyCreate(LoginRequiredMixin, CreateView):
+class SurveyCreate(LoginRequiredMixin, PermissionRequiredMixin, CreateView):
     """
     SurveyCreate View
     
@@ -258,6 +257,9 @@ class SurveyCreate(LoginRequiredMixin, CreateView):
 
     '/login/' 
         redirect url for login required permission 
+    
+    'canCreateSurvey' : permission_required
+        Permission requirement to use this view
     """
     model = Survey
     slug_field = 'surveySlug'
@@ -265,6 +267,7 @@ class SurveyCreate(LoginRequiredMixin, CreateView):
     fields = ['titleOfSurvey', 'directions']
     template_name = 'survey_form.html' 
     login_url = '/login/'
+    permission_required = 'canCreateSurvey'
 
     def get_success_url(self):
         """
@@ -275,7 +278,7 @@ class SurveyCreate(LoginRequiredMixin, CreateView):
         """
         return reverse('survey-detail', kwargs={'surveySlug': self.object.surveySlug})        
 
-class SurveyUpdate(LoginRequiredMixin, UpdateView):
+class SurveyUpdate(LoginRequiredMixin, PermissionRequiredMixin, UpdateView):
     """
     SurveyUpdate View
     
@@ -293,6 +296,9 @@ class SurveyUpdate(LoginRequiredMixin, UpdateView):
 
     '/login/' 
         redirect url for login required permission 
+
+    'canUpdateSurvey' : permission_required
+        Permission requirement to use this view
     """
     model = Survey
     slug_field = 'surveySlug'
@@ -300,6 +306,7 @@ class SurveyUpdate(LoginRequiredMixin, UpdateView):
     fields = ['titleOfSurvey', 'directions']
     template_name = 'survey_form.html'
     login_url = '/login/' 
+    permission_required = 'canUpdateSurvey'
 
     def get_success_url(self):
         """
@@ -310,7 +317,7 @@ class SurveyUpdate(LoginRequiredMixin, UpdateView):
         """
         return reverse('survey-detail', kwargs={'surveySlug': self.object.surveySlug})
 
-class SurveyDelete(LoginRequiredMixin, DeleteView):
+class SurveyDelete(LoginRequiredMixin, PermissionRequiredMixin, DeleteView):
     """
     SurveyDelete View
     
@@ -334,6 +341,9 @@ class SurveyDelete(LoginRequiredMixin, DeleteView):
 
     '/login/' 
         redirect url for login required permission 
+
+    'canDeleteSurvey' : permission_required
+        Permission requirement to use this view
     """
     model = Survey
     slug_field = 'surveySlug'
@@ -342,10 +352,12 @@ class SurveyDelete(LoginRequiredMixin, DeleteView):
     #forgo success url method since we are at the top of the tree
     success_url = reverse_lazy('survey')
     login_url = '/login/'
+    permission_required = 'canDeleteSurvey'
+
 
 #Class templated for creating, updating, and deleting categories
 #Still needs permissions!
-class CategoryCreate(LoginRequiredMixin, CreateView):
+class CategoryCreate(LoginRequiredMixin, PermissionRequiredMixin, CreateView):
     """
     CategoryCreate View
     
@@ -367,6 +379,9 @@ class CategoryCreate(LoginRequiredMixin, CreateView):
 
     '/login/' 
         redirect url for login required permission 
+
+    'canCreateCategory' : permission_required
+        Permission requirement to use this view
     """    
     model = Category
     slug_field = 'categorySlug'
@@ -374,7 +389,7 @@ class CategoryCreate(LoginRequiredMixin, CreateView):
     template_name = 'category_form.html'
     fields = ['titleOfCategory','lowWeightText', 'highWeightText']
     login_url = '/login/'
-
+    permission_required = 'canCreateCategory'
     def get_success_url(self):
         """
         get_success_url
@@ -398,7 +413,7 @@ class CategoryCreate(LoginRequiredMixin, CreateView):
         return super(CategoryCreate, self).form_valid(form)
         
 
-class CategoryUpdate(LoginRequiredMixin, UpdateView):
+class CategoryUpdate(LoginRequiredMixin, PermissionRequiredMixin, UpdateView):
     """
     CategoryUpdate View
     
@@ -420,6 +435,9 @@ class CategoryUpdate(LoginRequiredMixin, UpdateView):
 
     '/login/' 
         redirect url for login required permission 
+
+    'canUpdateCategory' : permission_required
+        Permission requirement to use this view
     """
     model = Category
     slug_field = 'categorySlug'
@@ -427,6 +445,7 @@ class CategoryUpdate(LoginRequiredMixin, UpdateView):
     template_name = 'category_form.html'
     fields = ['titleOfCategory','lowWeightText', 'highWeightText']
     login_url = '/login/'
+    permission_required = 'canUpdateCategory'
 
     def get_success_url(self):
         """
@@ -438,7 +457,7 @@ class CategoryUpdate(LoginRequiredMixin, UpdateView):
         return reverse('category-detail', kwargs={'surveySlug': self.object.survey.surveySlug,
                                                     'categorySlug': self.object.categorySlug}) 
 
-class CategoryDelete(LoginRequiredMixin, DeleteView):
+class CategoryDelete(LoginRequiredMixin, PermissionRequiredMixin, DeleteView):
     """
     CategoryDelete View
     
@@ -463,12 +482,15 @@ class CategoryDelete(LoginRequiredMixin, DeleteView):
     '/login/' 
         redirect url for login required permission 
     
+    'canDeleteCategory' : permission_required
+        Permission requirement to use this view
     """
     model = Category
     slug_field = 'categorySlug'
     slug_url_kwarg = 'categorySlug'
     template_name = 'category_form_confirm_delete.html' 
     login_url = '/login/'
+    permission_required = 'canDeleteCategory'
 
     def get_success_url(self):
         """
@@ -480,7 +502,7 @@ class CategoryDelete(LoginRequiredMixin, DeleteView):
         return reverse('survey-detail', kwargs={'surveySlug': self.object.survey.surveySlug})
     success_url = get_success_url
 
-class QuestionCreate(LoginRequiredMixin, CreateView):
+class QuestionCreate(LoginRequiredMixin, PermissionRequiredMixin, CreateView):
     """
     QuestionCreate View
     
@@ -502,6 +524,9 @@ class QuestionCreate(LoginRequiredMixin, CreateView):
 
     '/login/' 
         redirect url for login required permission 
+
+    'canCreateQuestion' : permission_required
+        Permission requirement to use this view
     """    
     model = Question
     slug_field = 'questionSlug'
@@ -509,6 +534,7 @@ class QuestionCreate(LoginRequiredMixin, CreateView):
     template_name = 'question_form.html'
     fields = ['questionText','answer', 'questionNumber']
     login_url = '/login/'
+    permission_required = 'canCreateQuestion'
 
     def get_success_url(self):
         """
@@ -534,7 +560,7 @@ class QuestionCreate(LoginRequiredMixin, CreateView):
         return super(QuestionCreate, self).form_valid(form)
         
 
-class QuestionUpdate(LoginRequiredMixin, UpdateView):
+class QuestionUpdate(LoginRequiredMixin, PermissionRequiredMixin, UpdateView):
     """
     QuestionUpdate View
     
@@ -556,6 +582,9 @@ class QuestionUpdate(LoginRequiredMixin, UpdateView):
 
     '/login/' 
         redirect url for login required permission 
+    
+    'canUpdateQuestion' : permission_required
+        Permission requirement to use this view
     """
     model = Question
     slug_field = 'questionSlug'
@@ -563,6 +592,7 @@ class QuestionUpdate(LoginRequiredMixin, UpdateView):
     template_name = 'question_form.html'
     fields = ['questionText','answer', 'questionNumber']
     login_url = '/login/'
+    permission_required = 'canUpdateQuestion'
 
     def get_success_url(self):
         """
@@ -575,7 +605,7 @@ class QuestionUpdate(LoginRequiredMixin, UpdateView):
                                                     'categorySlug': self.object.category.categorySlug,
                                                     'questionSlug': self.object.questionSlug})
 
-class QuestionDelete(LoginRequiredMixin, DeleteView):
+class QuestionDelete(LoginRequiredMixin, PermissionRequiredMixin, DeleteView):
     """
     QuestionDelete View
     
@@ -599,12 +629,16 @@ class QuestionDelete(LoginRequiredMixin, DeleteView):
 
     '/login/' 
         redirect url for login required permission 
+
+    'canDeleteQuestion' : permission_required
+        Permission requirement to use this view
     """
     model = Question
     slug_field = 'questionSlug'
     slug_url_kwarg = 'questionSlug'
     template_name = 'question_form_confirm_delete.html' 
     login_url = '/login/'
+    permission_required = 'canDeleteQuestion'
 
     def get_success_url(self):
         """

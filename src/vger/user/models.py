@@ -1,17 +1,31 @@
 from django.db import models
 from django.contrib.auth.models import User
 
-# Advisor model: Can view completed surveys of only their advisees
 class Advisor(models.Model): 
-    
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
-
-# Student model: exists to create a relationship between advisors and advisees
+    # Advisor model: Can view completed surveys of only their advisees
+    student = models.OneToOneField("Student", related_name=("Advisor"), default=None, null=True, on_delete=models.CASCADE)
+    class Meta:
+        permissions = (('canTakeSurvey', 'can take survey'),
+                        ('canViewOwnResults', 'can see own results'),
+                        ('canSeeAdviseeSurvey', 'can see advisee survey'),)
 class Student(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
-    advisor = models.ForeignKey(Advisor, on_delete=models.CASCADE, null=False)
-
-# Administrator model: Model for use for user accounts to have survey edit
-# access, separate from site backend administration
+    # Student model: exists to create a relationship between advisors and advisees
+    advisor = models.ForeignKey("Advisor", related_name=("Advisee"), default=None, null=True, on_delete=models.CASCADE)
+    class Meta:
+        permissions = (('canTakeSurvey', 'can take survey'),
+                        ('canViewOwnResults', 'can see own results'))
 class Administrator(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    # Administrator model: Model for use for user accounts to have survey edit
+    # access, separate from site backend administration
+    class Meta:
+        permissions = (('canCreateSurvey', 'can create survey'),
+                        ('canEditSurvey', 'can edit survey'),
+                        ('canDeleteSurvey', 'can delete survey'),
+                        ('canCreateCategory', 'can create category'),
+                        ('canEditCategory', 'can edit category'),
+                        ('canDeleteCategory', 'can delete category'),
+                        ('canCreateQuestion', 'can create question'),
+                        ('canEditQuestion', 'can edit question'),
+                        ('canDeleteQuestion', 'can delete question'),
+                        ('canTakeSurvey', 'can take survey'),
+                        ('canViewOwnResults', 'can see own results'))
