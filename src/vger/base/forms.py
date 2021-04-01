@@ -22,7 +22,8 @@ class SurveyCategoryForm(forms.Form):
             (4,'weight 4'),
         )
         for i, question in enumerate(questions):
-            self.fields['custom_%s' % i] = forms.ChoiceField(choices=QUESTION_WEIGHTS, label=question.questionText)
+            self.fields['custom_%s' % i] = forms.CharField(label=question.questionText, widget=forms.RadioSelect(attrs={'class': 'form-check-inline'}, choices=QUESTION_WEIGHTS))
+            #self.fields['custom_%s' % i] = forms.ChoiceField(choices=QUESTION_WEIGHTS, label=question.questionText)
         
     def category_answers(self):
         for name, value in self.cleaned_data.items():
