@@ -11,12 +11,20 @@
   <!------Remove the () from the end of all to get relational queires to work-->
   {% for Category in survey_detail.categories.all %}
     <div style="margin-left:20px;margin-top:20px">
-    <!-----Title: {{ Category.titleOfCategory }}---->
-    <a href="{{ Category.get_absolute_url }}">Title: {{Category.titleOfCategory}}</a> 
+
+    {% if perms.canCreateCategory %}
+      <a href="{{ Category.get_absolute_url }}">Title: {{Category.titleOfCategory}}</a> 
+    {% else %}
+      <p>Category Title: {{Category.titleOfCategory}}</p>
+    {% endif %}
 
     {% for Question in Category.questions.all %}
         <div style="margin-left:20px;margin-top:20px">
-          <a href="{{ Question.get_absolute_url }}">Question: {{Question.questionText}}?</a> 
+          {% if perms.canCreateQuestion %}
+            <a href="{{ Question.get_absolute_url }}">Question: {{Question.questionText}}?</a> 
+          {% else %}
+            <p>Question: {{Question.questionText}}?</p>
+          {% endif %}
         </div>
     {% endfor %}
     </div>

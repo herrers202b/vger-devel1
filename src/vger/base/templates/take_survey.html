@@ -7,16 +7,17 @@
             <legend >{{ toc }}</legend>
             {{ form }}
         </fieldset>
+
         <div class="form-group">
             <button  type="submit">
                 Next Page
             </button >
-            <form method="get" action="{{ survey.get_exit_url }}">
+            <!--<form method="get" action="{{ survey.get_exit_url }}">
                 <button type="submit">Finish Survey</button>
-            </form>
+            </form>-->
+
         </div>
-    </form>
-    
+    </form> 
 </div>
 
 {% endblock %}

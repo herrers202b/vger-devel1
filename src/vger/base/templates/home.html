@@ -13,22 +13,27 @@
     
     <h2 > For Students</h2>
     <ul>
-        <li><a href="{% url 'login' %}">Login</a> to take a new survey!</li>
+        {% if not user.is_authenticated %}
+            <li><a href="{% url 'login' %}">Login</a> to take a new survey!</li>
+        {% endif %}
         <li>You may also see previous scores and compare those results</li>
         <li>If you would like, you can download your survey results</li>
     </ul>
     <h2>For Advisors</h2>
     <ul>
-        <li><a href="{% url 'login' %}">Login</a> to view students results/score breakdown</li>
+        {% if not user.is_authenticated %}
+            <li><a href="{% url 'login' %}">Login</a> to view students results/score breakdown</li>
+        {% endif %}
+        <li>View students results/score breakdown</li>
     </ul>
 
     <h2>For Admins</h2>
     <ul>
-        <li>Login to publish a new survey</li>
+        {% if not user.is_authenticated %}
+            <li><a href="{% url 'login' %}">Login</a> to take a survey and/or see scores.</li>
+        {% endif %}
         <li>You can check on the current and/or previous versions of the survey</li>
         <li>You may also update questions and/or gather questions from other surveys</li>
-
-        <p><a href="{% url 'login' %}">Login</a> to take a survey and/or see scores.</p>
         
 </body>
 <!--AND HERE-->

@@ -7,7 +7,11 @@
 
   {% for Question in category_detail.questions.all %}
     <div style="margin-left:20px;margin-top:20px">
+      {% if perms.canCreateQuestion %}
         <a href="{{ Question.get_absolute_url }}">Question: {{Question.questionText}}?</a> 
+      {% else %}
+        <p>Question: {{Question.questionText}}?</p>
+      {% endif %}
     </div>
   {% endfor %}
   <p> </p>

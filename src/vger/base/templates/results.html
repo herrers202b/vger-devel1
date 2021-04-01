@@ -8,7 +8,7 @@
 
 {% for category in categories %}
 <p>Category: {{category.titleOfCategory}}
-
+    <br>
     {% for question in questions %}
     {% if question.category == category %}
     <li>For: {{question.questionText}}</li>
