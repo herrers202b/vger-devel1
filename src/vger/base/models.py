@@ -5,7 +5,8 @@ import uuid
 from django.template.defaultfilters import slugify
 
 import hashlib, random, sys
-from django.contrib.auth.models import User
+from django.contrib.auth.models import AbstractUser
+from user.models import customUser
 # Create your models here.
 
 #Untested question model
@@ -182,7 +183,7 @@ class SurveyInstance(models.Model):
     """
     session_hash = models.CharField(max_length=40, unique=True, default=create_session_hash.__func__)
     survey = models.ForeignKey('Survey', on_delete=models.RESTRICT, null=True)
-    user = models.ForeignKey(User, on_delete=models.CASCADE, null=False)
+    user = models.ForeignKey(customUser, on_delete=models.CASCADE, null=False)
     
     def __str__(self):
         """String for representing the Survey Instance Object"""
