@@ -5,6 +5,12 @@
   <p>Question number: {{question_detail.questionNumber}}</p>
   <p> </p>
   <a href="{{ question_detail.category.get_absolute_url }}">Return</a>
-  <a href="{{ question_detail.get_absolute_url }}/update-question">Update Question</a> 
-  <a href="{{ question_detail.get_absolute_url }}/delete-question">Delete Question</a> 
+
+  {% if perms.canUpdateQuestion %}
+    <a href="{{ question_detail.get_absolute_url }}/update-question">Update Question</a>   {% endif %}
+  {% if perms.canDeleteQuestion %}
+    <a href="{{ question_detail.get_absolute_url }}/delete-question">Delete Question</a> 
+  {% endif %}
+
+
 {% endblock %}

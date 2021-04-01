@@ -12,7 +12,14 @@
   {% endfor %}
   <p> </p>
   <a href="{{ category_detail.survey.get_absolute_url }}">Return</a>
-  <a href="{{ category_detail.get_absolute_url }}/update-category">Update Category</a> 
-  <a href="{{ category_detail.get_absolute_url }}/delete-category">Delete Category</a> 
-  <a href="{{ category_detail.get_absolute_url }}/create-question">Create Question</a>  
+
+  {% if perms.canUpdateCategory %}
+    <a href="{{ category_detail.get_absolute_url }}/update-category">Update Category</a> 
+  {% endif %}
+  {% if perms.canDeleteCategory %}
+    <a href="{{ category_detail.get_absolute_url }}/delete-category">Delete Category</a> 
+  {% endif %}
+  {% if perms.canCreateQuestion %}
+    <a href="{{ category_detail.get_absolute_url }}/create-question">Create Question</a>  
+  {% endif %}
 {% endblock %}
