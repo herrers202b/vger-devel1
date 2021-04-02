@@ -1,0 +1,49 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+{% block content %}
+<!--INSERT PAGE CONTENT BETWEEN HERE-->
+<form method="POST" action="">
+  {% csrf_token %}
+  <fieldset>
+    <div class="form-row">
+      <legend>Register:</legend>
+    </div>
+
+    <div class="form-row">
+      <div class="form-group col-md-6 mb-0">
+        {{ form.username|as_crispy_field }}
+      </div>
+    </div>
+
+    <div class="form-row">
+      <div class="form-group col-md-6 mb-0">
+        {{ form.email|as_crispy_field }}
+      </div>
+    </div>
+
+    <div class="form-row">
+      <div class="form-group col-md-6 mb-0">
+        {{ form.password1|as_crispy_field }}
+      </div>
+    </div>
+
+    <div class="form-row">
+      <div class="form-group col-md-6 mb-0">
+        {{ form.password2|as_crispy_field }}
+      </div>
+    </div>
+  </fieldset>
+
+  <button type="submit" class="btn btn-primary">
+    Create User
+  </button>
+</form>
+
+<div class="border-top pt-3 row spacer">
+  <small class="text-muted">
+    Already Have An account? <a class="ml-2" href="{% url 'login' %}">Log in</a>
+  </small>
+
+</div>
+<!--AND HERE-->
+{% endblock content %}

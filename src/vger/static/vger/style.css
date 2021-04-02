@@ -1,18 +1,37 @@
 body {
-    font-size: 1.3em;
-    font-weight: bold;
-    color: #000000;
-    background-color: #8a1538; 
+    font-size:1.3em;
+    font-weight:bold;
+    color:#000000;
+    background-color:#8a1538; 
 }
 
-h1, h2, h3, h4, h5, h6 {
-    color: #8a1538;
+h1, h2, h3, h4, h5, h6, a {
+    color:#8a1538;
+}
+
+a:hover {
+    color:#cc1e52;
+    text-decoration:none;
 }
 
 .nav-link {
-    color: #8a1538;
+    color:#8a1538;
 }
 
-.spacer{margin-top: 5px;}
+.nav-link:hover {
+    color:#cc1e52;
+}
 
-.row{margin-top: 10px;}
+.spacer{margin-top:5px;}
+
+.row{margin-top:10px;}
+
+.btn-primary {
+    background-color:#8a1538;
+    border-color:#8a1538;
+}
+
+.btn-primary:hover {
+    background-color:#cc1e52;
+    border-color:#cc1e52;
+}

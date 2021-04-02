@@ -1,19 +1,41 @@
 {% extends "base.html" %}
+{% load crispy_forms_tags %}
 {% block content %}
-<div class="row spacer">
-    <form method="POST">
-        {% csrf_token %}
-        <fieldset>
-            <legend>Log In:</legend>
-            {{ form }}
-        </fieldset>
-        <button type="submit">
-            Sign In
-        </button>
-    </form>
-</div>
-<div class="borter-top pt-3 row spacer">
+<form method="POST">
+  {% csrf_token %}
+  <fieldset>
+    <div class="form-row">
+      <legend>Log In:</legend>
+    </div>
 
+    <div class="form-row">
+      <div class="form-group col-mb-6 mb-0">
+        {{ form.username|as_crispy_field }}
+      </div>
+    </div>
+
+    <div class="form-row">
+      <div class="form-group col-mb-6 mb-0">
+        {{ form.password|as_crispy_field }}
+      </div>
+    </div>
+
+    <div class="form-row">
+      <div class="form-group col-mb-6 mb-0">
+        {{ form|as_crispy_errors }}
+      </div>
+    </div>
+  </fieldset>
+
+  <button type="submit" class="btn btn-primary">
+    Sign In
+  </button>
+</form>
+
+<div class="border-top pt-3 row spacer">
+  <small class="text-muted">
+    Don't have an account? <a class="ml-2" href="{% url 'register' %}">Register here</a>
+  </small>
 </div>
 
 {% endblock content %}
