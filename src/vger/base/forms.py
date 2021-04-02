@@ -15,17 +15,18 @@ class SurveyCategoryForm(forms.Form):
         print("questions", questions)
         #TODO: Assign weights from the question in for loop
         QUESTION_WEIGHTS = (
-            (0,'weight 0'),
-            (1,'weight 1'),
-            (2,'weight 2'),
-            (3,'weight 3'),
-            (4,'weight 4'),
+            (0,'0'),
+            (1,'1'),
+            (2,'2'),
+            (3,'3'),
+            (4,'4'),
         )
         for i, question in enumerate(questions):
             self.fields['custom_%s' % i] = forms.ChoiceField(
-                widget=forms.RadioSelect(attrs={'class': 'form-check-inline', 'list-style-type': 'none'}),
+                widget=forms.RadioSelect,
                 choices=QUESTION_WEIGHTS,
-                label=question.questionText)
+                label=question.questionText
+            )
             #self.fields['custom_%s' % i] = forms.ChoiceField(choices=QUESTION_WEIGHTS, label=question.questionText)
         
     def category_answers(self):
