@@ -12,7 +12,7 @@
   {% endfor %}
   <p> </p>
   <a href="{{ category_detail.survey.get_absolute_url }}">Return</a>
-  <a href="{{ category_detail.get_absolute_url }}/update-category">Update Category</a> 
-  <a href="{{ category_detail.get_absolute_url }}/delete-category">Delete Category</a> 
-  <a href="{{ category_detail.get_absolute_url }}/create-question">Create Question</a>  
+  <a style= "margin-left: 25px;" href="{{ category_detail.get_absolute_url }}/update-category">Update Category</a> 
+  <a style= "margin-left: 25px;" href="{{ category_detail.get_absolute_url }}/delete-category">Delete Category</a> 
+  <a style= "margin-left: 25px;" href="{{ category_detail.get_absolute_url }}/create-question">Create Question</a>  
 {% endblock %}
