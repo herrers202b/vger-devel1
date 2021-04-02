@@ -10,7 +10,9 @@
         <a href="{{ survey.get_absolute_url }}">{{ survey.titleOfSurvey }}</a> 
         {% if user.is_authenticated %}
         <form method="get" action="{{ survey.get_creation_url }}">
-          <button type="submit">Take Survey</button>
+          <div class="row spacer">
+              <button type="submit">Take Survey</button>
+          </div>
         </form>
         {% endif %}
       </li>

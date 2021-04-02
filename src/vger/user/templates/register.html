@@ -1,48 +1,59 @@
 {% extends 'base.html' %}
+{% load crispy_forms_tags %}
 {% block content %}
 <!--INSERT PAGE CONTENT BETWEEN HERE-->
 <form method="POST" action="">
+  {% csrf_token %}
   <fieldset>
-    <div class="row spacer">
+    <div class="form-row">
       <legend>Register:</legend>
     </div>
 
-    <div class="row spacer">
-      {% csrf_token %}
-      {{form.username.label}}
-      {{form.username}}
+    <div class="form-row">
+      <div class="form-group col-md-6 mb-0">
+        {{ form.username|as_crispy_field }}
+      </div>
+    </div>
+
+    <div class="form-row">
+      <div class="form-group col-md-6 mb-0">
+        {{ form.email|as_crispy_field }}
+      </div>
     </div>
 
     <div class="row spacer">
-      {{form.email.label}}
-      {{form.email}}
+      {{form.role.label|as_crispy_field}}
+      {{form.role|as_crispy_field}}
     </div>
 
     <div class="row spacer">
-      {{form.role.label}}
-      {{form.role}}
+      {{form.password1.label|as_crispy_field}}
+      {{form.password1|as_crispy_field}}
     </div>
 
-    <div class="row spacer">
-      {{form.password1.label}}
-      {{form.password1}}
-    </div>
-
-    <div class="row spacer">
-      {{form.password2.label}}
-      {{form.password2}}
+    <div class="form-row">
+      <div class="form-group col-md-6 mb-0">
+        {{ form.password2|as_crispy_field }}
+      </div>
     </div>
   </fieldset>
 
-  <div class="row spacer">
-    <input type="submit" name="Create User">
-  </div>
+  <button type="submit" class="btn btn-primary">
+    Create User
+  </button>
 </form>
 
+<<<<<<< HEAD
 {{form.errors}}
 
 <div class="borter-top pt-3 row spacer">
 
+=======
+<div class="border-top pt-3 row spacer">
+  <small class="text-muted">
+    Already Have An account? <a class="ml-2" href="{% url 'login' %}">Log in</a>
+  </small>
+>>>>>>> master
 
 </div>
 <!--AND HERE-->
