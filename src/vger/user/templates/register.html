@@ -22,13 +22,11 @@
     </div>
 
     <div class="row spacer">
-      {{form.role.label|as_crispy_field}}
-      {{form.role|as_crispy_field}}
+      {{ form.role|as_crispy_field }}
     </div>
 
     <div class="row spacer">
-      {{form.password1.label|as_crispy_field}}
-      {{form.password1|as_crispy_field}}
+      {{ form.password1|as_crispy_field }}
     </div>
 
     <div class="form-row">
@@ -37,23 +35,16 @@
       </div>
     </div>
   </fieldset>
-
+ 
   <button type="submit" class="btn btn-primary">
     Create User
   </button>
 </form>
 
-<<<<<<< HEAD
 {{form.errors}}
 
 <div class="borter-top pt-3 row spacer">
 
-=======
-<div class="border-top pt-3 row spacer">
-  <small class="text-muted">
-    Already Have An account? <a class="ml-2" href="{% url 'login' %}">Log in</a>
-  </small>
->>>>>>> master
 
 </div>
 <!--AND HERE-->
