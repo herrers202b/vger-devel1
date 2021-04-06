@@ -16,8 +16,8 @@ urlpatterns = [
     path('survey/<slug:surveySlug>/category/<slug:categorySlug>/question/<slug:questionSlug>', views.QuestionDetailView.as_view(), name='question-detail'),
     path('survey/<slug:surveySlug>/category/<slug:categorySlug>/question/<slug:questionSlug>/update-question/', views.QuestionUpdate.as_view(), name='question-update'),
     path('survey/<slug:surveySlug>/category/<slug:categorySlug>/question/<slug:questionSlug>/delete-question/', views.QuestionDelete.as_view(), name='question-delete'),
-    path('survey/results/<slug:session_hash>', views.results, name='results-page'),
-    path('survey/take/<int:pk>', views.generateNewSurvey, name='gen-survey'),
-    path('survey/take/<slug:session_hash>', views.welcomeSurvey, name='welcome-to-survey'),
-    path('survey/take/<slug:session_hash>/page=<int:page>', views.takeSurvey, name='take-survey')
+    # path('survey/results/<slug:session_hash>', views.results, name='results-page'),
+    # path('survey/take/<int:pk>', views.generateNewSurvey, name='gen-survey'),
+    # path('survey/take/<slug:session_hash>', views.welcomeSurvey, name='welcome-to-survey'),
+    # path('survey/take/<slug:session_hash>/page=<int:page>', views.takeSurvey, name='take-survey')
 ]
