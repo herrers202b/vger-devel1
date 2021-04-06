@@ -1,15 +1,54 @@
 {% extends "base.html" %}
-
+{% block head %}
+<script type="text/javascript" src="/static/base/expand_button.js"></script>
+{% endblock %}
 {% block content %}
-<h1>Title: {{survey_detail.titleOfSurvey }}</h1>
+<h1>Title: {{survey.titleOfSurvey }}</h1>
 
-<p><strong>Description:</strong> {{survey_detail.description }}</p>
+<p><strong>Description:</strong> {{survey.description }}</p>
+
+<script>
+  function Hide() {
+      if(document.getElementById('id_type').options[document.getElementById('id_type').selectedIndex].value == "1") {
+           document.getElementById('id_list1').style.display = 'none';
+           document.getElementById('id_list2').style.display = '';
+      } else {
+           document.getElementById('id_list1').style.display = '';
+           document.getElementById('id_list2').style.display = 'none';
+      }
+  }
+  
+  window.onload = function() {
+      document.getElementById('id_type').onchange = Hide;
+  };
+  </script>
+  
+  <div>
+      {{ form.type.label_tag }}{{ form.type }}
+  </div>
+  <div id="id_list1">
+      {{ form.list1.label_tag }}{{ form.list1 }}
+  </div>
+  <div id="id_list2">
+      {{ form.list2.label_tag }}{{ form.list2 }}
+  </div>
+
+
+
+
+
+
+
+
+
+
+
 
   <h4>Categories:</h4>
   <!--https://stackoverflow.com/questions/6704749/relatedmanager-object-is-not-iterable-django-->
   <!--https://stackoverflow.com/questions/37346173/django-select-related -->
   <!------Remove the () from the end of all to get relational queires to work-->
-  {% for Category in survey_detail.categories.all %}
+  {% for Category in categories %}
     <div style="margin-left:20px;margin-top:20px">
 
     {% if perms.canCreateCategory %}
@@ -17,7 +56,7 @@
     {% else %}
       <p>Category Title: {{Category.titleOfCategory}}</p>
     {% endif %}
-
+   
     {% for Question in Category.questions.all %}
         <div style="margin-left:20px;margin-top:20px">
           {% if perms.canCreateQuestion %}
@@ -31,7 +70,6 @@
   {% endfor %}
    <p> </p>
    <a href="{% url 'survey' %}">Return</a>
-
   {% if perms.canDeleteSurvey %}
     <a href="{{ survey_detail.get_absolute_url }}/delete">Delete Survey</a>
   {% endif %}

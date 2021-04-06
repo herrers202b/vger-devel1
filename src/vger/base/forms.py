@@ -4,7 +4,8 @@ from django import forms
 from django.contrib.admin.widgets import AdminSplitDateTime
 from django.forms.fields import DateField
 from .widgets import XDSoftDateTimePickerInput
-from .models import Survey
+from .models import Survey, Category, Question
+from django.forms import HiddenInput
 
 class SurveyCreateForm(forms.ModelForm):
     
@@ -15,6 +16,29 @@ class SurveyCreateForm(forms.ModelForm):
             'start_date': XDSoftDateTimePickerInput(),
             'end_date': XDSoftDateTimePickerInput(),
         }
+
+class CategoryCreateForm(forms.Form):
+    title_of_category = forms.CharField(max_length=100)
+    More = forms.BooleanField(required=False, widget=HiddenInput())
+    type = forms.ChoiceField(choices = ((1, 'One'), (2, 'Two')))
+
+    # Use any form fields you need, CharField for simplicity reasons
+    list1 = forms.CharField()
+    list2 = forms.CharField()
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 # class SurveyCategoryForm(forms.Form):
 

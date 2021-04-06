@@ -1,6 +1,6 @@
 from django.contrib import admin
 # from .models import Question, Category, Survey, SurveyInstance
-from .models import Survey
+from .models import Survey, Survey_Question
 # # Register your models here.
 # admin.site.register(SurveyInstance)
 
@@ -39,5 +39,6 @@ class SurveyAdmin(admin.ModelAdmin):
 
 # #Registering above Admin classes and thier respective classes
 admin.site.register(Survey, SurveyAdmin)
+admin.site.register(Survey_Question)
 # admin.site.register(Category, CategoryAdmin)
 # admin.site.register(Question, QuestionAdmin)

@@ -80,59 +80,77 @@ class SurveyListView(LoginRequiredMixin, generic.ListView):
     template_name = 'survey_list.html' 
     login_url = '/login/'
 
-class SurveyDetailView(LoginRequiredMixin, generic.DetailView):
-    """
-    SurveyDetailView
+# class SurveyDetailView(LoginRequiredMixin, request):
+#     """
+#     SurveyDetailView
 
-    This is the class that we will use to show
-    the details of a specific survey
+#     This is the class that we will use to show
+#     the details of a specific survey
 
-    Survey : model
-        The specific model we will be detailing in this view
+#     Survey : model
+#         The specific model we will be detailing in this view
     
-    'survey_detail' :  context_object_name
-        this is what we will refer to when trying
-        to query via HTML
+#     'survey_detail' :  context_object_name
+#         this is what we will refer to when trying
+#         to query via HTML
 
-    'survey_detail.html' : template_name
-        the name of our html file that contains
-        the template we will use
+#     'survey_detail.html' : template_name
+#         the name of our html file that contains
+#         the template we will use
 
-    'surveySlug' : slug_field
-        slug field for this view
+#     'surveySlug' : slug_field
+#         slug field for this view
 
-    'surveySlug' : slug_url_kwarg
-        slug keyword arguments for this view
+#     'surveySlug' : slug_url_kwarg
+#         slug keyword arguments for this view
         
-    '/login/' 
-        redirect url for login required permission
-    """
-    from django.shortcuts import get_object_or_404
-    model = Survey
-    context_object_name = 'survey_detail'
-    template_name = 'survey_detail.html' 
-    slug_field = 'surveySlug'
-    slug_url_kwarg = 'surveySlug'
-    login_url = '/login/'
+#     '/login/' 
+#         redirect url for login required permission
+#     """
+#     from django.shortcuts import get_object_or_404
+#     model = Survey
+#     context_object_name = 'survey_detail'
+#     template_name = 'survey_detail.html' 
+#     slug_field = 'surveySlug'
+#     slug_url_kwarg = 'surveySlug'
+#     login_url = '/login/'
     
 
-    def survey_detail_view(self, request, primary_key):
-        """
-        survey_detail_view
+#     def survey_detail_view(self, request, primary_key):
+#         """
+#         survey_detail_view
 
-        Method, adapted from Django tutorial, will check
-        to see if a survey exists.
+#         Method, adapted from Django tutorial, will check
+#         to see if a survey exists.
 
-        Survey : the obeject we will either retrieve 
-            or 404 error
+#         Survey : the obeject we will either retrieve 
+#             or 404 error
         
-        method returns the appropriate render
+#         method returns the appropriate render
             
-        '/login/' 
-            redirect url for login required permission
-        """
-        Survey = get_object_or_404(Survey, slug=slug)
-        return render(request, 'base/templates/survey_detail.html', context={'survey': Survey})
+#         '/login/' 
+#             redirect url for login required permission
+#         """
+#         Survey = get_object_or_404(Survey, slug=slug)
+#         return render(request, 'base/templates/survey_detail.html', context={'survey': Survey})
+from .forms import CategoryCreateForm
+
+def SureveyDetailView(request, surveySlug):
+    if not request.user.is_authenticated:
+         return redirect('/login/')
+    
+    survey = Survey.objects.get(surveySlug=surveySlug)
+    categories = Category.objects.filter(survey_fk=survey)
+    category_form = CategoryCreateForm()
+    context = {
+        'survey' : survey,
+        'categories' : categories,
+        'form' : category_form
+
+    }
+    
+    return render(request, 'survey_detail.html', context)
+    
 
 class CategoryDetailView(LoginRequiredMixin, generic.DetailView):
     """

@@ -26,18 +26,13 @@ class Survey(models.Model):
 
 class Category(models.Model):
     titleOfCategory = models.CharField(max_length=100)
-    categorySlug = models.SlugField(null=False, unique=True)
-
-    def save(self, *args, **kwargs):
-        if not self.categorySlug:
-            self.categorySlug = slugify(self.titleOfCategory)
-        return super().save(*args, **kwargs)
+    survey_fk = models.ForeignKey('Survey', on_delete=models.CASCADE)
 
     
 class Survey_Question(models.Model):
     survey_fk = models.ForeignKey('Survey', on_delete=models.CASCADE)
-    category_fk = models.ForeignKey('Category', on_delete=models.CASCADE)
-    question_fk = models.ForeignKey('Question', on_delete=models.CASCADE)
+    category_fk = models.ForeignKey('Category', on_delete=models.CASCADE, null=True)
+    question_fk = models.ForeignKey('Question', on_delete=models.CASCADE, null=True)
 
 class Answer(models.Model):
     user_fk = models.ForeignKey(customUser, on_delete=models.CASCADE)
