@@ -671,7 +671,6 @@ class QuestionDelete(LoginRequiredMixin, PermissionRequiredMixin, DeleteView):
         """
         return reverse('category-detail', kwargs={'surveySlug': self.object.category.survey.surveySlug,
                                                     'categorySlug': self.object.category.categorySlug})
-    # success_url = get_success_url
     
 ###############################################################################
 def create_session_hash():
@@ -688,7 +687,17 @@ def survey_page_counter(survey):
 ##############################################################################33
 from .models import User_Survey
 def generateNewSurvey(request, surveySlug):
-    #TODO: need to check if user had a survey
+    """
+
+    generateNewSurvey view
+
+    used for establishing a session to monitor
+    what current page we are on, and creates a user_survey object
+    for establishing a wether or not the user has taken the survey
+
+    TODO: need to check if user had a survey
+    """
+    
     if not request.user.is_authenticated:
         return redirect('/login/')
 
@@ -702,7 +711,17 @@ def generateNewSurvey(request, surveySlug):
     return redirect(survey.get_take_url())
 
 def welcomeSurvey(request, surveySlug):
-    #TODO: need to check if user had a survey
+    """
+
+    welcomeSurvey view
+
+    used for displaying a welcome page that gives the description
+    of the survey before the person starts it
+
+    OPTIONAL TODO: Do we want instructions for a survey to be added?
+    TODO: need to check if user had a survey
+    """
+    
     if not request.user.is_authenticated:
         return redirect('/login/')
 
@@ -715,7 +734,23 @@ def welcomeSurvey(request, surveySlug):
 from .forms import SurveyCategoryForm
 
 def takeSurvey(request, surveySlug, page):
-    #TODO: need to check if user had a survey in User_Survey
+    """
+    takeSurvey view
+
+    This view is used for taking the survey and hands off
+    each category and each question under those categories.
+    this view hands off the category to the SurveyCategoryForm.
+
+    We use the session to keep track of which page were currenlty on
+    and incriment based on the page.
+    If we have the totalPage eqal to current page the redirect the
+    user to the results otherwise handle the post method and save
+    the information to a new answer model
+
+    TODO: need to check if user had a survey in User_Survey
+    TODO: Save answers of all types rather than just radio
+    """
+    
     currPage = request.session.get('currPage', 0)
     totalPage = request.session.get('totalPage', 0)
     survey = Survey.objects.get(surveySlug=request.session.get('surveySlug')) 
@@ -727,7 +762,7 @@ def takeSurvey(request, surveySlug, page):
     if request.method == 'POST':
         form = SurveyCategoryForm(request.POST, instance=list_of_categories[currPage].pk)
         if form.is_valid():
-            #TODO: Save answers of all types rather than just radio
+            
             for (q, a) in form.category_answers():
                 answer = Answer.objects.create(
                     user_fk = request.user,
@@ -741,14 +776,12 @@ def takeSurvey(request, surveySlug, page):
         if currPage + 1 == totalPage:
             return redirect('results-page')
 
-    
     form = SurveyCategoryForm(instance=list_of_categories[currPage].pk)
     
     context = {
         'toc' : list_of_categories[currPage].titleOfCategory,
         'form' : form,
     }
-    print("here")
     return render(request, 'take_survey.html', context)
 
 # def results(request, session_hash):

@@ -1,14 +1,18 @@
 from django import forms
-# from .models import SurveyInstance, Survey, Category, Question
-# from django.forms import ModelForm
 from django.contrib.admin.widgets import AdminSplitDateTime
 from django.forms.fields import DateField
 from .widgets import XDSoftDateTimePickerInput
 from .models import Survey, Category, Question, Survey_Question, Option_Choice
 from django.forms import HiddenInput
 
+
 class SurveyCreateForm(forms.ModelForm):
+    """
+    SurveyCreateForm
+
+    This form is for creating a survey and is currently unfinished
     
+    """
     class Meta:
         model = Survey
         fields = ('titleOfSurvey', 'description', 'start_date', 'end_date')
@@ -30,7 +34,15 @@ class CategoryCreateForm(forms.Form):
 
 #TODO: Refactor form to approprately gather question answer groups
 class SurveyCategoryForm(forms.Form):
+    """
+    SurveyCategoryForm
 
+    This form is used for creating a number of questions based on
+    how many are in a category dynamically and the returning those
+    in a form
+
+    @kwargs = Primary key of the category table entry
+    """
     def __init__(self, *args, **kwargs):
         toc = kwargs.pop('instance')
         super(SurveyCategoryForm, self).__init__(*args, **kwargs)
@@ -44,7 +56,6 @@ class SurveyCategoryForm(forms.Form):
             option_choices = Option_Choice.objects.filter(option_group=question.option_group)
 
             options = ((o_c.choice_text, o_c.choice_text) for o_c in option_choices)
-            forms.ChoiceField
             #This is for multi field questions
             name = 'custom_%s' % i
             self.fields[name + ' ' + str(survey_question.pk)] = forms.ChoiceField(
