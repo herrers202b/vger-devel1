@@ -140,7 +140,6 @@ def SureveyDetailView(request, surveySlug):
          return redirect('/login/')
     
     survey = Survey.objects.get(surveySlug=surveySlug)
-    survey_question = Survey_Question.objects.get(survey_fk=survey)
     categories = Category.objects.filter(survey_fk=survey)
     questions = Survey_Question.objects.filter(survey_fk=survey)
     
@@ -679,9 +678,30 @@ def create_session_hash():
             hash = hashlib.sha1()
             hash.update(str(random.randint(0,sys.maxsize)).encode('utf-8'))
             return hash.hexdigest()
+
+#This func is used to handle a survey object and count the number of necessary pages
+#and then pass that data pack in a representable way to be handled in either a session
+#based format or in some itterative represenation
+def survey_page_counter(survey):
+    return len(Category.objects.filter(survey_fk=survey))
+
 ##############################################################################33
-def welcomeSurvey(request, surveySlug):
+from .models import User_Survey
+def generateNewSurvey(request, surveySlug):
+    #TODO: need to check if user had a survey
+    if not request.user.is_authenticated:
+        return redirect('/login/')
+
+    survey = Survey.objects.get(surveySlug=surveySlug)    
     request.session['surveySlug'] = surveySlug
+    request.session['totalPage'] = survey_page_counter(survey)
+    request.session['currPage'] = 0
+
+    u_s = User_Survey.objects.create(user_fk=request.user, survey_fk=survey)
+    u_s.save()
+    return redirect(survey.get_take_url())
+
+def welcomeSurvey(request, surveySlug):
     #TODO: need to check if user had a survey
     if not request.user.is_authenticated:
         return redirect('/login/')
@@ -692,60 +712,44 @@ def welcomeSurvey(request, surveySlug):
     }
     return render(request, 'welcome_to_survey.html', context)
 
-# def welcomeSurvey(request, session_hash):
-#     request.session['session_hash'] = session_hash
-#     SI = SurveyInstance.objects.get(session_hash=session_hash)
-#     context = {
-#         'Survey' : SI.survey,
-#         'SI' : SI
-#     }
-#     return render(request, 'welcome_to_survey.html', context)
+from .forms import SurveyCategoryForm
 
-# def takeSurvey(request, session_hash, page):
-#     session_category = request.session.get('session_category', None)
-#     print(session_category)
-#     if session_category == None or session_category == []:
-#         session_category = []
-#         si = SurveyInstance.objects.get(session_hash=session_hash)
-#         categories = Category.objects.filter(survey=si.survey)
-#         for cat in categories:
-#             session_category.append(cat.titleOfCategory)
-#         request.session['session_category'] = session_category
+def takeSurvey(request, surveySlug, page):
+    #TODO: need to check if user had a survey in User_Survey
+    currPage = request.session.get('currPage', 0)
+    totalPage = request.session.get('totalPage', 0)
+    survey = Survey.objects.get(surveySlug=request.session.get('surveySlug')) 
+    list_of_categories = Category.objects.filter(survey_fk=survey)[::1]
+    
+    if currPage == totalPage:
+            return redirect('results-page')
 
-#     elif len(session_category) != 0:
-#         if request.method == 'POST':
-#             form = SurveyCategoryForm(request.POST, instance=session_category[0])
-#             if form.is_valid():
-#                 si = SurveyInstance.objects.get(session_hash=session_hash)
-#                 category = Category.objects.get(survey=si.survey, titleOfCategory=session_category[0])
-#                 questions = Question.objects.filter(category=category) 
-#                 print(questions)
-#                 for (q, a) in form.category_answers():
-#                     print("q", q)
-#                     model_question = questions.get(questionText=q)
-#                     model_question.answer = a
-#                     model_question.save()
+    if request.method == 'POST':
+        form = SurveyCategoryForm(request.POST, instance=list_of_categories[currPage].pk)
+        if form.is_valid():
+            #TODO: Save answers of all types rather than just radio
+            for (q, a) in form.category_answers():
+                answer = Answer.objects.create(
+                    user_fk = request.user,
+                    survey_question_fk = Survey_Question.objects.get(pk=q),
+                    answer_text = a
+                )
+                answer.save()
 
+            request.session['currPage'] = currPage + 1
+        
+        if currPage + 1 == totalPage:
+            return redirect('results-page')
 
-#             # for i, question in enumerate(questions):
-              
-#             del session_category[0]
-
-#         request.session['session_category'] = session_category
-#     if len(session_category) == 0:
-#         #TODO: exit survey
-#         si = SurveyInstance.objects.get(session_hash=request.session['session_hash'])
-#         si.survey.finished = True
-#         si.save()
-#         return redirect(si.get_exit_url())
-#         print("TODO")
-
-#     print(session_category)
-#     #print(request.session['session_category'])
-#     #TODO: if post save questions
-#     form = SurveyCategoryForm(instance=session_category[0])
-
-#     return render(request, 'take_survey.html', {'toc': session_category[0], 'form' : form})
+    
+    form = SurveyCategoryForm(instance=list_of_categories[currPage].pk)
+    
+    context = {
+        'toc' : list_of_categories[currPage].titleOfCategory,
+        'form' : form,
+    }
+    print("here")
+    return render(request, 'take_survey.html', context)
 
 # def results(request, session_hash):
 #     """

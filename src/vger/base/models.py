@@ -22,7 +22,11 @@ class Survey(models.Model):
         """Returns the url to access a detailed record for this survey"""
         return reverse("survey-detail", kwargs={'surveySlug': self.surveySlug})
     
+    def get_gen_url(self):
+        return reverse("gen-survey", kwargs={'surveySlug' : self.surveySlug})
     
+    def get_take_url(self):
+        return reverse("take-survey", kwargs={'surveySlug' : self.surveySlug, 'page' : 0})
 
 class Category(models.Model):
     titleOfCategory = models.CharField(max_length=100)
@@ -59,3 +63,11 @@ class Option_Choice(models.Model):
 
 class Input_Type(models.Model):
     input_type_name = models.CharField(max_length=20)
+
+
+class User_Survey(models.Model):
+    finished = models.BooleanField(default=False)     
+    
+    user_fk = models.ForeignKey(customUser, on_delete=models.CASCADE)
+    survey_fk = models.ForeignKey('Survey', on_delete=models.CASCADE)
+    

@@ -4,7 +4,7 @@
 <body>
     <h2>{{ Survey.titleOfSurvey }} </h2>
     <p>{{ Survey.directions }} </p>
-    <form method="get" action="{{ SI.get_absolute_url }}">
+    <form method="get" action="{{ Survey.get_gen_url }}">
         <button type="submit">Start Survey</button>
       </form>
 </body>

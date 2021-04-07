@@ -4,7 +4,7 @@ from django import forms
 from django.contrib.admin.widgets import AdminSplitDateTime
 from django.forms.fields import DateField
 from .widgets import XDSoftDateTimePickerInput
-from .models import Survey, Category, Question
+from .models import Survey, Category, Question, Survey_Question, Option_Choice
 from django.forms import HiddenInput
 
 class SurveyCreateForm(forms.ModelForm):
@@ -28,48 +28,36 @@ class CategoryCreateForm(forms.Form):
 
 
 
+#TODO: Refactor form to approprately gather question answer groups
+class SurveyCategoryForm(forms.Form):
 
-
-
-
-
-
-
-
-
-
-
-
-# class SurveyCategoryForm(forms.Form):
-
-#     def __init__(self, *args, **kwargs):
-#         toc = kwargs.pop('instance')
-#         super(SurveyCategoryForm, self).__init__(*args, **kwargs)
-#         category = Category.objects.filter(titleOfCategory=toc).first()
-#         questions = Question.objects.filter(category=category)
-#         print("toc", toc)
-#         print("category", category)
-#         print("questions", questions)
-#         #TODO: Assign weights from the question in for loop
-#         QUESTION_WEIGHTS = (
-#             (0,'0'),
-#             (1,'1'),
-#             (2,'2'),
-#             (3,'3'),
-#             (4,'4'),
-#         )
-#         for i, question in enumerate(questions):
-#             self.fields['custom_%s' % i] = forms.ChoiceField(
-#                 widget=forms.RadioSelect,
-#                 choices=QUESTION_WEIGHTS,
-#                 label=question.questionText
-#             )
-#             #self.fields['custom_%s' % i] = forms.ChoiceField(choices=QUESTION_WEIGHTS, label=question.questionText)
+    def __init__(self, *args, **kwargs):
+        toc = kwargs.pop('instance')
+        super(SurveyCategoryForm, self).__init__(*args, **kwargs)
+        category = Category.objects.get(pk=toc)
+        survey_questions = Survey_Question.objects.filter(category_fk=category)
         
-#     def category_answers(self):
-#         for name, value in self.cleaned_data.items():
-#             if name.startswith('custom_'):
-#                 yield (self.fields[name].label, value)
+        for i, survey_question in enumerate(survey_questions):
+            question = survey_question.question_fk
+            #TODO: Design logic here for answer formatting in field types
+
+            option_choices = Option_Choice.objects.filter(option_group=question.option_group)
+
+            options = ((o_c.choice_text, o_c.choice_text) for o_c in option_choices)
+            forms.ChoiceField
+            #This is for multi field questions
+            name = 'custom_%s' % i
+            self.fields[name + ' ' + str(survey_question.pk)] = forms.ChoiceField(
+                widget=forms.RadioSelect,
+                choices=options,
+                label=question.question_text
+            )
+            
+        
+    def category_answers(self):   
+        for name, value in self.cleaned_data.items():
+            if name.startswith('custom_'):
+                yield (name.split()[1], value)
   
 
    

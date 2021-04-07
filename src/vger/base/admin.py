@@ -1,6 +1,6 @@
 from django.contrib import admin
 # from .models import Question, Category, Survey, SurveyInstance
-from .models import Input_Type, Option_Choice, Option_Group, Survey, Survey_Question, Category, Question
+from .models import Input_Type, Option_Choice, Option_Group, Survey, Survey_Question, Category, Question, Answer
 # # Register your models here.
 # admin.site.register(SurveyInstance)
 
@@ -68,7 +68,7 @@ class Input_TypeAdmin(admin.ModelAdmin):
     out.
     """
     list_display = ('input_type_name',)
-
+admin.site.register(Answer)
 admin.site.register(Survey, SurveyAdmin)
 admin.site.register(Survey_Question)
 admin.site.register(Category, CategoryAdmin)
