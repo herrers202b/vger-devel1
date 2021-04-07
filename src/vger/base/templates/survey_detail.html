@@ -6,6 +6,28 @@
 <h1>Title: {{survey.titleOfSurvey }}</h1>
 
 <p><strong>Description:</strong> {{survey.description }}</p>
+{% comment %} {% if perms.canDeleteSurvey %}
+    <a href="{{ survey_detail.get_absolute_url }}/delete">Delete Survey</a>
+{% endif %} {% endcomment %}
+<h2><strong>Categories:</strong></h2>
+{% for Category in categories%}
+  <p>{{Category.titleOfCategory}}</p>
+  <h2>Questions: </h2>
+  {% for Question in questions %}
+    {% if Question.category_fk == Category %}
+      <p>{{Question.question_fk.question_text}}</p>
+      {% comment %} {% if perms.canUpdateQuestion %}
+        <a href="{{ question_detail.get_absolute_url }}/update-question">Update Question</a>   {% endif %}
+      {% if perms.canDeleteQuestion %}
+        <a href="{{ question_detail.get_absolute_url }}/delete-question">Delete Question</a> 
+      {% endif %} {% endcomment %}
+    {% endif %}
+  {% endfor %}
+{% endfor %}
+
+{% comment %} {% if perms.canCreateCategory %}
+      <a href="{{ Category.get_absolute_url }}">Title: {{Category.titleOfCategory}}</a> 
+{% endif %} {% endcomment %}
 
 <script>
   function Hide() {
@@ -18,7 +40,7 @@
       }
   }
   
-  window.onload = function() {
+ {% comment %} window.onload = function() {
       document.getElementById('id_type').onchange = Hide;
   };
   </script>
@@ -31,19 +53,13 @@
   </div>
   <div id="id_list2">
       {{ form.list2.label_tag }}{{ form.list2 }}
-  </div>
+  </div> {% endcomment %}
 
 
 
 
 
-
-
-
-
-
-
-
+{% comment %} 
   <h4>Categories:</h4>
   <!--https://stackoverflow.com/questions/6704749/relatedmanager-object-is-not-iterable-django-->
   <!--https://stackoverflow.com/questions/37346173/django-select-related -->
@@ -78,6 +94,6 @@
   {% endif %}
   {% if perms.canCreateCategory %}
   <a href="{{ survey_detail.get_absolute_url }}/create-category">Create Category</a>   
-  {% endif %}
+  {% endif %} {% endcomment %}
 
 {% endblock %}

@@ -141,12 +141,13 @@ def SureveyDetailView(request, surveySlug):
     
     survey = Survey.objects.get(surveySlug=surveySlug)
     categories = Category.objects.filter(survey_fk=survey)
-    category_form = CategoryCreateForm()
+    questions = Survey_Question.objects.filter(survey_fk=survey)
+    
+    #category_form = CategoryCreateForm()
     context = {
         'survey' : survey,
         'categories' : categories,
-        'form' : category_form
-
+        'questions' : questions,
     }
     
     return render(request, 'survey_detail.html', context)
