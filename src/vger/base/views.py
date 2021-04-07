@@ -140,12 +140,13 @@ def SureveyDetailView(request, surveySlug):
          return redirect('/login/')
     
     survey = Survey.objects.get(surveySlug=surveySlug)
+    survey_question = Survey_Question.objects.get(survey_fk=survey)
     categories = Category.objects.filter(survey_fk=survey)
-    category_form = CategoryCreateForm()
+    # category_form = CategoryCreateForm()
     context = {
         'survey' : survey,
         'categories' : categories,
-        'form' : category_form
+        # 'form' : category_form
 
     }
     
@@ -670,7 +671,7 @@ class QuestionDelete(LoginRequiredMixin, PermissionRequiredMixin, DeleteView):
         """
         return reverse('category-detail', kwargs={'surveySlug': self.object.category.survey.surveySlug,
                                                     'categorySlug': self.object.category.categorySlug})
-    success_url = get_success_url
+    # success_url = get_success_url
     
 ###############################################################################
 def create_session_hash():
@@ -678,36 +679,17 @@ def create_session_hash():
             hash.update(str(random.randint(0,sys.maxsize)).encode('utf-8'))
             return hash.hexdigest()
 ##############################################################################33
-# def generateNewSurvey(request, pk):
-#     request.session['session_category'] = None
-#     #need to check if user had a survey
-#     if not request.user.is_authenticated:
-#         return redirect('/login/')
-#     new_survey = Survey.objects.get(pk=pk)
-#     categories = Category.objects.filter(survey=new_survey)
-#     #TODO: if survey is already in the survey_instance with user ask if they want to continue the old one
-#     new_survey.pk = None
-#     new_survey.assigned = True
-#     new_survey.surveySlug = create_session_hash()
-#     new_survey.save()
+def welcomeSurvey(request, surveySlug):
+    request.session['surveySlug'] = surveySlug
+    #TODO: need to check if user had a survey
+    if not request.user.is_authenticated:
+        return redirect('/login/')
 
-#     for c_item in categories:
-#         questions = Question.objects.filter(category=c_item)
-#         c_item.pk = None
-#         c_item.survey = new_survey
-#         c_item.categorySlug = create_session_hash()
-#         c_item.save()
-#         for q_item in questions:
-#             q_item.pk = None
-#             q_item.category = c_item
-#             q_item.questionSlug = create_session_hash()
-#             q_item.save()
-        
-
-#     survey_instance = SurveyInstance.objects.create(survey=new_survey, user=request.user)
-#     survey_instance.save()
-    
-#     return redirect(survey_instance.get_welcome_url())
+    survey = Survey.objects.get(surveySlug=surveySlug)
+    context = {
+         'Survey' : survey,
+    }
+    return render(request, 'welcome_to_survey.html', context)
 
 # def welcomeSurvey(request, session_hash):
 #     request.session['session_hash'] = session_hash

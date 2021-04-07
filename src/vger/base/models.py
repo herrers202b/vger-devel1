@@ -35,7 +35,7 @@ class Survey_Question(models.Model):
     question_fk = models.ForeignKey('Question', on_delete=models.CASCADE, null=True)
 
 class Answer(models.Model):
-    user_fk = models.ForeignKey(customUser, on_delete=models.CASCADE)
+    user_fk = models.ForeignKey(customUser, on_delete=models.CASCADE, null=True)
     survey_question_fk = models.ForeignKey('Survey_Question', on_delete=models.CASCADE)
     
     answer_text = models.CharField(max_length=20)
