@@ -1,7 +1,14 @@
 {% extends 'base.html' %}
 {% load crispy_forms_tags %}
 {% block content %}
-<!--INSERT PAGE CONTENT BETWEEN HERE-->
+{% if messages %}
+<ul class="messages">
+    {% for message in messages %}
+    <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+    {% endfor %}
+</ul>
+{% endif %}
+
 <form method="POST" action="">
   {% csrf_token %}
   <fieldset>
@@ -17,13 +24,7 @@
 
     <div class="form-row">
       <div class="form-group col-md-6 mb-0">
-        {{ form.email|as_crispy_field }}
-      </div>
-    </div>
-
-    <div class="form-row">
-      <div class="form-group col-md-6 mb-0">
-        {{ form.role|as_crispy_field }}
+        {{ ut_form.role|as_crispy_field }}
       </div>
     </div>
 

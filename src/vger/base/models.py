@@ -1,7 +1,7 @@
 from django.db import models
 from django.urls import reverse
 from django.shortcuts import render, HttpResponseRedirect
-from user.models import customUser
+from django.contrib.auth.models import User
 from django.template.defaultfilters import slugify
 
 
@@ -77,7 +77,7 @@ class Answer(models.Model):
     evaluate the properties of the question later
 
     """
-    user_fk = models.ForeignKey(customUser, on_delete=models.CASCADE, null=True)
+    user_fk = models.ForeignKey(User, on_delete=models.CASCADE, null=True)
     survey_question_fk = models.ForeignKey('Survey_Question', on_delete=models.CASCADE)
     
     answer_text = models.CharField(max_length=20)
@@ -163,6 +163,6 @@ class User_Survey(models.Model):
     """
     finished = models.BooleanField(default=False)     
     
-    user_fk = models.ForeignKey(customUser, on_delete=models.CASCADE)
+    user_fk = models.ForeignKey(User, on_delete=models.CASCADE)
     survey_fk = models.ForeignKey('Survey', on_delete=models.CASCADE)
     

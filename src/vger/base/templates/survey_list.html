@@ -21,7 +21,4 @@
     <p>There are no surveys in the database</p>
     
   {% endif %} 
-  {% if perms.canCreateSurvey %}
-    <a class=navlink href="{% url 'survey-create' %}">Create a survey</a>
-  {% endif %}
 {% endblock %}
