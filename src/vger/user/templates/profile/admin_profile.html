@@ -4,9 +4,9 @@
 <p>Admin Profile</p>
 <div>
     {% if perms.canCreateUser %}
-        <li class="nav-item">
-            <a class="nav-link" href="{% url 'register' %}">Register</a>
-        </li>
+    <li class="nav-item">
+        <a class="nav-link" href="{% url 'register' %}">Register</a>
+    </li>
     {% endif %}
 </div>
 {% endblock %}

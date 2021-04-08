@@ -4,7 +4,7 @@
 {% endblock %}
 {% block content %}
 <h1>Title: {{survey.titleOfSurvey }}</h1>
-
+<a href="{{ survey.get_welcome_url }}">Take Survey</a>
 <p><strong>Description:</strong> {{survey.description }}</p>
 {% comment %} {% if perms.canDeleteSurvey %}
     <a href="{{ survey_detail.get_absolute_url }}/delete">Delete Survey</a>
@@ -28,32 +28,6 @@
 {% comment %} {% if perms.canCreateCategory %}
       <a href="{{ Category.get_absolute_url }}">Title: {{Category.titleOfCategory}}</a> 
 {% endif %} {% endcomment %}
-
-<script>
-  function Hide() {
-      if(document.getElementById('id_type').options[document.getElementById('id_type').selectedIndex].value == "1") {
-           document.getElementById('id_list1').style.display = 'none';
-           document.getElementById('id_list2').style.display = '';
-      } else {
-           document.getElementById('id_list1').style.display = '';
-           document.getElementById('id_list2').style.display = 'none';
-      }
-  }
-  
- {% comment %} window.onload = function() {
-      document.getElementById('id_type').onchange = Hide;
-  };
-  </script>
-  
-  <div>
-      {{ form.type.label_tag }}{{ form.type }}
-  </div>
-  <div id="id_list1">
-      {{ form.list1.label_tag }}{{ form.list1 }}
-  </div>
-  <div id="id_list2">
-      {{ form.list2.label_tag }}{{ form.list2 }}
-  </div> {% endcomment %}
 
 
 

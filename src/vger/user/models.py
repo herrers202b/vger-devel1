@@ -1,7 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
-
-
+from django.apps import apps
 class Advisor(models.Model): 
     # Advisor model: Can view completed surveys of only their advisees
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='advisorAccount')
@@ -26,7 +25,7 @@ class Administrator(models.Model):
     # Administrator model: Model for use for user accounts to have survey edit
     # access, separate from site backend administration
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='adminAccount')
-
+    survey = models.ManyToManyField("base.Survey")
     class Meta:
         permissions = (('canCreateSurvey', 'can create survey'),
                         ('canEditSurvey', 'can edit survey'),

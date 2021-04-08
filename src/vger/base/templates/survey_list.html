@@ -1,19 +1,17 @@
 {% extends "base.html" %}
 
 {% block content %}
-  <h1>Survey List</h1>
+  <h1>List of Surveys</h1>
   {% if survey_list %}
-  <ul>
+  <ul id="parent">
     {% for survey in survey_list %}
       <li>
-        <a href="{{ survey.get_absolute_url }}">{{ survey.titleOfSurvey }}</a> 
-        <!-- {% if user.is_authenticated %}
-        <form method="get" action="{{ survey.get_creation_url }}">
-          <div class="row spacer">
-              <button type="submit">Take Survey</button>
-          </div>
-        </form>
-        {% endif %} -->
+        <div>
+            <a href="{{ survey.get_absolute_url }}">{{ survey.titleOfSurvey }}</a> 
+            <div class="tke-srvy">
+              <a class="btn btn-primary" href="{{ survey.get_welcome_url }}">Take Survey</a>
+            </div>
+        </div>
       </li>
     {% endfor %}
   </ul>

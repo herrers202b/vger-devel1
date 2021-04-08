@@ -33,6 +33,10 @@ class Survey(models.Model):
         """Returns the url to access a detailed record for this survey"""
         return reverse("survey-detail", kwargs={'surveySlug': self.surveySlug})
     
+    def get_welcome_url(self):
+        """Returns the url to access the welcome page for this survey"""
+        return reverse("welcome-to-survey", kwargs={'surveySlug' : self.surveySlug})
+
     def get_gen_url(self):
         """Returns the generate survey view to prep the users info before taking the survey"""
         return reverse("gen-survey", kwargs={'surveySlug' : self.surveySlug})
