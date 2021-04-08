@@ -10,6 +10,7 @@ media
 
 # database data
 data/
+migrations/
 
 # Mac stuff most of you won't need
 .DS_Store
