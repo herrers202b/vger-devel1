@@ -10,21 +10,31 @@
     <a href="{{ survey_detail.get_absolute_url }}/delete">Delete Survey</a>
 {% endif %} {% endcomment %}
 <h2><strong>Categories:</strong></h2>
+{% if not categories %}
+  <p> There do not appear to be any categories</p>
+{% endif %}
 {% for Category in categories%}
-  <p>{{Category.titleOfCategory}}</p>
-  <h2>Questions: </h2>
-  {% for Question in questions %}
-    {% if Question.category_fk == Category %}
-      <p>{{Question.question_fk.question_text}}</p>
-      {% comment %} {% if perms.canUpdateQuestion %}
-        <a href="{{ question_detail.get_absolute_url }}/update-question">Update Question</a>   {% endif %}
-      {% if perms.canDeleteQuestion %}
-        <a href="{{ question_detail.get_absolute_url }}/delete-question">Delete Question</a> 
-      {% endif %} {% endcomment %}
-    {% endif %}
-  {% endfor %}
+  <a href="{{ Category.get_absolute_url }}">Detail View: {{Category.titleOfCategory}}</a> 
+  <br>
 {% endfor %}
+<br>
 
+<div style='display:flex'>
+{% comment %} Return button {% endcomment %}
+  <form action = "{%url 'survey' %}">
+    <button type = "submit">
+      Return
+    </button>
+  </form>
+{% comment %} Create Category button {% endcomment %}
+  {%if perms.canCreateCategory%}
+    <form action = "{%url 'category-create' survey.surveySlug %}">
+      <button type = "submit">
+        Create Category
+      </button>
+    </form>
+  {% endif %}
+</div>
 {% comment %} {% if perms.canCreateCategory %}
       <a href="{{ Category.get_absolute_url }}">Title: {{Category.titleOfCategory}}</a> 
 {% endif %} {% endcomment %}
@@ -69,5 +79,16 @@
   {% if perms.canCreateCategory %}
   <a href="{{ survey_detail.get_absolute_url }}/create-category">Create Category</a>   
   {% endif %} {% endcomment %}
-
+{% comment %}
+  <h2>Questions: </h2>
+  {% for Question in questions %}
+    {% if Question.category_fk == Category %}
+      <p>{{Question.question_fk.question_text}}</p>
+       {% if perms.canUpdateQuestion %}
+        <a href="{{ question_detail.get_absolute_url }}/update-question">Update Question</a>   {% endif %}
+      {% if perms.canDeleteQuestion %}
+        <a href="{{ question_detail.get_absolute_url }}/delete-question">Delete Question</a> 
+      {% endif %} 
+  {% endfor %}
+{% endcomment %}
 {% endblock %}

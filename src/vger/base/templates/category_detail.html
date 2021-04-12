@@ -15,8 +15,33 @@
     </div>
   {% endfor %}
   <p> </p>
-  <a href="{{ category_detail.survey.get_absolute_url }}">Return</a>
+  <a href="{{ category_detail.survey_fk.get_absolute_url }}">Return</a>
 
+<div style='display:flex'>
+{% comment %} Return button {% endcomment %}
+  <form action = "{{ category_detail.survey_fk.get_absolute_url }}">
+    <button type = "submit">
+      Return
+    </button>
+  </form>
+{% comment %} Update Category button {% endcomment %}
+  {%if perms.canUpdateCategory%}
+    <form action = "{{ category_detail.get_absolute_url }}/update-category">
+      <button type = "submit">
+        Update Category
+      </button>
+    </form>
+  {% endif %}
+{% comment %} Delete Category button {% endcomment %}
+  {%if perms.canUpdateCategory%}
+    <form action = "{{ category_detail.get_absolute_url }}/delete-category">
+      <button type = "submit">
+        Delete Category
+      </button>
+    </form>
+  {% endif %}
+</div>
+{% comment %}
   {% if perms.canUpdateCategory %}
     <a href="{{ category_detail.get_absolute_url }}/update-category">Update Category</a> 
   {% endif %}
@@ -26,4 +51,5 @@
   {% if perms.canCreateQuestion %}
     <a href="{{ category_detail.get_absolute_url }}/create-question">Create Question</a>  
   {% endif %}
+{% endcomment %}
 {% endblock %}

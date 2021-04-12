@@ -405,12 +405,13 @@ class CategoryCreate(LoginRequiredMixin, PermissionRequiredMixin, CreateView):
         Permission requirement to use this view
     """    
     model = Category
-    slug_field = 'categorySlug'
-    slug_url_kwarg = 'categorySlug'
+    #slug_field = 'categorySlug'
+    #slug_url_kwarg = 'categorySlug'
     template_name = 'category_form.html'
     fields = ['titleOfCategory',]
     login_url = '/login/'
     permission_required = 'canCreateCategory'
+
     def get_success_url(self):
         """
         get_success_url
@@ -418,8 +419,10 @@ class CategoryCreate(LoginRequiredMixin, PermissionRequiredMixin, CreateView):
         takes a self paremeter and uses this to find its slug field(and others)
         to dynamically generate a url to our object
         """
-        return reverse('category-detail', kwargs={'surveySlug': self.object.survey.surveySlug,
-                                                    'categorySlug': self.object.categorySlug})
+        #category = Category.objects.get(pk=self.titleOfCategory)
+        #id =  self.object.pk
+        return reverse('category-detail', kwargs={'surveySlug': self.object.survey_fk.surveySlug,
+                                                    'pk': self.object.pk})
     
     def form_valid(self, form):
         """
@@ -429,8 +432,11 @@ class CategoryCreate(LoginRequiredMixin, PermissionRequiredMixin, CreateView):
         we will set our 'Parent Survey' to that
         of the survey passed in with our kwargs
         """
-
-        form.instance.survey = Survey.objects.get(surveySlug=self.kwargs['surveySlug'])
+        
+        form.instance.survey_fk = Survey.objects.get(surveySlug=self.kwargs['surveySlug'])
+        #print(survey)
+        #self.survey_fk = Category.objects.filter(survey_fk=survey)
+        #form.instance.survey = Survey.objects.get(surveySlug=self.kwargs['surveySlug'])
         return super(CategoryCreate, self).form_valid(form)
         
 
@@ -475,8 +481,8 @@ class CategoryUpdate(LoginRequiredMixin, PermissionRequiredMixin, UpdateView):
         takes a self paremeter and uses this to find its slug field(and others)
         to dynamically generate a url to our object
         """
-        return reverse('category-detail', kwargs={'surveySlug': self.object.survey.surveySlug,
-                                                    'categorySlug': self.object.categorySlug}) 
+        return reverse('category-detail', kwargs={'surveySlug': self.object.survey_fk.surveySlug,
+                                                    'pk': self.object.pk}) 
 
 class CategoryDelete(LoginRequiredMixin, PermissionRequiredMixin, DeleteView):
     """
@@ -520,7 +526,7 @@ class CategoryDelete(LoginRequiredMixin, PermissionRequiredMixin, DeleteView):
         takes a self paremeter and uses this to find its slug field(and others)
         to dynamically generate a url to our object
         """
-        return reverse('survey-detail', kwargs={'surveySlug': self.object.survey.surveySlug})
+        return reverse('survey-detail', kwargs={'surveySlug': self.object.survey_fk.surveySlug})
     success_url = get_success_url
 
 class QuestionCreate(LoginRequiredMixin, PermissionRequiredMixin, CreateView):

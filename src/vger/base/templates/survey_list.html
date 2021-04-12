@@ -17,6 +17,8 @@
   </ul>
   {% else %}
     <p>There are no surveys in the database</p>
-    
+    {% if perms.canCreateSurvey %}
+    <p> Would you like to <a class="nav-link" href="{% url 'survey-create' %}">create a survey</a></p>
+    {%endif%}
   {% endif %} 
 {% endblock %}

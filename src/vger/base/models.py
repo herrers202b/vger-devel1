@@ -56,8 +56,12 @@ class Category(models.Model):
     """
     titleOfCategory = models.CharField(max_length=100)
     survey_fk = models.ForeignKey('Survey', on_delete=models.CASCADE)
-
     
+    def get_absolute_url(self):
+        return reverse("category-detail", kwargs={'surveySlug': self.survey_fk.surveySlug,
+                                                    'pk': self.pk})
+    
+
 class Survey_Question(models.Model):
     """
     Survey_Question Model
