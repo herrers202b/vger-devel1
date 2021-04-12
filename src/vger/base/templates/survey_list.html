@@ -1,24 +1,42 @@
 {% extends "base.html" %}
 
 {% block content %}
-  <h1>List of Surveys</h1>
+  <div class="container-fluid">
+    <h2>List of Surveys</h2>
+  </div>
   {% if survey_list %}
-  <ul id="parent">
-    {% for survey in survey_list %}
-      <li>
-        <div>
-            <a href="{{ survey.get_absolute_url }}">{{ survey.titleOfSurvey }}</a> 
-            <div class="tke-srvy">
-              <a class="btn btn-primary" href="{{ survey.get_welcome_url }}">Take Survey</a>
+    <div class="container-fluid">
+      <ul class="list-group-flush">
+        {% for survey in survey_list %}
+          <li class="list-group-item">
+            <div class="container-fluid row">
+              <div class="col-sm-8">
+                <p>{{ survey.titleOfSurvey }}</p> 
+              </div>
+              <div class="col-sm float-right">
+                <a class="btn btn-info" href="{{ survey.get_absolute_url }}">
+                  Edit Survey
+                </a>
+                <a class="btn btn-primary" href="{{ survey.get_welcome_url }}">
+                  Take Survey
+                </a>
+              </div>
             </div>
-        </div>
-      </li>
-    {% endfor %}
-  </ul>
+          </li>
+        {% endfor %}
+      </ul>
+    </div>
   {% else %}
-    <p>There are no surveys in the database</p>
-    {% if perms.canCreateSurvey %}
-    <p> Would you like to <a class="nav-link" href="{% url 'survey-create' %}">create a survey</a></p>
-    {%endif%}
+    <div class="container-fluid">
+      <p><strong>There are no surveys in the database</strong></p>
+    </div>
   {% endif %} 
+
+  {% if perms.canCreateSurvey %}
+    <div class="container-fluid">
+      <a class="btn btn-success" href="{% url 'survey-create' %}">
+        Create New Survey
+      </a>
+    </div>
+  {% endif %}
 {% endblock %}
