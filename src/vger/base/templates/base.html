@@ -31,9 +31,15 @@
               <li class="nav-item">
                 <a class="nav-link" href="{% url 'logout' %}">Logout</a>
               </li>
+              {% if perms.canCreateSurvey %}
+                <li class="nav-item">
+                  <a class="nav-link" href="{% url 'survey' %}">Survey</a>
+                </li>
+              {% else %}
               <li class="nav-item">
                 <a class="nav-link" href="{% url 'survey' %}">Take Survey</a>
               </li>
+              {% endif %}
               <li class="nav-item">
                 <a class="nav-link" href="{% url 'profile' %}">{{ user.username }}</a>
               </li>
