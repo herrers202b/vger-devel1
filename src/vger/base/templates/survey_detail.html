@@ -1,39 +1,83 @@
 {% extends "base.html" %}
+
 {% block head %}
 <script type="text/javascript" src="/static/base/expand_button.js"></script>
 {% endblock %}
+
 {% block content %}
-<h1>Title: {{survey.titleOfSurvey }}</h1>
-<a href="{{ survey.get_welcome_url }}">Take Survey</a>
-<p><strong>Description:</strong> {{survey.description }}</p>
+<div class="container-fluid">
+  <h2>Title: {{ survey.titleOfSurvey }}</h2>
+</div>
+
+{% comment %} <a href="{{ survey.get_welcome_url }}">Take Survey</a> {% endcomment %}
+
+<div class="container-fluid">
+  <p><strong>Description:</strong> {{survey.description }}</p>
+</div>
+
 {% comment %} {% if perms.canDeleteSurvey %}
     <a href="{{ survey_detail.get_absolute_url }}/delete">Delete Survey</a>
 {% endif %} {% endcomment %}
-<h2><strong>Categories:</strong></h2>
-{% if not categories %}
-  <p> There do not appear to be any categories</p>
-{% endif %}
-{% for Category in categories%}
-  <a href="{{ Category.get_absolute_url }}">Detail View: {{Category.titleOfCategory}}</a> 
-  <br>
-{% endfor %}
-<br>
+<div class="container-fluid">
+  <h2>Categories</h2>
+</div>
 
-<div style='display:flex'>
+<div class="container-fluid">
+  {% if not categories %}
+    <p><strong>There do not appear to be any categories</strong></p>
+  {% else %}
+    <ul class="list-group-flush">
+      {% for Category in categories %}
+      <li class="list-group-item">
+        <div class="container-fluid row">
+          <div class="col-sm-8">
+            <p>{{Category.titleOfCategory}}</p>
+          </div>
+
+          <div class="col-sm float-right">
+            <div class="btn-toolbar" role="toolbar">
+              <div class="btn-group mr-2" role="group">
+                <a class="btn btn-info" href="{{ Category.get_absolute_url }}">
+                  Edit Category
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </li>
+      {% endfor %}
+    </ul>
+</div>
+
+  <div class="container-fluid">
+    <div class="btn-toolbar" role="toolbar">
+      {% if perms.canCreateCategory %}
+      <div class="btn-group mr-2" role="group">
+        <form action="{%url 'category-create' survey.surveySlug %}">
+          <button class="btn btn-success" type="submit">
+            Create New Category
+          </button>
+        </form>
+      </div>
+      {% endif %}
+      <div class="btn-group mr-2" role="group">
+        <a class="btn btn-primary" href="{{survey.get_welcome_url}}">
+          Take Survey
+        </a>
+      </div>
+    </div>
+  </div>
+  {% endif %}
+
+<br />
+
+<div class="container-fluid">
 {% comment %} Return button {% endcomment %}
-  <form action = "{%url 'survey' %}">
-    <button type = "submit">
+  <form action="{%url 'survey' %}">
+    <button class="btn btn-primary" type="submit">
       Return
     </button>
   </form>
-{% comment %} Create Category button {% endcomment %}
-  {%if perms.canCreateCategory%}
-    <form action = "{%url 'category-create' survey.surveySlug %}">
-      <button type = "submit">
-        Create Category
-      </button>
-    </form>
-  {% endif %}
 </div>
 {% comment %} {% if perms.canCreateCategory %}
       <a href="{{ Category.get_absolute_url }}">Title: {{Category.titleOfCategory}}</a> 

@@ -14,12 +14,18 @@
                 <p>{{ survey.titleOfSurvey }}</p> 
               </div>
               <div class="col-sm float-right">
-                <a class="btn btn-info" href="{{ survey.get_absolute_url }}">
-                  Edit Survey
-                </a>
-                <a class="btn btn-primary" href="{{ survey.get_welcome_url }}">
-                  Take Survey
-                </a>
+                <div class="btn-toolbar" role="toolbar">
+                  <div class="btn-group mr-2" role="group">
+                    <a class="btn btn-info" href="{{ survey.get_absolute_url }}">
+                      Edit Survey
+                    </a>
+                  </div>
+                  <div class="btn-group mr-2" role="group">
+                    <a class="btn btn-primary" href="{{ survey.get_welcome_url }}">
+                      Take Survey
+                    </a>
+                  </div>
+                </div>
               </div>
             </div>
           </li>
