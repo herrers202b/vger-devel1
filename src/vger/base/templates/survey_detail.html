@@ -34,14 +34,25 @@
             <p>{{Category.titleOfCategory}}</p>
           </div>
 
-          <div class="col-sm float-right">
+          {% if perms.canEditCategory %}
+          <div class="col-sm">
             <div class="btn-toolbar" role="toolbar">
               <div class="btn-group mr-2" role="group">
                 <a class="btn btn-info" href="{{ Category.get_absolute_url }}">
-                  Edit Category
+                  Edit
                 </a>
               </div>
+
+              {% if perms.canDeleteCategory %}
+              <div class="btn-group mr-2" role="group">
+                <form action="{{ Category.get_absolute_url }}/delete-category">
+                  <button class="btn btn-danger" type="submit">
+                    Delete</button>
+                </form>
+              </div>
+              {% endif %}
             </div>
+          {% endif %}
           </div>
         </div>
       </li>
