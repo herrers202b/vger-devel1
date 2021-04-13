@@ -15,11 +15,13 @@
               </div>
               <div class="col-sm float-right">
                 <div class="btn-toolbar" role="toolbar">
+                  {% if perms.canEditSurvey %}
                   <div class="btn-group mr-2" role="group">
                     <a class="btn btn-info" href="{{ survey.get_absolute_url }}">
                       Edit Survey
                     </a>
                   </div>
+                  {% endif %}
                   <div class="btn-group mr-2" role="group">
                     <a class="btn btn-primary" href="{{ survey.get_welcome_url }}">
                       Take Survey
