@@ -2,9 +2,9 @@ from django import forms
 from django.contrib.admin.widgets import AdminSplitDateTime
 from django.forms.fields import DateField
 from .widgets import XDSoftDateTimePickerInput
-from .models import Survey, Category, Question, Survey_Question, Option_Choice, Input_Type
+from .models import Survey, Category, Question, Survey_Question, Option_Choice, Input_Type, Option_Group
 from django.forms import HiddenInput, Select
-
+from django.forms.models import ModelChoiceField, ModelChoiceIterator
 
 class SurveyCreateForm(forms.ModelForm):
     """
@@ -30,28 +30,34 @@ class CategoryCreateForm(forms.Form):
     list1 = forms.CharField()
     list2 = forms.CharField()
 
-class QuestionTypeSelect(forms.Select):
+class QuestionChoiceField(ModelChoiceField):
 
-        def create_option(self, name, value, label, selected, index, subindex=None, attrs=None):
-            option = super().create_option(name, value, label, selected, index, subindex, attrs)
-                 
-            if value:
-                option['attrs']['data-name'] = value.instance.input_type_name         
-            return option
+    def label_from_instance(self, obj):
+            return f'{obj.input_type_name}'
+
+class OptionChoiceField(ModelChoiceField):
+
+    def label_from_instance(self, obj):
+            return f'{obj.name_of_group}'
 class QuestionCreateForm(forms.ModelForm):
     
+    input_type_fk = QuestionChoiceField(queryset=Input_Type.objects,
+                                            widget=Select())
+    option_group = OptionChoiceField(queryset=Option_Group.objects,
+                                            widget=Select())
+                                            
     class Meta:
         model = Question
         fields = ('question_text',
             'answer_is_required',
             'is_multi_option_answer',
-            'input_type_fk',)
+            'input_type_fk',
+            'option_group')
         labels = {
             'answer_is_required': 'Is an answer required for this question?',
             'is_multi_option_answer': 'Is this a multiple choice question?',
-            'input_type_fk': 'Question type'
+            'input_type': 'Question type'
         }
-        widget = {'input_type_fk' : QuestionTypeSelect}
 
 #TODO: Refactor form to approprately gather question answer groups
 class SurveyCategoryForm(forms.Form):
