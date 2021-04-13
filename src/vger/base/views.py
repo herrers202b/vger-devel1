@@ -529,7 +529,6 @@ class QuestionCreate(LoginRequiredMixin, PermissionRequiredMixin, CreateView):
     login_url = '/login/'
     permission_required = 'canCreateQuestion'
 
-
     def get(self, request, *args, **kwargs):
         context = {'form': QuestionCreateForm()}
         return render(request, 'question_form.html', context)
@@ -541,8 +540,7 @@ class QuestionCreate(LoginRequiredMixin, PermissionRequiredMixin, CreateView):
         takes a self paremeter and uses this to find its slug field(and others)
         to dynamically generate a url to our object
         """
-        return reverse('question-detail', kwargs={'surveySlug': self.object.category.survey_fk.surveySlug,
-                                                    'categoryPk': self.object.category.pk,
+        return reverse('question-detail', kwargs={'sQPk': self.object.survey_questions,
                                                     'questionPk': self.object.pk})
     
     def form_valid(self, form):
@@ -554,6 +552,8 @@ class QuestionCreate(LoginRequiredMixin, PermissionRequiredMixin, CreateView):
         of the survey passed in with our kwargs
         """
         form.instance.category = Category.objects.get(pk=self.kwargs['pk'])
+        #survey = Survey.objects.get(pk=form.instance.category.survey_fk)
+
         #Category.objects.get(categorySlug=self.kwargs['categorySlug'])
         print(form.cleaned_data)
         return super(QuestionCreate, self).form_valid(form)

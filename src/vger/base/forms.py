@@ -42,7 +42,8 @@ class OptionChoiceField(ModelChoiceField):
 class QuestionCreateForm(forms.ModelForm):
     
     input_type_fk = QuestionChoiceField(queryset=Input_Type.objects,
-                                            widget=Select())
+                                            widget=Select(),
+                                            label="Question type")
     option_group = OptionChoiceField(queryset=Option_Group.objects,
                                             widget=Select())
                                             
@@ -56,7 +57,6 @@ class QuestionCreateForm(forms.ModelForm):
         labels = {
             'answer_is_required': 'Is an answer required for this question?',
             'is_multi_option_answer': 'Is this a multiple choice question?',
-            'input_type': 'Question type'
         }
 
 #TODO: Refactor form to approprately gather question answer groups
