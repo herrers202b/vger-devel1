@@ -18,10 +18,19 @@
                   {% if perms.canEditSurvey %}
                   <div class="btn-group mr-2" role="group">
                     <a class="btn btn-info" href="{{ survey.get_absolute_url }}">
-                      Edit Survey
+                      Edit
                     </a>
                   </div>
                   {% endif %}
+
+                  {% if perms.canDeleteSurvey %}
+                  <div class="btn-group mr-2" role="group">
+                    <a class="btn btn-danger" href="{{survey.get_absolute_url }}/delete">
+                      Delete
+                    </a>
+                  </div>
+                  {% endif %}
+
                   {% if perms.canTakeSurvey %}
                   <div class="btn-group mr-2" role="group">
                     <a class="btn btn-primary" href="{{ survey.get_welcome_url }}">
