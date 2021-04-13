@@ -541,7 +541,7 @@ class QuestionCreate(LoginRequiredMixin, PermissionRequiredMixin, CreateView):
         takes a self paremeter and uses this to find its slug field(and others)
         to dynamically generate a url to our object
         """
-        return reverse('question-detail', kwargs={'surveySlug': self.object.category.survey.surveySlug,
+        return reverse('question-detail', kwargs={'surveySlug': self.object.category.survey_fk.surveySlug,
                                                     'categoryPk': self.object.category.pk,
                                                     'questionPk': self.object.pk})
     
