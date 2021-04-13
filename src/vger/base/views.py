@@ -378,6 +378,7 @@ class SurveyDelete(LoginRequiredMixin, PermissionRequiredMixin, DeleteView):
 
 #Class templated for creating, updating, and deleting categories
 #Still needs permissions!
+
 class CategoryCreate(LoginRequiredMixin, PermissionRequiredMixin, CreateView):
     """
     CategoryCreate View
@@ -392,12 +393,6 @@ class CategoryCreate(LoginRequiredMixin, PermissionRequiredMixin, CreateView):
         The name of the template we want Djagno 
         to use when creating this view.
 
-    'categorySlug' : slug_field
-        slug field for this view
-
-    'categorySlug' : slug_url_kwarg
-        slug keyword arguments for this view
-
     '/login/' 
         redirect url for login required permission 
 
@@ -405,8 +400,6 @@ class CategoryCreate(LoginRequiredMixin, PermissionRequiredMixin, CreateView):
         Permission requirement to use this view
     """    
     model = Category
-    #slug_field = 'categorySlug'
-    #slug_url_kwarg = 'categorySlug'
     template_name = 'category_form.html'
     fields = ['titleOfCategory',]
     login_url = '/login/'
@@ -419,8 +412,6 @@ class CategoryCreate(LoginRequiredMixin, PermissionRequiredMixin, CreateView):
         takes a self paremeter and uses this to find its slug field(and others)
         to dynamically generate a url to our object
         """
-        #category = Category.objects.get(pk=self.titleOfCategory)
-        #id =  self.object.pk
         return reverse('category-detail', kwargs={'surveySlug': self.object.survey_fk.surveySlug,
                                                     'pk': self.object.pk})
     
@@ -453,12 +444,6 @@ class CategoryUpdate(LoginRequiredMixin, PermissionRequiredMixin, UpdateView):
     category_form.html : template_name
         The name of the template we want Djagno 
         to use when creating this view.
-    
-    'categorySlug' : slug_field
-        slug field for this view
-
-    'categorySlug' : slug_url_kwarg
-        slug keyword arguments for this view
 
     '/login/' 
         redirect url for login required permission 
@@ -467,8 +452,6 @@ class CategoryUpdate(LoginRequiredMixin, PermissionRequiredMixin, UpdateView):
         Permission requirement to use this view
     """
     model = Category
-    slug_field = 'categorySlug'
-    slug_url_kwarg = 'categorySlug'
     template_name = 'category_form.html'
     fields = ['titleOfCategory',]
     login_url = '/login/'
@@ -500,12 +483,6 @@ class CategoryDelete(LoginRequiredMixin, PermissionRequiredMixin, DeleteView):
         The name of the template we want Djagno 
         to use when creating this view.
 
-    'categorySlug' : slug_field
-        slug field for this view
-
-    'categorySlug' : slug_url_kwarg
-        slug keyword arguments for this view
-
     '/login/' 
         redirect url for login required permission 
     
@@ -513,8 +490,6 @@ class CategoryDelete(LoginRequiredMixin, PermissionRequiredMixin, DeleteView):
         Permission requirement to use this view
     """
     model = Category
-    slug_field = 'categorySlug'
-    slug_url_kwarg = 'categorySlug'
     template_name = 'category_form_confirm_delete.html' 
     login_url = '/login/'
     permission_required = 'canDeleteCategory'
@@ -529,6 +504,8 @@ class CategoryDelete(LoginRequiredMixin, PermissionRequiredMixin, DeleteView):
         return reverse('survey-detail', kwargs={'surveySlug': self.object.survey_fk.surveySlug})
     success_url = get_success_url
 
+from .forms import QuestionCreateForm
+
 class QuestionCreate(LoginRequiredMixin, PermissionRequiredMixin, CreateView):
     """
     QuestionCreate View
@@ -538,30 +515,24 @@ class QuestionCreate(LoginRequiredMixin, PermissionRequiredMixin, CreateView):
 
     Question : model
         Question is the model used in this form
-    
-    question_form.html : template_name
-        The name of the template we want Djagno 
-        to use when creating this view.
 
-    'questionSlug' : slug_field
-        slug field for this view
-
-    'questionSlug' : slug_url_kwarg
-        slug keyword arguments for this view
-
-    '/login/' 
-        redirect url for login required permission 
-
-    'canCreateQuestion' : permission_required
-        Permission requirement to use this view
     """    
     model = Question
-    slug_field = 'questionSlug'
-    slug_url_kwarg = 'questionSlug'
+    form_class = QuestionCreateForm
     template_name = 'question_form.html'
-    fields = ['questionText','answer', 'questionNumber']
+    """
+    fields = ['question_text',
+                'answer_is_required',
+                'is_multi_option_answer'
+                'input_type_fk',]
+    """
     login_url = '/login/'
     permission_required = 'canCreateQuestion'
+
+
+    def get(self, request, *args, **kwargs):
+        context = {'form': QuestionCreateForm()}
+        return render(request, 'question_form.html', context)
 
     def get_success_url(self):
         """
@@ -571,8 +542,8 @@ class QuestionCreate(LoginRequiredMixin, PermissionRequiredMixin, CreateView):
         to dynamically generate a url to our object
         """
         return reverse('question-detail', kwargs={'surveySlug': self.object.category.survey.surveySlug,
-                                                    'categorySlug': self.object.category.categorySlug,
-                                                    'questionSlug': self.object.questionSlug})
+                                                    'categoryPk': self.object.category.pk,
+                                                    'questionPk': self.object.pk})
     
     def form_valid(self, form):
         """
@@ -582,7 +553,8 @@ class QuestionCreate(LoginRequiredMixin, PermissionRequiredMixin, CreateView):
         we will set our 'Parent Category' to that
         of the survey passed in with our kwargs
         """
-        form.instance.category = Category.objects.get(categorySlug=self.kwargs['categorySlug'])
+        form.instance.category = Category.objects.get(pk=self.kwargs['pk'])
+        #Category.objects.get(categorySlug=self.kwargs['categorySlug'])
         print(form.cleaned_data)
         return super(QuestionCreate, self).form_valid(form)
         
@@ -600,12 +572,6 @@ class QuestionUpdate(LoginRequiredMixin, PermissionRequiredMixin, UpdateView):
     question_form.html : template_name
         The name of the template we want Djagno 
         to use when creating this view.
-
-    'questionSlug' : slug_field
-        slug field for this view
-
-    'questionSlug' : slug_url_kwarg
-        slug keyword arguments for this view
 
     '/login/' 
         redirect url for login required permission 

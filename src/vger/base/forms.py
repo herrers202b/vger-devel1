@@ -2,8 +2,8 @@ from django import forms
 from django.contrib.admin.widgets import AdminSplitDateTime
 from django.forms.fields import DateField
 from .widgets import XDSoftDateTimePickerInput
-from .models import Survey, Category, Question, Survey_Question, Option_Choice
-from django.forms import HiddenInput
+from .models import Survey, Category, Question, Survey_Question, Option_Choice, Input_Type
+from django.forms import HiddenInput, Select
 
 
 class SurveyCreateForm(forms.ModelForm):
@@ -30,7 +30,28 @@ class CategoryCreateForm(forms.Form):
     list1 = forms.CharField()
     list2 = forms.CharField()
 
+class QuestionTypeSelect(forms.Select):
 
+        def create_option(self, name, value, label, selected, index, subindex=None, attrs=None):
+            option = super().create_option(name, value, label, selected, index, subindex, attrs)
+                 
+            if value:
+                option['attrs']['data-name'] = value.instance.input_type_name         
+            return option
+class QuestionCreateForm(forms.ModelForm):
+    
+    class Meta:
+        model = Question
+        fields = ('question_text',
+            'answer_is_required',
+            'is_multi_option_answer',
+            'input_type_fk',)
+        labels = {
+            'answer_is_required': 'Is an answer required for this question?',
+            'is_multi_option_answer': 'Is this a multiple choice question?',
+            'input_type_fk': 'Question type'
+        }
+        widget = {'input_type_fk' : QuestionTypeSelect}
 
 #TODO: Refactor form to approprately gather question answer groups
 class SurveyCategoryForm(forms.Form):

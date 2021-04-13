@@ -33,23 +33,19 @@
     </form>
   {% endif %}
 {% comment %} Delete Category button {% endcomment %}
-  {%if perms.canUpdateCategory%}
+  {%if perms.canDeleteCategory%}
     <form action = "{{ category_detail.get_absolute_url }}/delete-category">
       <button type = "submit">
         Delete Category
       </button>
     </form>
   {% endif %}
+  {%if perms.canCreateQuestion%}
+    <form action = "{{ category_detail.get_absolute_url }}/create-question">
+      <button type = "submit">
+        Create Question
+      </button>
+    </form>
+  {% endif %}
 </div>
-{% comment %}
-  {% if perms.canUpdateCategory %}
-    <a href="{{ category_detail.get_absolute_url }}/update-category">Update Category</a> 
-  {% endif %}
-  {% if perms.canDeleteCategory %}
-    <a href="{{ category_detail.get_absolute_url }}/delete-category">Delete Category</a> 
-  {% endif %}
-  {% if perms.canCreateQuestion %}
-    <a href="{{ category_detail.get_absolute_url }}/create-question">Create Question</a>  
-  {% endif %}
-{% endcomment %}
 {% endblock %}
