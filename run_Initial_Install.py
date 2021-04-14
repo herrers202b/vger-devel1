@@ -54,7 +54,7 @@ def windowsInstall():
 
     print("*************** Spin the Server Down ***************")
     os.system('docker-compose down')
-    print("Initial Install was ran on your Windows and your site is back down.")
+    print("Initial Install was ran on your Windows OS and your site is back down.")
 
 def get_platform():
     platforms = {
