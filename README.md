@@ -82,4 +82,4 @@ this is to help navigate project functionality.
 ---
 
 ### ``runInitial.py`` usage
-> initializes/installs the database, in order to start running the product.
+> initializes/installs the database, in order to start running the product
