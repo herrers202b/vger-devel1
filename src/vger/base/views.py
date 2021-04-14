@@ -730,22 +730,18 @@ def takeSurvey(request, surveySlug, page):
     if currPage == totalPage:
             return redirect(survey.get_result_url())
 
-    if request.method == 'POST':
-        form = SurveyCategoryForm(request.POST, instance=list_of_categories[currPage].pk)
-        if form.is_valid():
+    form = SurveyCategoryForm(request.POST, instance=list_of_categories[currPage].pk)
+    if form.is_valid():
             
-            for (q, a) in form.category_answers():
-                answer = Answer.objects.create(
-                    user_fk = request.user,
-                    survey_question_fk = Survey_Question.objects.get(pk=q),
-                    answer_text = a
-                )
-                answer.save()
+        for (q, a) in form.category_answers():
+            answer = Answer.objects.create(
+                user_fk = request.user,
+                survey_question_fk = Survey_Question.objects.get(pk=q),
+                answer_text = a
+            )
+            answer.save()
 
-            request.session['currPage'] = currPage + 1
-        
-        if currPage + 1 == totalPage:
-            return redirect(survey.get_take_url())
+        request.session['currPage'] = currPage + 1
 
     form = SurveyCategoryForm(instance=list_of_categories[currPage].pk)
     
@@ -760,7 +756,7 @@ def results(request, surveySlug):
     """ 
     survey = Survey.objects.get(surveySlug=surveySlug)
     categories = Category.objects.filter(survey_fk=survey)
-    
+
 
     context = {
         'surveySlug': surveySlug,
