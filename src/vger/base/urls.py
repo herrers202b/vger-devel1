@@ -17,7 +17,7 @@ urlpatterns = [
     path('survey/<slug:surveySlug>/category/<int:categoryPk>/question/<int:questionPk>', views.QuestionDetailView.as_view(), name='question-detail'),
     path('survey/<slug:surveySlug>/category/<slug:categorySlug>/question/<slug:questionSlug>/update-question/', views.QuestionUpdate.as_view(), name='question-update'),
     path('survey/<slug:surveySlug>/category/<slug:categorySlug>/question/<slug:questionSlug>/delete-question/', views.QuestionDelete.as_view(), name='question-delete'),
-    # path('survey/results/<slug:session_hash>', views.results, name='results-page'),
+    path('survey/results/<slug:surveySlug>', views.results, name='results-page'),
     path('survey/take/<slug:surveySlug>', views.generateNewSurvey, name='gen-survey'),
     path('survey/welcome/<slug:surveySlug>', views.welcomeSurvey, name='welcome-to-survey'),
     path('survey/take/<slug:surveySlug>/page=<int:page>', views.takeSurvey, name='take-survey')

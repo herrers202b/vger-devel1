@@ -5,18 +5,19 @@
 <body>
 <h1>Results</h1>
 <p>Here's your survey results</p>
+<p> The survey is {{ survey_name }}</p>
 
-{% for category in categories %}
+ {% for category in categories %}
 <p>Category: {{category.titleOfCategory}}
-    <br>
+    {% comment %} <br>
     {% for question in questions %}
     {% if question.category == category %}
     <li>For: {{question.questionText}}</li>
     <li>You answered: {{question.answer}}</li>
     {% endif %}
     {% endfor %}
-    <br>
-{% endfor %}
+    <br>{% endcomment %}
+{% endfor %} 
 
 <!--<p>Would you like to take this survey again?</p>
     <a href="{{ survey.get_absolute_url }}">{{ survey.titleOfSurvey }}</a> 

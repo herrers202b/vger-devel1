@@ -728,7 +728,7 @@ def takeSurvey(request, surveySlug, page):
     list_of_categories = Category.objects.filter(survey_fk=survey)[::1]
     
     if currPage == totalPage:
-            return redirect('results-page')
+            return redirect(survey.get_result_url())
 
     if request.method == 'POST':
         form = SurveyCategoryForm(request.POST, instance=list_of_categories[currPage].pk)
@@ -745,7 +745,7 @@ def takeSurvey(request, surveySlug, page):
             request.session['currPage'] = currPage + 1
         
         if currPage + 1 == totalPage:
-            return redirect('results-page')
+            return redirect(survey.get_take_url())
 
     form = SurveyCategoryForm(instance=list_of_categories[currPage].pk)
     
@@ -754,6 +754,21 @@ def takeSurvey(request, surveySlug, page):
         'form' : form,
     }
     return render(request, 'take_survey.html', context)
+
+def results(request, surveySlug):
+    """
+    """ 
+    survey = Survey.objects.get(surveySlug=surveySlug)
+    categories = Category.objects.filter(survey_fk=survey)
+    
+
+    context = {
+        'surveySlug': surveySlug,
+        'survey_name': survey.titleOfSurvey,
+        'categories': categories,
+    }
+
+    return render(request, 'results.html', context)
 
 # def results(request, session_hash):
 #     """

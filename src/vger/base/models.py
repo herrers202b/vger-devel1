@@ -45,6 +45,9 @@ class Survey(models.Model):
         """Returns the take survey view to send the user from the welcome page to the first page of the survey"""
         return reverse("take-survey", kwargs={'surveySlug' : self.surveySlug, 'page' : 0})
 
+    def get_result_url(self):
+        """Returns the results page view to send the user from the take survey page to the results page"""
+        return reverse("results-page", kwargs={'surveySlug' : self.surveySlug})
 
 class Category(models.Model):
     """
