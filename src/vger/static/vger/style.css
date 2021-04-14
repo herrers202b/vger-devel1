@@ -9,7 +9,7 @@ h1, h2, h3, h4, h5, h6, a {
 }
 
 a:hover {
-    color:#cc1e52;
+    color:#660f29;
     text-decoration:none;
 }
 
@@ -19,7 +19,7 @@ a:hover {
 }
 
 .nav-link:hover {
-    color:#cc1e52;
+    color:#660f29;
 }
 
 .spacer{margin-top:5px;}
@@ -32,9 +32,15 @@ a:hover {
 }
 
 .btn-primary:hover {
-    background-color:#cc1e52;
-    border-color:#cc1e52;
+    background-color:#660f29;
+    border-color:#660f29;
 }
+
+.btn-primary.disabled {
+    background-color:#89374f;
+    border-color:#89374f;
+}
+
 .row{margin-top: 10px;}
 
 table{margin-top: 15px;}

@@ -75,7 +75,7 @@ class Survey_Question(models.Model):
     """
     survey_fk = models.ForeignKey('Survey', on_delete=models.CASCADE)
     category_fk = models.ForeignKey('Category', on_delete=models.CASCADE, null=True)
-    question_fk = models.ForeignKey('Question', on_delete=models.CASCADE, null=True)
+    question_fk = models.ForeignKey('Question', related_name="survey_questions", on_delete=models.CASCADE, null=True)
 
 
 class Answer(models.Model):
@@ -122,6 +122,12 @@ class Question(models.Model):
     answer_is_required = models.BooleanField()
     is_multi_option_answer = models.BooleanField()
 
+    def save(self,*args, **kwargs):
+        created = not self.pk
+        super().save(*args, **kwargs)
+        if created:
+            Survey_Question.objects.create(question_fk=self,)
+            
 
 class Option_Group(models.Model):
     """
