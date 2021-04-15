@@ -81,13 +81,16 @@ this is to help navigate project functionality.
 
 ### ``runVger.py`` usage
 > NOTE: it is REQUIRED that the initialization script has been run before the start script
+
 > Run System Start Script: starts the system. 
+
 > To spin the system back down make sure you either run 'docker-compose down' or you run 'closeVger.py'
 
 ---
 
 ### ``runTests.py`` usage
 > NOTE: it is REQUIRED that the initialization script has been run before the tests script
+
 > Run Tests Script: runs all test files in project apps for all Operating Systems
 
 ---
