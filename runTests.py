@@ -14,7 +14,8 @@ def linuxTest():
     print("*************** Running Tests ***************")
     os.system('python3 run.py test')
     os.system('docker compose down')
-    print("Test were ran on your Linux OS and your site is back down.")
+    print(" ")
+    print("*************** Test were ran on your Linux OS and your site is back down ***************")
 
 def macTest():
     print("*************** Making sure site is down ***************")
@@ -22,7 +23,8 @@ def macTest():
     print("*************** Running Tests ***************")
     os.system('python3 run.py test')
     os.system('docker compose down')
-    print("Test were ran on your MacOS and your site is back down.")
+    print(" ")
+    print("*************** Test were ran on your MacOS and your site is back down ***************")
 
 def windowsTest():
     print("*************** Making sure site is down ***************")
@@ -30,7 +32,8 @@ def windowsTest():
     print("*************** Running Tests ***************")
     os.system('docker-compose run django python3 manage.py test')
     os.system('docker-compose down')
-    print("Test were ran on your MacOS and your site is back down.")
+    print(" ")
+    print("*************** Test were ran on your Windows OS and your site is back down ***************")
 
 def get_platform():
     platforms = {
