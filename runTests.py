@@ -9,31 +9,40 @@ import subprocess
 import time
 
 def linuxTest():
-    print("*************** Making sure site is down ***************")
-    os.system('docker compose down')
-    print("*************** Running Tests ***************")
-    os.system('python3 run.py test')
-    os.system('docker compose down')
-    print(" ")
-    print("*************** Test were ran on your Linux OS and your site is back down ***************")
+    if(os.path.isfile('verifiedInstall.txt') == True):
+        print("*************** Making sure site is down ***************")
+        os.system('docker compose down')
+        print("*************** Running Tests ***************")
+        os.system('python3 run.py test')
+        os.system('docker compose down')
+        print(" ")
+        print("*************** Test were ran on your Linux OS and your site is back down ***************")
+    else:
+        print("*** You must run runInitial.py first! See README.md for more information. ***")
 
 def macTest():
-    print("*************** Making sure site is down ***************")
-    os.system('docker compose down')
-    print("*************** Running Tests ***************")
-    os.system('python3 run.py test')
-    os.system('docker compose down')
-    print(" ")
-    print("*************** Test were ran on your MacOS and your site is back down ***************")
+    if(os.path.isfile('verifiedInstall.txt') == True):
+        print("*************** Making sure site is down ***************")
+        os.system('docker compose down')
+        print("*************** Running Tests ***************")
+        os.system('python3 run.py test')
+        os.system('docker compose down')
+        print(" ")
+        print("*************** Test were ran on your MacOS and your site is back down ***************")
+    else:
+        print("*** You must run runInitial.py first! See README.md for more information. ***")
 
 def windowsTest():
-    print("*************** Making sure site is down ***************")
-    os.system('docker-compose down')
-    print("*************** Running Tests ***************")
-    os.system('docker-compose run django python3 manage.py test')
-    os.system('docker-compose down')
-    print(" ")
-    print("*************** Test were ran on your Windows OS and your site is back down ***************")
+    if(os.path.isfile('verifiedInstall.txt') == True):
+        print("*************** Making sure site is down ***************")
+        os.system('docker-compose down')
+        print("*************** Running Tests ***************")
+        os.system('docker-compose run django python3 manage.py test')
+        os.system('docker-compose down')
+        print(" ")
+        print("*************** Test were ran on your Windows OS and your site is back down ***************")
+    else:
+        print("*** You must run runInitial.py first! See README.md for more information. ***")
 
 def get_platform():
     platforms = {
