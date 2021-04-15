@@ -1,200 +1,185 @@
 from django.db import models
-#Used to generate URLs by reversing the URL patterns
 from django.urls import reverse
-import uuid
+from django.shortcuts import render, HttpResponseRedirect
+from django.contrib.auth.models import User
 from django.template.defaultfilters import slugify
 
-import hashlib, random, sys
-from django.contrib.auth.models import AbstractUser
-from user.models import customUser
-# Create your models here.
 
-#Untested question model
-class Question(models.Model):
-    
-    """
-    Question Model
-
-    The model for our individual questions
-
-    Parameters
-    ----------
-    questionText : str
-        questionText serves as the text of our question or general prompt
-    ansser : int 
-        answer will be the selected weight for our question or prompt, should
-        be on a scale of 0-4
-    QUESTION_WEIGHTS : choice
-        QUESTION_WEIGHTS will be a choice/radio button that allows the user
-        to select from 0 to 4 on a scale of weights for some questionText
-    category : forign key
-        category is our forign key to the category model.
-         Used to link questions to categories
-    questionNumber : int
-        the number of the question the user will be adding to
-        the catergory
-    questionSlug : slugField
-        this is our unique slug that we will use to create URLs from 
-    """
-    #Choices bank with weights and questions
-    QUESTION_WEIGHTS = (
-        (0,'weight 0'),
-        (1,'weight 1'),
-        (2,'weight 2'),
-        (3,'weight 3'),
-        (4,'weight 4'),
-    )
-    questionText = models.CharField(max_length=100, help_text="Please enter a prompt. ex) I know how to install software on my computer.")
-    answer = models.IntegerField(choices=QUESTION_WEIGHTS, blank=True, null=True, help_text="Results of question")
-    category = models.ForeignKey("Category", verbose_name=("Parent Category"), related_name=("questions"), default=None, null=True, on_delete=models.CASCADE)
-    questionNumber = models.IntegerField(default='1', help_text="Please enter a question number")
-    questionSlug = models.SlugField(null=False, unique=True)
-
-
-    """String for representing the Question object."""
-    def __str__(self):
-        return f'{self.questionNumber}'
-
-    def get_absolute_url(self):
-        """Returns the url to access a detailed record for this survey"""
-        return reverse("question-detail", kwargs={'questionSlug': self.questionSlug,
-                                                    'categorySlug': self.category.categorySlug,
-                                                    'surveySlug': self.category.survey.surveySlug})
-
-    def save(self, *args, **kwargs):
-        if not self.questionSlug:
-            hash = hashlib.sha1()
-            hash.update(str(random.randint(0,sys.maxsize)).encode('utf-8'))
-            self.questionSlug = slugify(hash.hexdigest())
-        return super().save(*args, **kwargs)
-
-#Untested character model
-class Category(models.Model):
-    """
-    Category Model
-
-    The model for categories of questions
-
-    Parameters
-    ----------
-    titleOfCategory : str
-        titleOfCategory will be the title of our category, ex "Computer Skills"
-    lowWeightText : str
-        lowWeightText flavor text for our lower weight header, ex "Not like me at all"
-    highWeightText : str
-        highWeightText flavor text for our high weight header, ex "Extremely like me"
-    survey : forign key
-        survey will be our forign key to the survey model such 
-        that we can link categoies of surveys.
-    categorySlug : slugField
-        this is our unique slug that we will use to create URLs from 
-    """
-    titleOfCategory = models.CharField(max_length=100, help_text="Please enter a title for this category, ex) Computer Skills.")
-    lowWeightText = models.CharField(max_length=50, default="Not like me at all", help_text="Please enter flavor text for the low weight of the category, ex) Not like me at all")
-    highWeightText = models.CharField(max_length=50, default="Extremely like me", help_text="Please enter flavor text for the high weight of the category, ex) Extremely like me")
-    survey = models.ForeignKey("Survey", verbose_name=("Parent Survey"), related_name=("categories"), default=None, null=True, on_delete=models.CASCADE)
-    categorySlug = models.SlugField(null=False, unique=True)
-
-    """String for representing the Category object."""
-    def __str__(self):
-        return f'{self.titleOfCategory}'
-    
-    def get_absolute_url(self):
-        """Returns the url to access a detailed record for this survey"""
-        return reverse("category-detail", kwargs={'categorySlug': self.categorySlug,
-                                                    'surveySlug': self.survey.surveySlug})
-
-    def save(self, *args, **kwargs):
-        if not self.categorySlug:
-            self.categorySlug = slugify(self.titleOfCategory)
-        return super().save(*args, **kwargs)
-    
-#Untested survey model
 class Survey(models.Model):
     """
-    Survey model
+    Survey Model
 
-    The model for the survey category
+    This model is used to represent the metadata about a 
+    whole survey
 
-    Parameters
-    ----------
-    titleOfSurvey : str
-        titleOfSurvey serves as the title of our survey, ex "VGER"
-    directions : str
-        directions will allow an admin to write any specific
-        directions for their survey 
-    created : DateTimeField
-        created is a timestamp for the date the survey was created
-    lastUpdated : DateTimeField  
-        lastUpdated is a timestamp for the last time a save() call
-        was made in this model
-    surveySlug : slugField
-        this is our unique slug that we will use to create URLs from 
+    TODO: Impliment versioning because the various models
+    will depend on the state of this post filling of a survey
     """
-    
-    titleOfSurvey = models.CharField(max_length=50, help_text="Please enter a name for the survey")
-    directions = models.CharField(max_length=500, help_text="Please enter any directions to take the survey")
-    created = models.DateTimeField(auto_now_add=True)
-    lastUpdated = models.DateTimeField(auto_now=True)
+    titleOfSurvey = models.CharField(max_length=20)
+    description = models.CharField(max_length=100)
+    start_date = models.DateTimeField()
+    end_date = models.DateTimeField()
+    is_open = models.BooleanField(default=True)
     surveySlug = models.SlugField(null=False, unique=True)
 
-    #This is to discern wether the model is being used as a template to take or a survey being taken 
-    assigned = models.BooleanField(default=False)
-    finished = models.BooleanField(default=False)
-    """String for representing the Survey object."""
-    def __str__(self):
-        return f'{self.titleOfSurvey}'
-    
-    #Replacing pk with slug for tutorial go here:
-    #https://learndjango.com/tutorials/django-slug-tutorial
-    def get_absolute_url(self):
-        """Returns the url to access a detailed record for this survey"""
-        return reverse("survey-detail", kwargs={'surveySlug': self.surveySlug})
-    
-    def get_creation_url(self):
-        return reverse("gen-survey", args=[str(self.pk)])
 
     def save(self, *args, **kwargs):
+        """Saves the surveySlug as the titleOfSurvey"""
         if not self.surveySlug:
             self.surveySlug = slugify(self.titleOfSurvey)
         return super().save(*args, **kwargs)
     
-
-
-#Untested survey instance model
-class SurveyInstance(models.Model):
-    @staticmethod
-    def create_session_hash():
-            hash = hashlib.sha1()
-            hash.update(str(random.randint(0,sys.maxsize)).encode('utf-8'))
-            return hash.hexdigest()  
-    """
-    SurveyInstance model
-
-    The model for a specific instance of a survey
-
-    Parameters
-    ----------
-    id : UUIDField
-        Unique id of the survey instance
-    survey : Foriegn Key
-        survey is the forign key into a specific survey
-        with which we wish to instantiate 
-    """
-    session_hash = models.CharField(max_length=40, unique=True, default=create_session_hash.__func__)
-    survey = models.ForeignKey('Survey', on_delete=models.RESTRICT, null=True)
-    user = models.ForeignKey(customUser, on_delete=models.CASCADE, null=False)
-    
-    def __str__(self):
-        """String for representing the Survey Instance Object"""
-        return f'{self.session_hash})'
+    def get_absolute_url(self):
+        """Returns the url to access a detailed record for this survey"""
+        return reverse("survey-detail", kwargs={'surveySlug': self.surveySlug})
     
     def get_welcome_url(self):
-        return reverse("welcome-to-survey", args=[str(self.session_hash)])
+        """Returns the url to access the welcome page for this survey"""
+        return reverse("welcome-to-survey", kwargs={'surveySlug' : self.surveySlug})
 
-    def get_absolute_url(self):
-        return reverse("take-survey", args=[str(self.session_hash), 0])
+    def get_gen_url(self):
+        """Returns the generate survey view to prep the users info before taking the survey"""
+        return reverse("gen-survey", kwargs={'surveySlug' : self.surveySlug})
     
-    def get_exit_url(self):
-        return reverse("results-page", args=[str(self.session_hash)])
+    def get_take_url(self):
+        """Returns the take survey view to send the user from the welcome page to the first page of the survey"""
+        return reverse("take-survey", kwargs={'surveySlug' : self.surveySlug, 'page' : 0})
+
+    def get_result_url(self):
+        """Returns the results page view to send the user from the take survey page to the results page"""
+        return reverse("results-page", kwargs={'surveySlug' : self.surveySlug})
+
+class Category(models.Model):
+    """
+    Category Model
+
+    Holds the title of the category and a reference to its 
+    appropriate survey
+
+    """
+    titleOfCategory = models.CharField(max_length=100)
+    survey_fk = models.ForeignKey('Survey', on_delete=models.CASCADE)
+    
+    def get_absolute_url(self):
+        return reverse("category-detail", kwargs={'surveySlug': self.survey_fk.surveySlug,
+                                                    'pk': self.pk})
+    
+
+class Survey_Question(models.Model):
+    """
+    Survey_Question Model
+
+    This model is to be used for answer referencing holding
+    a foriegn key of survey, category, and question
+
+    """
+    survey_fk = models.ForeignKey('Survey', on_delete=models.CASCADE)
+    category_fk = models.ForeignKey('Category', on_delete=models.CASCADE, null=True)
+    question_fk = models.ForeignKey('Question', related_name="survey_questions", on_delete=models.CASCADE, null=True)
+
+
+class Answer(models.Model):
+    """
+    Answer Model
+
+    This model holds a instance of each answer the user provides
+    when taking a survey and holds the user as a foreignkey
+    To reference the survey_question foreign key so we can
+    evaluate the properties of the question later
+
+    """
+    user_fk = models.ForeignKey(User, on_delete=models.CASCADE, null=True)
+    survey_question_fk = models.ForeignKey('Survey_Question', on_delete=models.CASCADE)
+    
+    answer_text = models.CharField(max_length=20)
+
+
+class Question(models.Model):
+    """
+    Question Model
+
+    used for holding the question_text for the question
+    in general. 
+
+    @input_type: used for distinguishing the how
+    the answer in the question is to be used for evaluation.
+    Ex: Text, Radio, Range?
+    
+    @option_group: used for a collection of options pre-established
+    options based on the input type
+
+    @question_text holds the general question
+
+    @answer_is_required is used to declare wether or not
+    the answer is required (TODO impl usage) 
+
+    @is_multi_option_answer is used for question evalutation (TODO impl usage) 
+    """
+    input_type_fk = models.ForeignKey('Input_Type', on_delete=models.PROTECT)
+    option_group = models.ForeignKey('Option_Group', on_delete=models.PROTECT)
+
+    question_text = models.CharField(max_length=200)
+    answer_is_required = models.BooleanField()
+    is_multi_option_answer = models.BooleanField()
+
+    def save(self,*args, **kwargs):
+        created = not self.pk
+        super().save(*args, **kwargs)
+        if created:
+            Survey_Question.objects.create(question_fk=self,)
+            
+
+class Option_Group(models.Model):
+    """
+    Option_Group Model
+
+    @name_of_group: group that holds each of the option_choices in
+    a foriegn key
+    """
+    name_of_group = models.CharField(max_length=20)
+
+
+class Option_Choice(models.Model):
+    """
+    Option_Choice Model
+
+    @option_group: holds a foreign key to the name of the group
+    of options
+
+    @choice_text: holds the text of the answer to be selected
+    or filled
+    """
+    option_group = models.ForeignKey('Option_Group', on_delete=models.CASCADE)
+
+    choice_text = models.CharField(max_length=20)
+
+
+class Input_Type(models.Model):
+    """
+    Input_Type Model
+
+    @input_type_name: holds the type of input like text
+    or radio
+    """
+    input_type_name = models.CharField(max_length=20)
+
+
+class User_Survey(models.Model):
+    """
+    User_Survey
+
+    This model is used to keep track of what surveys the user has
+    taken TODO: or is in the middle of taking
+
+    @finished: Used for session handling in determining
+    wether or not the user has finished the survey
+
+    @user_fk: Holds the user that has taken the survey
+
+    @survey_fk: Holds the survey the user is taking
+    """
+    finished = models.BooleanField(default=False)     
+    
+    user_fk = models.ForeignKey(User, on_delete=models.CASCADE)
+    survey_fk = models.ForeignKey('Survey', on_delete=models.CASCADE)
     

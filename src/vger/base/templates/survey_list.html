@@ -1,29 +1,67 @@
 {% extends "base.html" %}
 
 {% block content %}
-  <h1>Survey List</h1>
+  <div class="container-fluid">
+    <h2>List of Surveys</h2>
+  </div>
   {% if survey_list %}
-  <ul>
-    {% for survey in survey_list %}
-      {% if survey.assigned == False %}
-      <li>
-        <a href="{{ survey.get_absolute_url }}">{{ survey.titleOfSurvey }}</a> 
-        {% if user.is_authenticated %}
-        <form method="get" action="{{ survey.get_creation_url }}">
-          <div class="row spacer">
-              <button type="submit">Take Survey</button>
-          </div>
-        </form>
-        {% endif %}
-      </li>
-      {% endif %}
-    {% endfor %}
-  </ul>
+    <div class="container-fluid">
+      <ul class="list-group-flush">
+        {% for survey in survey_list %}
+          <li class="list-group-item">
+            <div class="container-fluid row">
+              <div class="col-sm-8">
+                <p>{{ survey.titleOfSurvey }}</p> 
+              </div>
+              <div class="col-sm float-right">
+                <div class="btn-toolbar" role="toolbar">
+                  {% if perms.canEditSurvey %}
+                  <div class="btn-group mr-2" role="group">
+                    <a class="btn btn-info" href="{{ survey.get_absolute_url }}">
+                      Edit
+                    </a>
+                  </div>
+                  {% endif %}
+
+                  {% if perms.canDeleteSurvey %}
+                  <div class="btn-group mr-2" role="group">
+                    <a class="btn btn-danger" href="{{survey.get_absolute_url }}/delete">
+                      Delete
+                    </a>
+                  </div>
+                  {% endif %}
+
+                  {% if perms.canTakeSurvey %}
+                  <div class="btn-group mr-2" role="group">
+                    <a class="btn btn-primary" href="{{ survey.get_welcome_url }}">
+                      Take Survey
+                    </a>
+                  </div>
+                  {% else %}
+                  <div class="btn-group mr-2" role="group">
+                    <a class="btn btn-primary disabled" href="#">
+                      Survey Closed
+                    </a>
+                  </div>
+                  {% endif %}
+                </div>
+              </div>
+            </div>
+          </li>
+        {% endfor %}
+      </ul>
+    </div>
   {% else %}
-    <p>There are no surveys in the database</p>
-    
+    <div class="container-fluid">
+      <p><strong>There are no surveys in the database</strong></p>
+    </div>
   {% endif %} 
+
   {% if perms.canCreateSurvey %}
-    <a class=navlink href="{% url 'survey-create' %}">Create a survey</a>
+    <div class="container-fluid">
+      <a class="btn btn-success" href="{% url 'survey-create' %}">
+        Create New Survey
+      </a>
+    </div>
   {% endif %}
 {% endblock %}

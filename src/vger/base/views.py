@@ -1,7 +1,7 @@
 from django.db.models.query import QuerySet
 from django.shortcuts import render
 #Form imports
-from base.forms import SurveyModelFrom, CategoryModelForm
+# from base.forms import SurveyModelFrom, CategoryModelForm
 from django.shortcuts import get_object_or_404
 from django.http import HttpResponseRedirect
 from django.http import HttpResponseNotAllowed
@@ -13,13 +13,14 @@ from django.contrib.auth.decorators import login_required, permission_required
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
 #Generic imports
 from django.views import generic
-from django.views.generic.edit import CreateView, UpdateView, DeleteView
+from django.views.generic.edit import CreateView, UpdateView, DeleteView, FormView
 #User imports
 from user.models import Administrator, Advisor, Student
 #Model imports
-from .models import Survey, Category, Question, SurveyInstance
+from .models import Survey, Category, Survey_Question, Answer, Question, Option_Choice, Option_Group, Input_Type
 from django.shortcuts import redirect
-from .forms import SurveyCategoryForm
+# from .forms import SurveyCategoryForm
+
 
 import hashlib, random, sys
 
@@ -79,59 +80,77 @@ class SurveyListView(LoginRequiredMixin, generic.ListView):
     template_name = 'survey_list.html' 
     login_url = '/login/'
 
-class SurveyDetailView(LoginRequiredMixin, generic.DetailView):
-    """
-    SurveyDetailView
+# class SurveyDetailView(LoginRequiredMixin, request):
+#     """
+#     SurveyDetailView
 
-    This is the class that we will use to show
-    the details of a specific survey
+#     This is the class that we will use to show
+#     the details of a specific survey
 
-    Survey : model
-        The specific model we will be detailing in this view
+#     Survey : model
+#         The specific model we will be detailing in this view
     
-    'survey_detail' :  context_object_name
-        this is what we will refer to when trying
-        to query via HTML
+#     'survey_detail' :  context_object_name
+#         this is what we will refer to when trying
+#         to query via HTML
 
-    'survey_detail.html' : template_name
-        the name of our html file that contains
-        the template we will use
+#     'survey_detail.html' : template_name
+#         the name of our html file that contains
+#         the template we will use
 
-    'surveySlug' : slug_field
-        slug field for this view
+#     'surveySlug' : slug_field
+#         slug field for this view
 
-    'surveySlug' : slug_url_kwarg
-        slug keyword arguments for this view
+#     'surveySlug' : slug_url_kwarg
+#         slug keyword arguments for this view
         
-    '/login/' 
-        redirect url for login required permission
-    """
-    from django.shortcuts import get_object_or_404
+#     '/login/' 
+#         redirect url for login required permission
+#     """
+#     from django.shortcuts import get_object_or_404
+#     model = Survey
+#     context_object_name = 'survey_detail'
+#     template_name = 'survey_detail.html' 
+#     slug_field = 'surveySlug'
+#     slug_url_kwarg = 'surveySlug'
+#     login_url = '/login/'
+    
 
-    model = Survey
-    context_object_name = 'survey_detail'
-    template_name = 'survey_detail.html' 
-    slug_field = 'surveySlug'
-    slug_url_kwarg = 'surveySlug'
-    login_url = '/login/'
+#     def survey_detail_view(self, request, primary_key):
+#         """
+#         survey_detail_view
 
-    def survey_detail_view(request, primary_key):
-        """
-        survey_detail_view
+#         Method, adapted from Django tutorial, will check
+#         to see if a survey exists.
 
-        Method, adapted from Django tutorial, will check
-        to see if a survey exists.
-
-        Survey : the obeject we will either retrieve 
-            or 404 error
+#         Survey : the obeject we will either retrieve 
+#             or 404 error
         
-        method returns the appropriate render
+#         method returns the appropriate render
             
-        '/login/' 
-            redirect url for login required permission
-        """
-        Survey = get_object_or_404(Survey, slug=slug) 
-        return render(request, 'base/templates/survey_detail.html', context={'survey': Survey})
+#         '/login/' 
+#             redirect url for login required permission
+#         """
+#         Survey = get_object_or_404(Survey, slug=slug)
+#         return render(request, 'base/templates/survey_detail.html', context={'survey': Survey})
+from .forms import CategoryCreateForm
+
+def SureveyDetailView(request, surveySlug):
+    if not request.user.is_authenticated:
+         return redirect('/login/')
+    
+    survey = Survey.objects.get(surveySlug=surveySlug)
+    categories = Category.objects.filter(survey_fk=survey)
+    questions = Survey_Question.objects.filter(survey_fk=survey)
+    
+    context = {
+        'survey' : survey,
+        'categories' : categories,
+        'questions' : questions,
+    }
+    
+    return render(request, 'survey_detail.html', context)
+    
 
 class CategoryDetailView(LoginRequiredMixin, generic.DetailView):
     """
@@ -180,7 +199,7 @@ class CategoryDetailView(LoginRequiredMixin, generic.DetailView):
         method returns the appropriate render
         """
         Category = get_object_or_404(Category, slug=slug)
-        return render(request, 'base/templates/category_detail.html', context={'category': category})
+        return render(request, 'base/templates/category_detail.html', context={'category': Category})
 
 class QuestionDetailView(LoginRequiredMixin, generic.DetailView):
     """
@@ -235,6 +254,8 @@ def home(request):
     return render(request, 'home.html')
 
 #Class templated for creating, updating, and deleting surveys
+from .forms import SurveyCreateForm
+
 class SurveyCreate(LoginRequiredMixin, PermissionRequiredMixin, CreateView):
     """
     SurveyCreate View
@@ -262,21 +283,21 @@ class SurveyCreate(LoginRequiredMixin, PermissionRequiredMixin, CreateView):
         Permission requirement to use this view
     """
     model = Survey
+    form_class = SurveyCreateForm
     slug_field = 'surveySlug'
     slug_url_kwarg = 'surveySlug'
-    fields = ['titleOfSurvey', 'directions']
-    template_name = 'survey_form.html' 
     login_url = '/login/'
     permission_required = 'canCreateSurvey'
 
-    def get_success_url(self):
-        """
-        get_success_url
+    def get(self, request, *args, **kwargs):
+        context = {'form': SurveyCreateForm()}
+        return render(request, 'survey_form.html', context)
 
-        takes a self paremeter and uses this to find its slug field(and others)
-        to dynamically generate a url to our object
-        """
-        return reverse('survey-detail', kwargs={'surveySlug': self.object.surveySlug})        
+    def form_valid(self, form):
+        survey = form.save()
+        survey.save()
+        return redirect(reverse('survey-detail', kwargs={'surveySlug': survey.surveySlug}))
+            
 
 class SurveyUpdate(LoginRequiredMixin, PermissionRequiredMixin, UpdateView):
     """
@@ -303,7 +324,7 @@ class SurveyUpdate(LoginRequiredMixin, PermissionRequiredMixin, UpdateView):
     model = Survey
     slug_field = 'surveySlug'
     slug_url_kwarg = 'surveySlug'
-    fields = ['titleOfSurvey', 'directions']
+    fields = ['titleOfSurvey', 'description']
     template_name = 'survey_form.html'
     login_url = '/login/' 
     permission_required = 'canUpdateSurvey'
@@ -357,6 +378,7 @@ class SurveyDelete(LoginRequiredMixin, PermissionRequiredMixin, DeleteView):
 
 #Class templated for creating, updating, and deleting categories
 #Still needs permissions!
+
 class CategoryCreate(LoginRequiredMixin, PermissionRequiredMixin, CreateView):
     """
     CategoryCreate View
@@ -371,12 +393,6 @@ class CategoryCreate(LoginRequiredMixin, PermissionRequiredMixin, CreateView):
         The name of the template we want Djagno 
         to use when creating this view.
 
-    'categorySlug' : slug_field
-        slug field for this view
-
-    'categorySlug' : slug_url_kwarg
-        slug keyword arguments for this view
-
     '/login/' 
         redirect url for login required permission 
 
@@ -384,12 +400,11 @@ class CategoryCreate(LoginRequiredMixin, PermissionRequiredMixin, CreateView):
         Permission requirement to use this view
     """    
     model = Category
-    slug_field = 'categorySlug'
-    slug_url_kwarg = 'categorySlug'
     template_name = 'category_form.html'
-    fields = ['titleOfCategory','lowWeightText', 'highWeightText']
+    fields = ['titleOfCategory',]
     login_url = '/login/'
     permission_required = 'canCreateCategory'
+
     def get_success_url(self):
         """
         get_success_url
@@ -397,8 +412,8 @@ class CategoryCreate(LoginRequiredMixin, PermissionRequiredMixin, CreateView):
         takes a self paremeter and uses this to find its slug field(and others)
         to dynamically generate a url to our object
         """
-        return reverse('category-detail', kwargs={'surveySlug': self.object.survey.surveySlug,
-                                                    'categorySlug': self.object.categorySlug})
+        return reverse('category-detail', kwargs={'surveySlug': self.object.survey_fk.surveySlug,
+                                                    'pk': self.object.pk})
     
     def form_valid(self, form):
         """
@@ -408,8 +423,11 @@ class CategoryCreate(LoginRequiredMixin, PermissionRequiredMixin, CreateView):
         we will set our 'Parent Survey' to that
         of the survey passed in with our kwargs
         """
-
-        form.instance.survey = Survey.objects.get(surveySlug=self.kwargs['surveySlug'])
+        
+        form.instance.survey_fk = Survey.objects.get(surveySlug=self.kwargs['surveySlug'])
+        #print(survey)
+        #self.survey_fk = Category.objects.filter(survey_fk=survey)
+        #form.instance.survey = Survey.objects.get(surveySlug=self.kwargs['surveySlug'])
         return super(CategoryCreate, self).form_valid(form)
         
 
@@ -426,12 +444,6 @@ class CategoryUpdate(LoginRequiredMixin, PermissionRequiredMixin, UpdateView):
     category_form.html : template_name
         The name of the template we want Djagno 
         to use when creating this view.
-    
-    'categorySlug' : slug_field
-        slug field for this view
-
-    'categorySlug' : slug_url_kwarg
-        slug keyword arguments for this view
 
     '/login/' 
         redirect url for login required permission 
@@ -440,10 +452,8 @@ class CategoryUpdate(LoginRequiredMixin, PermissionRequiredMixin, UpdateView):
         Permission requirement to use this view
     """
     model = Category
-    slug_field = 'categorySlug'
-    slug_url_kwarg = 'categorySlug'
     template_name = 'category_form.html'
-    fields = ['titleOfCategory','lowWeightText', 'highWeightText']
+    fields = ['titleOfCategory',]
     login_url = '/login/'
     permission_required = 'canUpdateCategory'
 
@@ -454,8 +464,8 @@ class CategoryUpdate(LoginRequiredMixin, PermissionRequiredMixin, UpdateView):
         takes a self paremeter and uses this to find its slug field(and others)
         to dynamically generate a url to our object
         """
-        return reverse('category-detail', kwargs={'surveySlug': self.object.survey.surveySlug,
-                                                    'categorySlug': self.object.categorySlug}) 
+        return reverse('category-detail', kwargs={'surveySlug': self.object.survey_fk.surveySlug,
+                                                    'pk': self.object.pk}) 
 
 class CategoryDelete(LoginRequiredMixin, PermissionRequiredMixin, DeleteView):
     """
@@ -473,12 +483,6 @@ class CategoryDelete(LoginRequiredMixin, PermissionRequiredMixin, DeleteView):
         The name of the template we want Djagno 
         to use when creating this view.
 
-    'categorySlug' : slug_field
-        slug field for this view
-
-    'categorySlug' : slug_url_kwarg
-        slug keyword arguments for this view
-
     '/login/' 
         redirect url for login required permission 
     
@@ -486,8 +490,6 @@ class CategoryDelete(LoginRequiredMixin, PermissionRequiredMixin, DeleteView):
         Permission requirement to use this view
     """
     model = Category
-    slug_field = 'categorySlug'
-    slug_url_kwarg = 'categorySlug'
     template_name = 'category_form_confirm_delete.html' 
     login_url = '/login/'
     permission_required = 'canDeleteCategory'
@@ -499,8 +501,10 @@ class CategoryDelete(LoginRequiredMixin, PermissionRequiredMixin, DeleteView):
         takes a self paremeter and uses this to find its slug field(and others)
         to dynamically generate a url to our object
         """
-        return reverse('survey-detail', kwargs={'surveySlug': self.object.survey.surveySlug})
+        return reverse('survey-detail', kwargs={'surveySlug': self.object.survey_fk.surveySlug})
     success_url = get_success_url
+
+from .forms import QuestionCreateForm
 
 class QuestionCreate(LoginRequiredMixin, PermissionRequiredMixin, CreateView):
     """
@@ -511,30 +515,23 @@ class QuestionCreate(LoginRequiredMixin, PermissionRequiredMixin, CreateView):
 
     Question : model
         Question is the model used in this form
-    
-    question_form.html : template_name
-        The name of the template we want Djagno 
-        to use when creating this view.
 
-    'questionSlug' : slug_field
-        slug field for this view
-
-    'questionSlug' : slug_url_kwarg
-        slug keyword arguments for this view
-
-    '/login/' 
-        redirect url for login required permission 
-
-    'canCreateQuestion' : permission_required
-        Permission requirement to use this view
     """    
     model = Question
-    slug_field = 'questionSlug'
-    slug_url_kwarg = 'questionSlug'
+    form_class = QuestionCreateForm
     template_name = 'question_form.html'
-    fields = ['questionText','answer', 'questionNumber']
+    """
+    fields = ['question_text',
+                'answer_is_required',
+                'is_multi_option_answer'
+                'input_type_fk',]
+    """
     login_url = '/login/'
     permission_required = 'canCreateQuestion'
+
+    def get(self, request, *args, **kwargs):
+        context = {'form': QuestionCreateForm()}
+        return render(request, 'question_form.html', context)
 
     def get_success_url(self):
         """
@@ -543,9 +540,8 @@ class QuestionCreate(LoginRequiredMixin, PermissionRequiredMixin, CreateView):
         takes a self paremeter and uses this to find its slug field(and others)
         to dynamically generate a url to our object
         """
-        return reverse('question-detail', kwargs={'surveySlug': self.object.category.survey.surveySlug,
-                                                    'categorySlug': self.object.category.categorySlug,
-                                                    'questionSlug': self.object.questionSlug})
+        return reverse('question-detail', kwargs={'sQPk': self.object.survey_questions,
+                                                    'questionPk': self.object.pk})
     
     def form_valid(self, form):
         """
@@ -555,7 +551,10 @@ class QuestionCreate(LoginRequiredMixin, PermissionRequiredMixin, CreateView):
         we will set our 'Parent Category' to that
         of the survey passed in with our kwargs
         """
-        form.instance.category = Category.objects.get(categorySlug=self.kwargs['categorySlug'])
+        form.instance.category = Category.objects.get(pk=self.kwargs['pk'])
+        #survey = Survey.objects.get(pk=form.instance.category.survey_fk)
+
+        #Category.objects.get(categorySlug=self.kwargs['categorySlug'])
         print(form.cleaned_data)
         return super(QuestionCreate, self).form_valid(form)
         
@@ -573,12 +572,6 @@ class QuestionUpdate(LoginRequiredMixin, PermissionRequiredMixin, UpdateView):
     question_form.html : template_name
         The name of the template we want Djagno 
         to use when creating this view.
-
-    'questionSlug' : slug_field
-        slug field for this view
-
-    'questionSlug' : slug_url_kwarg
-        slug keyword arguments for this view
 
     '/login/' 
         redirect url for login required permission 
@@ -649,121 +642,151 @@ class QuestionDelete(LoginRequiredMixin, PermissionRequiredMixin, DeleteView):
         """
         return reverse('category-detail', kwargs={'surveySlug': self.object.category.survey.surveySlug,
                                                     'categorySlug': self.object.category.categorySlug})
-    success_url = get_success_url
     
 ###############################################################################
 def create_session_hash():
             hash = hashlib.sha1()
             hash.update(str(random.randint(0,sys.maxsize)).encode('utf-8'))
             return hash.hexdigest()
+
+#This func is used to handle a survey object and count the number of necessary pages
+#and then pass that data pack in a representable way to be handled in either a session
+#based format or in some itterative represenation
+def survey_page_counter(survey):
+    return len(Category.objects.filter(survey_fk=survey))
+
 ##############################################################################33
-def generateNewSurvey(request, pk):
-    request.session['session_category'] = None
-    #need to check if user had a survey
+from .models import User_Survey
+def generateNewSurvey(request, surveySlug):
+    """
+
+    generateNewSurvey view
+
+    used for establishing a session to monitor
+    what current page we are on, and creates a user_survey object
+    for establishing a wether or not the user has taken the survey
+
+    TODO: need to check if user had a survey
+    """
+    
     if not request.user.is_authenticated:
         return redirect('/login/')
-    new_survey = Survey.objects.get(pk=pk)
-    categories = Category.objects.filter(survey=new_survey)
-    #TODO: if survey is already in the survey_instance with user ask if they want to continue the old one
-    new_survey.pk = None
-    new_survey.assigned = True
-    new_survey.surveySlug = create_session_hash()
-    new_survey.save()
 
-    for c_item in categories:
-        questions = Question.objects.filter(category=c_item)
-        c_item.pk = None
-        c_item.survey = new_survey
-        c_item.categorySlug = create_session_hash()
-        c_item.save()
-        for q_item in questions:
-            q_item.pk = None
-            q_item.category = c_item
-            q_item.questionSlug = create_session_hash()
-            q_item.save()
-        
+    survey = Survey.objects.get(surveySlug=surveySlug)    
+    request.session['surveySlug'] = surveySlug
+    request.session['totalPage'] = survey_page_counter(survey)
+    request.session['currPage'] = 0
 
-    survey_instance = SurveyInstance.objects.create(survey=new_survey, user=request.user)
-    survey_instance.save()
+    u_s = User_Survey.objects.create(user_fk=request.user, survey_fk=survey)
+    u_s.save()
+    return redirect(survey.get_take_url())
+
+def welcomeSurvey(request, surveySlug):
+    """
+
+    welcomeSurvey view
+
+    used for displaying a welcome page that gives the description
+    of the survey before the person starts it
+
+    OPTIONAL TODO: Do we want instructions for a survey to be added?
+    TODO: need to check if user had a survey
+    """
     
-    return redirect(survey_instance.get_welcome_url())
+    if not request.user.is_authenticated:
+        return redirect('/login/')
 
-def welcomeSurvey(request, session_hash):
-    request.session['session_hash'] = session_hash
-    SI = SurveyInstance.objects.get(session_hash=session_hash)
+    survey = Survey.objects.get(surveySlug=surveySlug)
     context = {
-        'Survey' : SI.survey,
-        'SI' : SI
+         'Survey' : survey,
     }
     return render(request, 'welcome_to_survey.html', context)
 
-def takeSurvey(request, session_hash, page):
-    session_category = request.session.get('session_category', None)
-    print(session_category)
-    if session_category == None or session_category == []:
-        session_category = []
-        si = SurveyInstance.objects.get(session_hash=session_hash)
-        categories = Category.objects.filter(survey=si.survey)
-        for cat in categories:
-            session_category.append(cat.titleOfCategory)
-        request.session['session_category'] = session_category
+from .forms import SurveyCategoryForm
 
-    elif len(session_category) != 0:
-        if request.method == 'POST':
-            form = SurveyCategoryForm(request.POST, instance=session_category[0])
-            if form.is_valid():
-                si = SurveyInstance.objects.get(session_hash=session_hash)
-                category = Category.objects.get(survey=si.survey, titleOfCategory=session_category[0])
-                questions = Question.objects.filter(category=category) 
-                print(questions)
-                for (q, a) in form.category_answers():
-                    print("q", q)
-                    model_question = questions.get(questionText=q)
-                    model_question.answer = a
-                    model_question.save()
-
-
-            # for i, question in enumerate(questions):
-              
-            del session_category[0]
-
-        request.session['session_category'] = session_category
-    if len(session_category) == 0:
-        #TODO: exit survey
-        si = SurveyInstance.objects.get(session_hash=request.session['session_hash'])
-        si.survey.finished = True
-        si.save()
-        return redirect(si.get_exit_url())
-        print("TODO")
-
-    print(session_category)
-    #print(request.session['session_category'])
-    #TODO: if post save questions
-    form = SurveyCategoryForm(instance=session_category[0])
-
-    return render(request, 'take_survey.html', {'toc': session_category[0], 'form' : form})
-
-def results(request, session_hash):
+def takeSurvey(request, surveySlug, page):
     """
-    results
+    takeSurvey view
 
-    num_instances : the object will return the number of 
-        times user has taken survey 
+    This view is used for taking the survey and hands off
+    each category and each question under those categories.
+    this view hands off the category to the SurveyCategoryForm.
+
+    We use the session to keep track of which page were currenlty on
+    and incriment based on the page.
+    If we have the totalPage eqal to current page the redirect the
+    user to the results otherwise handle the post method and save
+    the information to a new answer model
+
+    TODO: need to check if user had a survey in User_Survey
+    TODO: Save answers of all types rather than just radio
     """
-    context_object_name = 'results-page'
-    template_name = 'results.html'
+    
+    currPage = request.session.get('currPage', 0)
+    totalPage = request.session.get('totalPage', 0)
+    survey = Survey.objects.get(surveySlug=request.session.get('surveySlug')) 
+    list_of_categories = Category.objects.filter(survey_fk=survey)[::1]
+    
+    if currPage == totalPage:
+            return redirect(survey.get_result_url())
 
-    si = SurveyInstance.objects.get(session_hash=session_hash)
-    survey_name = si.survey.titleOfSurvey
-    categories = Category.objects.filter(survey=si.survey)
-    questions = []
-    for category in categories: 
-        questions += list(Question.objects.filter(category=category))
+    form = SurveyCategoryForm(request.POST, instance=list_of_categories[currPage].pk)
+    if form.is_valid():
+            
+        for (q, a) in form.category_answers():
+            answer = Answer.objects.create(
+                user_fk = request.user,
+                survey_question_fk = Survey_Question.objects.get(pk=q),
+                answer_text = a
+            )
+            answer.save()
+
+        request.session['currPage'] = currPage + 1
+
+    form = SurveyCategoryForm(instance=list_of_categories[currPage].pk)
+    
+    context = {
+        'toc' : list_of_categories[currPage].titleOfCategory,
+        'form' : form,
+    }
+    return render(request, 'take_survey.html', context)
+
+def results(request, surveySlug):
+    """
+    """ 
+    survey = Survey.objects.get(surveySlug=surveySlug)
+    categories = Category.objects.filter(survey_fk=survey)
+
 
     context = {
-        'Name_of_survey': survey_name,
-        'instance_hash': si,
+        'surveySlug': surveySlug,
+        'survey_name': survey.titleOfSurvey,
         'categories': categories,
-        'questions': questions,
     }
-    return render(request, 'results.html', context=context)
+
+    return render(request, 'results.html', context)
+
+# def results(request, session_hash):
+#     """
+#     results
+
+#     num_instances : the object will return the number of 
+#         times user has taken survey 
+#     """
+#     context_object_name = 'results-page'
+#     template_name = 'results.html'
+
+#     si = SurveyInstance.objects.get(session_hash=session_hash)
+#     survey_name = si.survey.titleOfSurvey
+#     categories = Category.objects.filter(survey=si.survey)
+#     questions = []
+#     for category in categories: 
+#         questions += list(Question.objects.filter(category=category))
+
+#     context = {
+#         'Name_of_survey': survey_name,
+#         'instance_hash': si,
+#         'categories': categories,
+#         'questions': questions,
+#     }
+#     return render(request, 'results.html', context=context)
