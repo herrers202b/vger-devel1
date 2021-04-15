@@ -33,7 +33,7 @@ def linuxInstall():
     print("*************** Spin the Server Down ***************")
     os.system('python3 run.py down')
     print(" ")
-    print("*************** Initial Innstall was ran on your Linux OS and your site is back down ***************")
+    print("*************** Initial Install was ran on your Linux OS and your site is back down ***************")
 
 def macInstall():
     print("*************** Build the Server ***************")
