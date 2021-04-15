@@ -1,4 +1,4 @@
-# The runTest.py script will make sure the site is down, bring it up, run the test showing any errors, then bring the site back down. 
+# The runTest.py script will make sure the site is down, bring it up, run the test showing any errors, then bring the site back down.
 #
 # To execute this script type in the command line: python3 ./runTests.py
 # Note: Must be in the /vger-devel1-dream-team directory to execute
@@ -7,7 +7,6 @@ import os
 import sys
 import subprocess
 import time
-
 
 def linuxTest():
     print("*************** Making sure site is down ***************")
@@ -24,7 +23,15 @@ def macTest():
     os.system('python3 run.py test')
     os.system('docker compose down')
     print("Test were ran on your MacOS and your site is back down.")
-    
+
+def windowsTest():
+    print("*************** Making sure site is down ***************")
+    os.system('docker-compose down')
+    print("*************** Running Tests ***************")
+    os.system('docker-compose run django python3 manage.py test')
+    os.system('docker-compose down')
+    print("Test were ran on your MacOS and your site is back down.")
+
 def get_platform():
     platforms = {
         'linux1': 'Linux',
@@ -37,7 +44,6 @@ def get_platform():
 
     return platforms[sys.platform]
 
-
 def main():
     if get_platform() == "linux":
         linuxTest()
@@ -47,7 +53,6 @@ def main():
         macTest()
     else:
         print("Your Operating System is not supported")
-
 
 if __name__ == "__main__":
     main()
