@@ -60,7 +60,7 @@ def windowsInstall():
     os.system('docker-compose migrate')
 
     print("*************** Set up a Root User ***************")
-    os.system('docker-compose run django python3 run.py createsuperuser')
+    os.system('docker-compose run django python3 run.py admin')
 
     print("*************** Spin the Server Down ***************")
     os.system('docker-compose down')
