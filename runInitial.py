@@ -1,5 +1,6 @@
 import os
 import sys
+import datetime, time
 
 # Builds the Docker images,
 # creates necessary directories with appropriate ownership,
@@ -28,6 +29,13 @@ def linuxInstall():
 
     print("*************** Spin the Server Down ***************")
     os.system('python3 run.py down')
+    
+    verifiedFile = open('verifiedInstall.txt', 'w+')
+    dateTime = datetime.datetime.now()
+    verifiedFile.write("You installed at: ")
+    verifiedFile.write(str(dateTime))
+    verifiedFile.close()
+    
     print(" ")
     print("*************** Initial Install was ran on your Linux OS and your site is back down ***************")
 
@@ -46,6 +54,14 @@ def macInstall():
 
     print("*************** Spin the Server Down ***************")
     os.system('python3 run.py down')
+
+    verifiedFile = open('verifiedInstall.txt', 'w+')
+    dateTime = datetime.datetime.now()
+    verifiedFile.write("You installed at: ")
+    verifiedFile.write(str(dateTime))
+    verifiedFile.close()
+
+
     print(" ")
     print("*************** Initial Install was ran on your MacOS and your site is back down ***************")
 
@@ -64,6 +80,13 @@ def windowsInstall():
 
     print("*************** Spin the Server Down ***************")
     os.system('docker-compose down')
+
+    verifiedFile = open('verifiedInstall.txt', 'w+')
+    dateTime = datetime.datetime.now()
+    verifiedFile.write("You installed at: ")
+    verifiedFile.write(str(dateTime))
+    verifiedFile.close()
+
     print(" ")
     print("*************** Initial Install was ran on your Windows OS and your site is back down ***************")
 
