@@ -8,13 +8,21 @@ import sys
 
 # Mac, Linux, Windows
 # 1. Build the server
-# 2. Set up a root user
-# 3. Spin the server up
-# 4. Spin the server down
+# 2. Run Django
+# 3. Make migrations
+# 4. Set up a root user
+# 5. Spin the server up
+# 6. Spin the server down
 
 def linuxInstall():
     print("*************** Build the Server ***************")
     os.system('python3 run.py build')
+
+    print("*************** Run Django ***************")
+    os.system('sudo docker-compose run django')
+
+    print("*************** Making Migrations ***************")
+    os.system('python3 run.py migrate --run-syncdb')
 
     print("*************** Set up a Root User ***************")
     os.system('python3 run.py admin')
@@ -30,6 +38,12 @@ def linuxInstall():
 def macInstall():
     print("*************** Build the Server ***************")
     os.system('python3 run.py build')
+
+    print("*************** Run Django ***************")
+    os.system('sudo docker-compose run django')
+
+    print("*************** Making Migrations ***************")
+    os.system('python3 run.py migrate --run-syncdb')
 
     print("*************** Set up a Root User ***************")
     os.system('python3 run.py admin')
@@ -48,9 +62,15 @@ def windowsInstall():
 
     print("*************** Spin up the Server ***************")
     os.system('docker-compose up')
-    
+
+    print("*************** Run Django ***************")
+    os.system('docker-compose run django')
+
+    print("*************** Making Migrations ***************")
+    os.system('docker-compose migrate')
+
     print("*************** Set up a Root User ***************")
-    os.system('docker-compose run django python3 manage.py createsuperuser')
+    os.system('docker-compose run django python3 run.py createsuperuser')
 
     print("*************** Spin the Server Down ***************")
     os.system('docker-compose down')
