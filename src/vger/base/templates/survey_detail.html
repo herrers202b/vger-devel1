@@ -1,45 +1,102 @@
 {% extends "base.html" %}
 
+{% block head %}
+<script type="text/javascript" src="/static/base/expand_button.js"></script>
+{% endblock %}
+
 {% block content %}
-<h1>Title: {{survey_detail.titleOfSurvey }}</h1>
+<div class="container-fluid">
+  <h2>Title: {{ survey.titleOfSurvey }}</h2>
+</div>
 
-<p><strong>Directions:</strong> {{survey_detail.directions }}</p>
+{% comment %} <a href="{{ survey.get_welcome_url }}">Take Survey</a> {% endcomment %}
 
-  <h4>Categories:</h4>
-  <!--https://stackoverflow.com/questions/6704749/relatedmanager-object-is-not-iterable-django-->
-  <!--https://stackoverflow.com/questions/37346173/django-select-related -->
-  <!------Remove the () from the end of all to get relational queires to work-->
-  {% for Category in survey_detail.categories.all %}
-    <div style="margin-left:20px;margin-top:20px">
+<div class="container-fluid">
+  <p><strong>Description:</strong> {{survey.description }}</p>
+</div>
 
-    {% if perms.canCreateCategory %}
-      <a href="{{ Category.get_absolute_url }}">Title: {{Category.titleOfCategory}}</a> 
-    {% else %}
-      <p>Category Title: {{Category.titleOfCategory}}</p>
-    {% endif %}
-
-    {% for Question in Category.questions.all %}
-        <div style="margin-left:20px;margin-top:20px">
-          {% if perms.canCreateQuestion %}
-            <a href="{{ Question.get_absolute_url }}">Question: {{Question.questionText}}?</a> 
-          {% else %}
-            <p>Question: {{Question.questionText}}?</p>
-          {% endif %}
-        </div>
-    {% endfor %}
-    </div>
-  {% endfor %}
-   <p> </p>
-   <a href="{% url 'survey' %}">Return</a>
-
-  {% if perms.canDeleteSurvey %}
+{% comment %} {% if perms.canDeleteSurvey %}
     <a href="{{ survey_detail.get_absolute_url }}/delete">Delete Survey</a>
-  {% endif %}
-  {% if perms.canUpdateSurvey %}
-  <a href="{{ survey_detail.get_absolute_url }}/update">Update Survey</a> 
-  {% endif %}
-  {% if perms.canCreateCategory %}
-  <a href="{{ survey_detail.get_absolute_url }}/create-category">Create Category</a>   
+{% endif %} {% endcomment %}
+<div class="container-fluid">
+  <h2>Categories</h2>
+</div>
+
+<div class="container-fluid">
+  {% if not categories %}
+    <p><strong>There do not appear to be any categories</strong></p>
+    {% if perms.canCreateCategory %}
+      <div class="btn-group mr-2" role="group">
+        <form action="{%url 'category-create' survey.surveySlug %}">
+          <button class="btn btn-success" type="submit">
+            Create New Category
+          </button>
+        </form>
+      </div>
+      {% endif %}
+  {% else %}
+    <ul class="list-group-flush">
+      {% for Category in categories %}
+      <li class="list-group-item">
+        <div class="container-fluid row">
+          <div class="col-sm-8">
+            <p>{{Category.titleOfCategory}}</p>
+          </div>
+
+          {% if perms.canEditCategory %}
+          <div class="col-sm">
+            <div class="btn-toolbar" role="toolbar">
+              <div class="btn-group mr-2" role="group">
+                <a class="btn btn-info" href="{{ Category.get_absolute_url }}">
+                  Edit
+                </a>
+              </div>
+
+              {% if perms.canDeleteCategory %}
+              <div class="btn-group mr-2" role="group">
+                <form action="{{ Category.get_absolute_url }}/delete-category">
+                  <button class="btn btn-danger" type="submit">
+                    Delete</button>
+                </form>
+              </div>
+              {% endif %}
+            </div>
+          {% endif %}
+          </div>
+        </div>
+      </li>
+      {% endfor %}
+    </ul>
+</div>
+
+  <div class="container-fluid">
+    <div class="btn-toolbar" role="toolbar">
+      {% if perms.canCreateCategory %}
+      <div class="btn-group mr-2" role="group">
+        <form action="{%url 'category-create' survey.surveySlug %}">
+          <button class="btn btn-success" type="submit">
+            Create New Category
+          </button>
+        </form>
+      </div>
+      {% endif %}
+      <div class="btn-group mr-2" role="group">
+        <a class="btn btn-primary" href="{{survey.get_welcome_url}}">
+          Take Survey
+        </a>
+      </div>
+    </div>
+  </div>
   {% endif %}
 
+<br />
+
+<div class="container-fluid">
+{% comment %} Return button {% endcomment %}
+  <form action="{%url 'survey' %}">
+    <button class="btn btn-primary" type="submit">
+      Return
+    </button>
+  </form>
+</div>
 {% endblock %}

@@ -77,4 +77,9 @@ this is to help navigate project functionality.
 ---
 
 ### ``runTests.py`` usage
-> runs all test files in project apps for all Operating Systems
+> Run Tests Script: runs all test files in project apps for all Operating Systems
+
+---
+
+### ``runInitial.py`` usage
+> Initial Install Script: initializes/installs the database, in order to start running the product

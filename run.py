@@ -38,8 +38,10 @@ def main():
 
     # Does the migrations
     elif 'migrate'.strip() in sys.argv:
-        os.system("sudo docker-compose run django python3 manage.py makemigrations")
-        os.system("sudo docker-compose run django python3 manage.py migrate")
+        os.system("sudo docker-compose run django python3 manage.py makemigrations base")
+        os.system("sudo docker-compose run django python3 manage.py makemigrations user")
+        os.system("sudo docker-compose run django python3 manage.py migrate base")
+        os.system("sudo docker-compose run django python3 manage.py migrate user")
         
     # Creates a superuser
     elif 'admin'.strip() in sys.argv:
@@ -77,7 +79,14 @@ def main():
         os.system("sudo docker rm $(sudo docker ps -a -q)")
     
     elif 'dbflush'.strip() in sys.argv:
-        os.system("sudo docker-compose run django python3 manage.py flush")
+        os.system("sudo docker kill $(sudo docker ps -a -q)")
+        os.system("sudo docker rm $(sudo docker ps -a -q)")
+        #os.system("sudo docker-compose run django python3 manage.py flush")
+        os.system("sudo chown -R $USER:$USER .")
+        os.system("sudo rm -rf data/")
+        os.system("sudo rm src/vger/db.sqlite3")
+        os.system("sudo docker-compose run django python3 manage.py makemigrations")
+        os.system("sudo docker-compose run django python3 manage.py migrate")
     else:   
         usage()
 

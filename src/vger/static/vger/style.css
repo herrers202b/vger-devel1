@@ -1,6 +1,5 @@
 body {
     font-size:1.3em;
-    font-weight:bold;
     color:#000000;
     background-color:#8a1538; 
 }
@@ -10,16 +9,17 @@ h1, h2, h3, h4, h5, h6, a {
 }
 
 a:hover {
-    color:#cc1e52;
+    color:#660f29;
     text-decoration:none;
 }
 
 .nav-link {
     color:#8a1538;
+    font-weight:bold;
 }
 
 .nav-link:hover {
-    color:#cc1e52;
+    color:#660f29;
 }
 
 .spacer{margin-top:5px;}
@@ -32,9 +32,38 @@ a:hover {
 }
 
 .btn-primary:hover {
-    background-color:#cc1e52;
-    border-color:#cc1e52;
+    background-color:#660f29;
+    border-color:#660f29;
 }
+
+.btn-primary.disabled {
+    background-color:#89374f;
+    border-color:#89374f;
+}
+
 .row{margin-top: 10px;}
 
 table{margin-top: 15px;}
+
+/* .tke-srvy {
+    padding-left: 0;
+    display: inline-block"
+} */
+
+/* #parent {
+    list-style: none;
+    width: 100%;
+    height: 90px;
+    margin: 0;
+    padding: 0;
+    white-space: nowrap;
+    overflow-x: auto;
+    overflow-y: hidden;
+}
+
+#parent > li {
+    display: inline-block;
+    width: 50%;
+    height: 100%;
+    background-color: red;
+} */

@@ -1,8 +1,6 @@
 {% extends "base.html" %}
 {% load crispy_forms_tags %}
-{% block content %}
-<!--This Section of code is used for the DateTimePicker widget impl-->
-<head>
+{% block head %}
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
   <title>Static Example</title>
@@ -13,7 +11,11 @@
   <!-- XDSoft DateTimePicker -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jquery-datetimepicker/2.5.20/jquery.datetimepicker.min.css" integrity="sha256-DOS9W6NR+NFe1fUhEE0PGKY/fubbUCnOfTje2JMDw3Y=" crossorigin="anonymous" />
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-datetimepicker/2.5.20/jquery.datetimepicker.full.min.js" integrity="sha256-FEqEelWI3WouFOo2VWP/uJfs1y8KJ++FLh2Lbqc8SJk=" crossorigin="anonymous"></script>
-</head>
+{% endblock %}
+
+{% block content %}
+<!--This Section of code is used for the DateTimePicker widget impl-->
+
 <!--^^^^This Section of code is used for the DateTimePicker widget impl^^^^-->
   
 <form action="" method="post">
