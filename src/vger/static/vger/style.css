@@ -7,19 +7,40 @@ body {
 h1, h2, h3, h4, h5, h6, a {
     color:#8a1538;
 }
-
-a:hover {
-    color:#660f29;
-    text-decoration:none;
+.logo {
+    display: block;
+    box-shadow: none;
+    padding-left: 2%;
+    width: auto;
+    height: 3.5rem;
+    float:left
+}
+.logo img {
+    height: 100%;
+    width: auto;
+}
+.nav-bar-links {
+    float: right; 
+    padding-left:30%;
+}
+.nav-b {
+    background-color: rgb(255, 255, 255);
+    flex: 1 1 auto;
+    border-bottom-left-radius: 25px;
+    border-bottom-right-radius: 25px;
+    width: 100%;
+    overflow: hidden;
 }
 
+
 .nav-link {
-    color:#8a1538;
-    font-weight:bold;
+    color:#000000;
+    font-weight: 400;
+    font-family: EB Garamond,serif;
 }
 
 .nav-link:hover {
-    color:#660f29;
+    color: #8a1538;
 }
 
 .spacer{margin-top:5px;}
