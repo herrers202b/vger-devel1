@@ -10,31 +10,56 @@ import time
 
 
 def linuxStart():
-    os.popen('docker-compose up')
-    time.sleep(5.5)
-    os.system('cd src/vger')
-    os.system('HOST_USER_ID=`id --user` HOST_GROUP_ID=`id --group` DJANGO_PORT=8888 docker-compose exec django python manage.py makemigrations')
-    os.system('HOST_USER_ID=`id --user` HOST_GROUP_ID=`id --group` DJANGO_PORT=8888 docker-compose exec django python manage.py migrate')
-    os.system('cd ../..')
-    print("Website is up and migrations are complete.")
+    if(os.path.isfile('verifiedInstall.txt') == True):
+        print('I am in a Docker Container')
+        print("*************** Starting the Server ***************")
+        os.popen('docker-compose up')
+        time.sleep(5.5)
+        print(" ")
+        print("*************** Making Migrations ***************")
+        os.system('cd src/vger')
+        os.system('HOST_USER_ID=`id --user` HOST_GROUP_ID=`id --group` DJANGO_PORT=8888 docker-compose exec django python manage.py makemigrations')
+        os.system('HOST_USER_ID=`id --user` HOST_GROUP_ID=`id --group` DJANGO_PORT=8888 docker-compose exec django python manage.py migrate')
+        os.system('cd ../..')
+        print(" ")
+        print("***** Website is up and migrations are complete on your Linux OS *****")
+        print(" ")
+    else:
+        print("*** You must run runInitial.py first! See README.md for more information. ***")
 
 def windowsStart():
-    os.popen('docker-compose up')
-    time.sleep(5.5)
-    os.system('cd src/vger')
-    os.system('docker-compose exec django python manage.py makemigrations')
-    os.system('docker-compose exec django python manage.py migrate')
-    os.system('cd ../..')
-    print("Website is up and migrations are complete.")
+    if(os.path.isfile('verifiedInstall.txt') == True):
+        print("*************** Starting the Server ***************")
+        os.popen('docker-compose up')
+        time.sleep(5.5)  
+        print(" ")
+        print("*************** Making Migrations ***************")
+        os.system('cd src/vger')
+        os.system('docker-compose exec django python manage.py makemigrations')
+        os.system('docker-compose exec django python manage.py migrate')
+        os.system('cd ../..')
+        print(" ")
+        print("***** Website is up and migrations are complete on your Windows OS *****")
+        print(" ")
+    else:
+        print("*** You must run runInitial.py first! See README.md for more information. ***")
 
 def macOSStart():
-    os.popen('HOST_USER_ID=`id --user` HOST_GROUP_ID=`id --group` DJANGO_PORT=8888 docker-compose up')
-    time.sleep(5.5)
-    os.system('cd src/vger')
-    os.system('HOST_USER_ID=`id --user` HOST_GROUP_ID=`id --group` DJANGO_PORT=8888 docker-compose exec django python manage.py makemigrations')
-    os.system('HOST_USER_ID=`id --user` HOST_GROUP_ID=`id --group` DJANGO_PORT=8888 docker-compose exec django python manage.py migrate')
-    os.system('cd ../..')
-    print("Website is up and migrations are complete.")
+    if(os.path.isfile('verifiedInstall.txt') == True):
+        print("*************** Starting the Server ***************")
+        os.popen('HOST_USER_ID=`id --user` HOST_GROUP_ID=`id --group` DJANGO_PORT=8888 docker-compose up')
+        time.sleep(5.5)
+        print(" ")
+        print("*************** Making Migrations ***************")
+        os.system('cd src/vger')
+        os.system('HOST_USER_ID=`id --user` HOST_GROUP_ID=`id --group` DJANGO_PORT=8888 docker-compose exec django python manage.py makemigrations')
+        os.system('HOST_USER_ID=`id --user` HOST_GROUP_ID=`id --group` DJANGO_PORT=8888 docker-compose exec django python manage.py migrate')
+        os.system('cd ../..')
+        print(" ")
+        print("***** Website is up and migrations are complete on your Mac OS *****")
+        print(" ")
+    else:
+        print("*** You must run runInitial.py first! See README.md for more information. ***")
 
 def get_platform():
     platforms = {
