@@ -14,6 +14,21 @@ class Survey(models.Model):
 
     TODO: Impliment versioning because the various models
     will depend on the state of this post filling of a survey
+
+    titleOfSurvey : CharField
+        the title of the survey
+    
+    description : CharField
+        a short 100 char length description of this survey
+
+    start_date, end_date : DateTimeField
+        the state and end date, respectivly, of this survey
+
+    is_open : BooleanField 
+        boolean that determines whether or not a survey is live
+
+    surveySlug : SlugField
+        a slugfield derived from the title fo the survey, used for url pathing
     """
     titleOfSurvey = models.CharField(max_length=20)
     description = models.CharField(max_length=100)
@@ -56,6 +71,11 @@ class Category(models.Model):
     Holds the title of the category and a reference to its 
     appropriate survey
 
+    titleOfCategory : CharField
+        title of the category with 100 char limiter
+
+    survey_fk : ForeignKey
+        the foreign key that is used to access a parent survey
     """
     titleOfCategory = models.CharField(max_length=100)
     survey_fk = models.ForeignKey('Survey', on_delete=models.CASCADE)
@@ -72,7 +92,17 @@ class Survey_Question(models.Model):
     This model is to be used for answer referencing holding
     a foriegn key of survey, category, and question
 
+
+    survey_fk : ForeignKey
+        Foreign key used to access a parent survey
+
+    category_fk : ForeignKey
+        Foreign key used to access a parent category
+
+    question_fk : ForeignKey
+        Foreign key used to access a child question
     """
+
     survey_fk = models.ForeignKey('Survey', on_delete=models.CASCADE)
     category_fk = models.ForeignKey('Category', related_name = "my_questions", on_delete=models.CASCADE, null=True)
     question_fk = models.ForeignKey('Question', related_name="survey_questions", on_delete=models.CASCADE, null=True)
@@ -87,6 +117,14 @@ class Answer(models.Model):
     To reference the survey_question foreign key so we can
     evaluate the properties of the question later
 
+    user_fk : ForeignKey
+        Foreign key used to access a user
+
+    survey_question_fk : ForeignKey
+        Foreign key used to access a Survey Question Object
+
+    answer_text : CharField
+        20 chararacter lenght answer text field
     """
     user_fk = models.ForeignKey(User, on_delete=models.CASCADE, null=True)
     survey_question_fk = models.ForeignKey('Survey_Question', on_delete=models.CASCADE)
