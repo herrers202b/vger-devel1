@@ -241,9 +241,23 @@ class QuestionDetailView(LoginRequiredMixin, generic.DetailView):
     from django.shortcuts import get_object_or_404
 
     model = Question
-    context_object_name = 'question_detail'
     template_name = 'question_detail.html'
     login_url = '/login/'
+
+    def get_context_data(self, **kwargs):
+        context = super(QuestionDetailView, self).get_context_data(**kwargs)
+        self.object = self.get_object()
+        this_question = Question.objects.get(pk=self.object.pk)
+        context['this_question'] = this_question
+
+        from django.core.exceptions import ObjectDoesNotExist
+
+        try:
+            this_category = Category.objects.get(my_questions__question_fk=this_question)
+            context['this_category'] = this_category
+        except Survey_Question.DoesNotExist:
+            this_category = None
+        return context
 
     def question_detail_view(request, primary_key):
         """
