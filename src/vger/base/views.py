@@ -189,10 +189,14 @@ class CategoryDetailView(LoginRequiredMixin, generic.DetailView):
         self.object = self.get_object()
         this_category = Category.objects.get(pk=self.object.pk)
         context['categories'] = this_category
-        my_survey_questions = Survey_Question.objects.get(category_fk=this_category)
-        context['my_survey_questions'] = my_survey_questions
-        myQuestions = Question.objects.all().filter(survey_questions=my_survey_questions)
-        context['myQuestions'] = myQuestions
+
+        from django.core.exceptions import ObjectDoesNotExist
+
+        try:
+            myQuestions = Question.objects.filter(survey_questions__category_fk=this_category)
+            context['myQuestions'] = myQuestions
+        except Survey_Question.DoesNotExist:
+            myQuestions = None
         return context
     def category_detail_view(request, primary_key):
         """
@@ -419,7 +423,7 @@ class CategoryCreate(LoginRequiredMixin, PermissionRequiredMixin, CreateView):
         to dynamically generate a url to our object
         """
         return reverse('category-detail', kwargs={'surveySlug': self.object.survey_fk.surveySlug,
-                                                    'categoryPk': self.object.pk})
+                                                    'pk': self.object.pk})
     
     def form_valid(self, form):
         """
@@ -471,7 +475,7 @@ class CategoryUpdate(LoginRequiredMixin, PermissionRequiredMixin, UpdateView):
         to dynamically generate a url to our object
         """
         return reverse('category-detail', kwargs={'surveySlug': self.object.survey_fk.surveySlug,
-                                                    'categoryPk': self.object.pk}) 
+                                                    'pk': self.object.pk})
 
 class CategoryDelete(LoginRequiredMixin, PermissionRequiredMixin, DeleteView):
     """
@@ -570,7 +574,7 @@ class QuestionCreate(LoginRequiredMixin, PermissionRequiredMixin, CreateView):
         my_survey_question = Survey_Question.objects.get(question_fk=self.object.pk)
         my_category = Category.objects.get(pk=my_survey_question.category_fk.pk)
         my_survey = Survey.objects.get(pk=my_survey_question.survey_fk.pk)
-        return reverse('question-detail', kwargs={'questionPk': self.object.pk,
+        return reverse('question-detail', kwargs={'pk': self.object.pk,
                                                     'categoryPk': my_category.pk,
                                                     'surveySlug': my_survey.pk})
 
@@ -596,10 +600,8 @@ class QuestionUpdate(LoginRequiredMixin, PermissionRequiredMixin, UpdateView):
         Permission requirement to use this view
     """
     model = Question
-    slug_field = 'questionSlug'
-    slug_url_kwarg = 'questionSlug'
     template_name = 'question_form.html'
-    fields = ['questionText','answer', 'questionNumber']
+    form_class = QuestionCreateForm
     login_url = '/login/'
     permission_required = 'canUpdateQuestion'
 
@@ -610,9 +612,12 @@ class QuestionUpdate(LoginRequiredMixin, PermissionRequiredMixin, UpdateView):
         takes a self paremeter and uses this to find its slug field(and others)
         to dynamically generate a url to our object
         """
-        return reverse('question-detail', kwargs={'surveySlug': self.object.category.survey.surveySlug,
-                                                    'categorySlug': self.object.category.categorySlug,
-                                                    'questionSlug': self.object.questionSlug})
+        my_survey_question = Survey_Question.objects.get(question_fk=self.object.pk)
+        my_category = Category.objects.get(pk=my_survey_question.category_fk.pk)
+        my_survey = Survey.objects.get(pk=my_survey_question.survey_fk.pk)
+        return reverse('question-detail', kwargs={'questionPk': self.object.pk,
+                                                    'categoryPk': my_category.pk,
+                                                    'surveySlug': my_survey.pk})
 
 class QuestionDelete(LoginRequiredMixin, PermissionRequiredMixin, DeleteView):
     """
@@ -656,8 +661,12 @@ class QuestionDelete(LoginRequiredMixin, PermissionRequiredMixin, DeleteView):
         takes a self paremeter and uses this to find its slug field(and others)
         to dynamically generate a url to our object
         """
-        return reverse('category-detail', kwargs={'surveySlug': self.object.category.survey.surveySlug,
-                                                    'categorySlug': self.object.category.categorySlug})
+        my_survey_question = Survey_Question.objects.get(question_fk=self.object.pk)
+        my_category = Category.objects.get(pk=my_survey_question.category_fk.pk)
+        my_survey = Survey.objects.get(pk=my_survey_question.survey_fk.pk)
+        return reverse('category-detail', kwargs={'pk': my_category.pk,
+                                                    'surveySlug': my_survey.pk})
+        
     
 ###############################################################################
 def create_session_hash():
