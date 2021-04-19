@@ -74,7 +74,7 @@ class Survey_Question(models.Model):
 
     """
     survey_fk = models.ForeignKey('Survey', on_delete=models.CASCADE)
-    category_fk = models.ForeignKey('Category', on_delete=models.CASCADE, null=True)
+    category_fk = models.ForeignKey('Category', related_name = "my_questions", on_delete=models.CASCADE, null=True)
     question_fk = models.ForeignKey('Question', related_name="survey_questions", on_delete=models.CASCADE, null=True)
 
 
@@ -122,12 +122,14 @@ class Question(models.Model):
     answer_is_required = models.BooleanField()
     is_multi_option_answer = models.BooleanField()
 
-    def save(self,*args, **kwargs):
-        created = not self.pk
-        super().save(*args, **kwargs)
-        if created:
-            Survey_Question.objects.create(question_fk=self,)
-            
+    def get_absolute_url(self):
+        my_survey_question = Survey_Question.objects.get(question_fk=self.pk)
+        my_category = Category.objects.get(pk=my_survey_question.category_fk.pk)
+        my_survey = Survey.objects.get(pk=my_survey_question.survey_fk.pk)
+        return reverse('question-detail', kwargs={'surveySlug': my_survey.pk,
+                                                    'categoryPk': my_category.pk,
+                                                    'pk': self.pk,})
+    
 
 class Option_Group(models.Model):
     """

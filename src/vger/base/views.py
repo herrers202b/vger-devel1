@@ -182,10 +182,18 @@ class CategoryDetailView(LoginRequiredMixin, generic.DetailView):
     model = Category
     context_object_name = 'category_detail'
     template_name = 'category_detail.html'
-    slug_field = 'categorySlug'
-    slug_url_kwarg = 'categorySlug'
     login_url = '/login/'
 
+    def get_context_data(self, **kwargs):
+        context = super(CategoryDetailView, self).get_context_data(**kwargs)
+        self.object = self.get_object()
+        this_category = Category.objects.get(pk=self.object.pk)
+        context['categories'] = this_category
+        my_survey_questions = Survey_Question.objects.get(category_fk=this_category)
+        context['my_survey_questions'] = my_survey_questions
+        myQuestions = Question.objects.all().filter(survey_questions=my_survey_questions)
+        context['myQuestions'] = myQuestions
+        return context
     def category_detail_view(request, primary_key):
         """
         category_detail_view
@@ -198,8 +206,8 @@ class CategoryDetailView(LoginRequiredMixin, generic.DetailView):
         
         method returns the appropriate render
         """
-        Category = get_object_or_404(Category, slug=slug)
-        return render(request, 'base/templates/category_detail.html', context={'category': Category})
+
+        return render(request, 'base/templates/category_detail.html', context)
 
 class QuestionDetailView(LoginRequiredMixin, generic.DetailView):
     """
@@ -231,8 +239,6 @@ class QuestionDetailView(LoginRequiredMixin, generic.DetailView):
     model = Question
     context_object_name = 'question_detail'
     template_name = 'question_detail.html'
-    slug_field = 'questionSlug'
-    slug_url_kwarg = 'questionSlug'
     login_url = '/login/'
 
     def question_detail_view(request, primary_key):
@@ -247,7 +253,7 @@ class QuestionDetailView(LoginRequiredMixin, generic.DetailView):
         
         method returns the appropriate render
         """
-        Question = get_object_or_404(Category, slug=slug)
+        Question = get_object_or_404(Question, pk=primary_key)
         return render(request, 'base/templates/question_detail.html', context={'question': question})
 
 def home(request):
@@ -413,7 +419,7 @@ class CategoryCreate(LoginRequiredMixin, PermissionRequiredMixin, CreateView):
         to dynamically generate a url to our object
         """
         return reverse('category-detail', kwargs={'surveySlug': self.object.survey_fk.surveySlug,
-                                                    'pk': self.object.pk})
+                                                    'categoryPk': self.object.pk})
     
     def form_valid(self, form):
         """
@@ -465,7 +471,7 @@ class CategoryUpdate(LoginRequiredMixin, PermissionRequiredMixin, UpdateView):
         to dynamically generate a url to our object
         """
         return reverse('category-detail', kwargs={'surveySlug': self.object.survey_fk.surveySlug,
-                                                    'pk': self.object.pk}) 
+                                                    'categoryPk': self.object.pk}) 
 
 class CategoryDelete(LoginRequiredMixin, PermissionRequiredMixin, DeleteView):
     """
@@ -533,15 +539,6 @@ class QuestionCreate(LoginRequiredMixin, PermissionRequiredMixin, CreateView):
         context = {'form': QuestionCreateForm()}
         return render(request, 'question_form.html', context)
 
-    def get_success_url(self):
-        """
-        get_success_url
-
-        takes a self paremeter and uses this to find its slug field(and others)
-        to dynamically generate a url to our object
-        """
-        return reverse('question-detail', kwargs={'sQPk': self.object.survey_questions,
-                                                    'questionPk': self.object.pk})
     
     def form_valid(self, form):
         """
@@ -552,12 +549,31 @@ class QuestionCreate(LoginRequiredMixin, PermissionRequiredMixin, CreateView):
         of the survey passed in with our kwargs
         """
         form.instance.category = Category.objects.get(pk=self.kwargs['pk'])
+        form.instance.survey = Survey.objects.get(pk=form.instance.category.survey_fk.pk)
+        instance = form.save()
+        Survey_Question.objects.create(category_fk= form.instance.category,
+                                        survey_fk=form.instance.survey,
+                                        question_fk=instance)
         #survey = Survey.objects.get(pk=form.instance.category.survey_fk)
 
         #Category.objects.get(categorySlug=self.kwargs['categorySlug'])
         print(form.cleaned_data)
         return super(QuestionCreate, self).form_valid(form)
-        
+
+    def get_success_url(self):
+        """
+        get_success_url
+
+        takes a self paremeter and uses this to find its slug field(and others)
+        to dynamically generate a url to our object
+        """
+        my_survey_question = Survey_Question.objects.get(question_fk=self.object.pk)
+        my_category = Category.objects.get(pk=my_survey_question.category_fk.pk)
+        my_survey = Survey.objects.get(pk=my_survey_question.survey_fk.pk)
+        return reverse('question-detail', kwargs={'questionPk': self.object.pk,
+                                                    'categoryPk': my_category.pk,
+                                                    'surveySlug': my_survey.pk})
+
 
 class QuestionUpdate(LoginRequiredMixin, PermissionRequiredMixin, UpdateView):
     """

@@ -4,11 +4,10 @@
   <h1>Title: {{category_detail.titleOfCategory }}</h1>
 
   <h4>Questions:</h4>
-
-  {% for Question in category_detail.questions.all %}
+  {% for Question in myQuestions %}
     <div style="margin-left:20px;margin-top:20px">
       {% if perms.canCreateQuestion %}
-        <a href="{{ Question.get_absolute_url }}">Question: {{Question.questionText}}?</a> 
+        <a href="{{ Question.get_absolute_url }}">Question: {{Question.question_text}}?</a> 
       {% else %}
         <p>Question: {{Question.questionText}}?</p>
       {% endif %}
