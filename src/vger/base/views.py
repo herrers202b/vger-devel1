@@ -682,7 +682,7 @@ class QuestionDelete(LoginRequiredMixin, PermissionRequiredMixin, DeleteView):
         return reverse('category-detail', kwargs={'pk': my_category.pk,
                                                     'surveySlug': my_survey.pk})
         
-    
+from .forms import OptionChoiceForm, OptionGroupForm
 class OptionCreateView(LoginRequiredMixin, PermissionRequiredMixin, generic.CreateView):
     """
     OptionCreateView
@@ -690,7 +690,7 @@ class OptionCreateView(LoginRequiredMixin, PermissionRequiredMixin, generic.Crea
     View dedicated to creation of new option groups should an admin need to add them
     """
     model = Option_Group
-    #form_class = OptionGroupCreateForm
+    form_class = OptionGroupForm
     template_name = 'option_form.html'
     login_url = '/login/'
     permission_required = 'canCreateOptions'
@@ -704,7 +704,9 @@ class OptionCreateView(LoginRequiredMixin, PermissionRequiredMixin, generic.Crea
         Method gets context of this render and returns it to the 
         form template to utilize
         """
-        context = {'form': OptionGroupCreateForm()}
+        context = {
+            'Groupform': OptionGroupForm(),
+            'Choiceform': OptionChoiceForm()}
         return render(request, 'option_form.html', context)
 
     
@@ -729,7 +731,7 @@ class OptionCreateView(LoginRequiredMixin, PermissionRequiredMixin, generic.Crea
             primary key of Question and pass it to a Survey_Question
 
         """
-        form.instance.survey = Survey.objects.get(pk=self.kwargs['pk'])
+        #form.instance.survey = Survey.objects.get(pk=self.kwargs['pk'])
         
         print(form.cleaned_data)
         return super(OptionCreateView, self).form_valid(form)

@@ -97,6 +97,19 @@ class QuestionCreateForm(forms.ModelForm):
             'is_multi_option_answer': 'Is this a multiple choice question?',
         }
 
+
+class OptionGroupForm(forms.ModelForm):
+    class Meta:
+        model = Option_Group
+        fields = ('name_of_group',)
+        labels = {'name_of_group':'Name of this option group:'}
+
+class OptionChoiceForm(forms.ModelForm):
+    class Meta:
+        model = Option_Choice
+        fields = ('choice_text',)
+        labels = {'choice_text': 'Enter some text for this particular choice.'}
+
 #TODO: Refactor form to approprately gather question answer groups
 class SurveyCategoryForm(forms.Form):
     """
