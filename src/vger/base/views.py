@@ -75,7 +75,6 @@ class SurveyListView(LoginRequiredMixin, generic.ListView):
     '/login/' 
         redirect url for login required permission
     """
-
     model = Survey
     context_object_name = 'survey_list'
     template_name = 'survey_list.html' 
@@ -668,6 +667,8 @@ class QuestionDelete(LoginRequiredMixin, PermissionRequiredMixin, DeleteView):
     login_url = '/login/'
     permission_required = 'canDeleteQuestion'
 
+
+
     def get_success_url(self):
         """
         get_success_url
@@ -682,6 +683,78 @@ class QuestionDelete(LoginRequiredMixin, PermissionRequiredMixin, DeleteView):
                                                     'surveySlug': my_survey.pk})
         
     
+class OptionCreateView(LoginRequiredMixin, PermissionRequiredMixin, generic.CreateView):
+    """
+    OptionCreateView
+
+    View dedicated to creation of new option groups should an admin need to add them
+    """
+    model = Option_Group
+    #form_class = OptionGroupCreateForm
+    template_name = 'option_form.html'
+    login_url = '/login/'
+    permission_required = 'canCreateOptions'
+
+
+    """
+    Commenting for git commit 
+
+    """
+    def get(self, request, *args, **kwargs):
+        """
+        get
+
+    
+        Method gets context of this render and returns it to the 
+        form template to utilize
+        """
+        context = {'form': OptionGroupCreateForm()}
+        return render(request, 'option_form.html', context)
+
+    
+    def form_valid(self, form):
+        """
+        form_valid
+
+        Modified from form_valid, this method now not only cleans data
+        it also generates the go-between Survey_Question object. Using
+        from.instance to get this questions category and survey we then
+        save the form and use the instance to create the Survey_Question 
+        that is the spiritual parent model to Question.
+
+        form.instance.category : Category object
+            the parent category for this Question, queried from kwargs
+
+        form.instance.survey : Survey object 
+            the parent survey for this Question, queried from kwargs
+
+        instance : form
+            this is an instance of this form object that is used to grab the 
+            primary key of Question and pass it to a Survey_Question
+
+        """
+        form.instance.category = Category.objects.get(pk=self.kwargs['pk'])
+        form.instance.survey = Survey.objects.get(pk=form.instance.category.survey_fk.pk)
+        instance = form.save()
+        Survey_Question.objects.create(category_fk= form.instance.category,
+                                        survey_fk=form.instance.survey,
+                                        question_fk=instance)
+        print(form.cleaned_data)
+        return super(QuestionCreate, self).form_valid(form)
+
+    def get_success_url(self):
+        """
+        get_success_url
+
+        takes a self paremeter and uses this to find its slug field(and others)
+        to dynamically generate a url to our object
+        """
+        my_survey_question = Survey_Question.objects.get(question_fk=self.object.pk)
+        my_category = Category.objects.get(pk=my_survey_question.category_fk.pk)
+        my_survey = Survey.objects.get(pk=my_survey_question.survey_fk.pk)
+        return reverse('question-detail', kwargs={'pk': self.object.pk,
+                                                    'categoryPk': my_category.pk,
+                                                    'surveySlug': my_survey.pk})
 
 
 
