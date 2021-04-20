@@ -232,6 +232,8 @@ class QuestionDetailView(LoginRequiredMixin,PermissionRequiredMixin, generic.Det
         context['this_question'] = this_question
         my_option_group = this_question.option_group
         context['my_option_group'] = my_option_group
+        my_input_type = this_question.input_type_fk
+        context['my_input_type'] = my_input_type
         #ObjectDoesNotExist import
         from django.core.exceptions import ObjectDoesNotExist
         #Try catch blocks for queries

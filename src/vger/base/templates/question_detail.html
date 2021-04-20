@@ -4,6 +4,7 @@
   <p>Question: {{this_question.question_text }}?</p>
   <p> </p>
   
+{% if my_input_type.input_type_name == 'Radio Button'%}
 <div style="display:flex">
   <ul class="list-group-flush">  
     <li class="list-group-item">
@@ -17,7 +18,15 @@
     </div>
   </ul>
 </div>
+{% else %}
+<div class="input-group">
+  <div class="input-group-prepend">
+    <span class="input-group-text">Answer</span>
+  </div>
+  <textarea class="form-control" aria-label="With textarea"></textarea>
+</div>{% endif %}
 
+ <p> </p>
 
 <div style='display:flex '>
   {% comment %} Return button {% endcomment %}
