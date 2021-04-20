@@ -696,10 +696,6 @@ class OptionCreateView(LoginRequiredMixin, PermissionRequiredMixin, generic.Crea
     permission_required = 'canCreateOptions'
 
 
-    """
-    Commenting for git commit 
-
-    """
     def get(self, request, *args, **kwargs):
         """
         get
@@ -733,14 +729,10 @@ class OptionCreateView(LoginRequiredMixin, PermissionRequiredMixin, generic.Crea
             primary key of Question and pass it to a Survey_Question
 
         """
-        form.instance.category = Category.objects.get(pk=self.kwargs['pk'])
-        form.instance.survey = Survey.objects.get(pk=form.instance.category.survey_fk.pk)
-        instance = form.save()
-        Survey_Question.objects.create(category_fk= form.instance.category,
-                                        survey_fk=form.instance.survey,
-                                        question_fk=instance)
+        form.instance.survey = Survey.objects.get(pk=self.kwargs['pk'])
+        
         print(form.cleaned_data)
-        return super(QuestionCreate, self).form_valid(form)
+        return super(OptionCreateView, self).form_valid(form)
 
     def get_success_url(self):
         """
@@ -749,12 +741,8 @@ class OptionCreateView(LoginRequiredMixin, PermissionRequiredMixin, generic.Crea
         takes a self paremeter and uses this to find its slug field(and others)
         to dynamically generate a url to our object
         """
-        my_survey_question = Survey_Question.objects.get(question_fk=self.object.pk)
-        my_category = Category.objects.get(pk=my_survey_question.category_fk.pk)
-        my_survey = Survey.objects.get(pk=my_survey_question.survey_fk.pk)
-        return reverse('question-detail', kwargs={'pk': self.object.pk,
-                                                    'categoryPk': my_category.pk,
-                                                    'surveySlug': my_survey.pk})
+
+        return render(request, 'survey_list.html', context)
 
 
 
