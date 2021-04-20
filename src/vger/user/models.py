@@ -40,4 +40,7 @@ class Administrator(models.Model):
                         ('canViewOwnResults', 'can see own results'),
                         ('canCreateUser', 'can create user'),
                         ('canUpdateUser', 'can update user'),
-                        ('canDeleteUser', 'can delete user'))
+                        ('canDeleteUser', 'can delete user'),
+                        ('canSeeSurveyDetail', 'can see survey detail view'),
+                        ('canSeeCategoryDetail', 'can see category detail view'),
+                        ('canSeeQuestionDetail','can see question detail view'),)

@@ -81,7 +81,7 @@ class SurveyListView(LoginRequiredMixin, generic.ListView):
     login_url = '/login/'
 
 from .forms import CategoryCreateForm
-
+@permission_required('canSeeSurveyDetail')
 def SureveyDetailView(request, surveySlug):
     """
     Survey Detail View
@@ -101,7 +101,8 @@ def SureveyDetailView(request, surveySlug):
     #Login check
     if not request.user.is_authenticated:
          return redirect('/login/')
-    
+    #Permission check
+    permission_required = 'canSeeSurveyDetail'
     survey = Survey.objects.get(surveySlug=surveySlug)
     categories = Category.objects.filter(survey_fk=survey)
     questions = Survey_Question.objects.filter(survey_fk=survey)
@@ -114,8 +115,7 @@ def SureveyDetailView(request, surveySlug):
     
     return render(request, 'survey_detail.html', context)
     
-
-class CategoryDetailView(LoginRequiredMixin, generic.DetailView):
+class CategoryDetailView(LoginRequiredMixin, PermissionRequiredMixin ,generic.DetailView):
     """
     CategoryDetailView
 
@@ -140,6 +140,7 @@ class CategoryDetailView(LoginRequiredMixin, generic.DetailView):
     context_object_name = 'category_detail'
     template_name = 'category_detail.html'
     login_url = '/login/'
+    permission_required = 'canSeeCategoryDetail'
 
     def get_context_data(self, **kwargs):
         """
@@ -172,7 +173,7 @@ class CategoryDetailView(LoginRequiredMixin, generic.DetailView):
         except Survey_Question.DoesNotExist:
             myQuestions = None
         return context
-
+        
     def category_detail_view(request, primary_key):
         """
         category_detail_view
@@ -182,7 +183,7 @@ class CategoryDetailView(LoginRequiredMixin, generic.DetailView):
 
         return render(request, 'base/templates/category_detail.html', context)
 
-class QuestionDetailView(LoginRequiredMixin, generic.DetailView):
+class QuestionDetailView(LoginRequiredMixin,PermissionRequiredMixin, generic.DetailView):
     """
     QuestionDetailView
 
@@ -206,7 +207,7 @@ class QuestionDetailView(LoginRequiredMixin, generic.DetailView):
     model = Question
     template_name = 'question_detail.html'
     login_url = '/login/'
-
+    permission_required = 'canSeeQuestionDetail'
     def get_context_data(self, **kwargs):
         """
         get_context_data

@@ -62,7 +62,12 @@
                   {% for Question in Category.my_questions.all %}
                     <div class="container-fluid row">
                       <div class="col-sm-8">
-                        <p> {{Question.question_fk.question_text}} </p>
+
+                          <div class="btn-toolbar" role="toolbar">
+                            <div class="btn-group mr-3" role="group">
+                              <p> {{Question.question_fk.question_text}} </p>
+                            </div>
+
                         {% if perms.canEditQuestion %}
                           <div class="btn-toolbar" role="toolbar">
                             <div class="btn-group mr-3" role="group">
@@ -94,11 +99,11 @@
                       </form>
                     </div>
                   {% endif %}
+                  
                 </div>
               </div>
               </ul>
             </div>
-
           </div>
 
           {% if perms.canEditCategory %}
