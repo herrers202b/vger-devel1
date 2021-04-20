@@ -629,7 +629,7 @@ class QuestionUpdate(LoginRequiredMixin, PermissionRequiredMixin, UpdateView):
         my_survey_question = Survey_Question.objects.get(question_fk=self.object.pk)
         my_category = Category.objects.get(pk=my_survey_question.category_fk.pk)
         my_survey = Survey.objects.get(pk=my_survey_question.survey_fk.pk)
-        return reverse('question-detail', kwargs={'questionPk': self.object.pk,
+        return reverse('question-detail', kwargs={'pk': self.object.pk,
                                                     'categoryPk': my_category.pk,
                                                     'surveySlug': my_survey.pk})
 

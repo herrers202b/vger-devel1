@@ -6,7 +6,7 @@
   
 <div style='display:flex'>
   {% comment %} Return button {% endcomment %}
-  <form action = "{{ this_category.get_absolute_url }}">
+  <form action = "{{ this_category.survey_fk.get_absolute_url }}">
     <button type = "submit">
       Return
     </button>
@@ -28,4 +28,5 @@
     </form>
   {% endif %}
 </div>
+
 {% endblock %}
