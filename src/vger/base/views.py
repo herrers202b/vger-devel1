@@ -75,6 +75,7 @@ class SurveyListView(LoginRequiredMixin, generic.ListView):
     '/login/' 
         redirect url for login required permission
     """
+
     model = Survey
     context_object_name = 'survey_list'
     template_name = 'survey_list.html' 

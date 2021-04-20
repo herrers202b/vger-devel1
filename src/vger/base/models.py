@@ -3,7 +3,7 @@ from django.urls import reverse
 from django.shortcuts import render, HttpResponseRedirect
 from django.contrib.auth.models import User
 from django.template.defaultfilters import slugify
-
+from django.dispatch import receiver
 
 class Survey(models.Model):
     """
@@ -222,4 +222,21 @@ class User_Survey(models.Model):
     
     user_fk = models.ForeignKey(User, on_delete=models.CASCADE)
     survey_fk = models.ForeignKey('Survey', on_delete=models.CASCADE)
-    
+
+
+#NOT FOR CALLING!
+@receiver(models.signals.post_delete, sender=Survey_Question)
+def delete_reverse(sender, **kwargs):
+    """
+    delete_reverse
+
+    This functions purpose is intended to delete the Question model
+    upon deleting the Survey without using the Survey_Question as
+    a foreign key in the Question model
+
+    """
+    try:
+        if kwargs['instance'].question_fk:
+            kwargs['instance'].question_fk.delete()
+    except:
+        pass
