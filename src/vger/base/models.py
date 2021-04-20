@@ -189,7 +189,7 @@ class Option_Choice(models.Model):
     @choice_text: holds the text of the answer to be selected
     or filled
     """
-    option_group = models.ForeignKey('Option_Group', on_delete=models.CASCADE)
+    option_group = models.ForeignKey('Option_Group', related_name="my_choices", on_delete=models.CASCADE)
 
     choice_text = models.CharField(max_length=20)
 

@@ -4,7 +4,22 @@
   <p>Question: {{this_question.question_text }}?</p>
   <p> </p>
   
-<div style='display:flex'>
+<div style="display:flex">
+  <ul class="list-group-flush">  
+    <li class="list-group-item">
+    <div class="btn-group btn-group-toggle" data-toggle="buttons">
+      {% for Option_Choice in my_option_group.my_choices.all%} 
+       <label class="btn btn-secondary">
+            <input type="radio" name="{{Option_Choice.choice_text}}" id="option3" autocomplete="off"> {{Option_Choice.choice_text}}
+        </label>     
+      {% endfor %}
+    </li>  
+    </div>
+  </ul>
+</div>
+
+
+<div style='display:flex '>
   {% comment %} Return button {% endcomment %}
   <form action = "{{ this_category.survey_fk.get_absolute_url }}">
     <button type = "submit">

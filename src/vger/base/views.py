@@ -173,7 +173,7 @@ class CategoryDetailView(LoginRequiredMixin, PermissionRequiredMixin ,generic.De
         except Survey_Question.DoesNotExist:
             myQuestions = None
         return context
-        
+
     def category_detail_view(request, primary_key):
         """
         category_detail_view
@@ -230,6 +230,8 @@ class QuestionDetailView(LoginRequiredMixin,PermissionRequiredMixin, generic.Det
         self.object = self.get_object()
         this_question = Question.objects.get(pk=self.object.pk)
         context['this_question'] = this_question
+        my_option_group = this_question.option_group
+        context['my_option_group'] = my_option_group
         #ObjectDoesNotExist import
         from django.core.exceptions import ObjectDoesNotExist
         #Try catch blocks for queries
@@ -677,6 +679,9 @@ class QuestionDelete(LoginRequiredMixin, PermissionRequiredMixin, DeleteView):
                                                     'surveySlug': my_survey.pk})
         
     
+
+
+
 ###############################################################################
 def create_session_hash():
             hash = hashlib.sha1()
