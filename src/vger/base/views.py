@@ -82,7 +82,7 @@ class SurveyListView(LoginRequiredMixin, generic.ListView):
     login_url = '/login/'
 
 from .forms import CategoryCreateForm
-
+@permission_required('canSeeSurveyDetail')
 def SureveyDetailView(request, surveySlug):
     """
     Survey Detail View
@@ -102,7 +102,8 @@ def SureveyDetailView(request, surveySlug):
     #Login check
     if not request.user.is_authenticated:
          return redirect('/login/')
-    
+    #Permission check
+    permission_required = 'canSeeSurveyDetail'
     survey = Survey.objects.get(surveySlug=surveySlug)
     categories = Category.objects.filter(survey_fk=survey)
     questions = Survey_Question.objects.filter(survey_fk=survey)
@@ -115,8 +116,7 @@ def SureveyDetailView(request, surveySlug):
     
     return render(request, 'survey_detail.html', context)
     
-
-class CategoryDetailView(LoginRequiredMixin, generic.DetailView):
+class CategoryDetailView(LoginRequiredMixin, PermissionRequiredMixin ,generic.DetailView):
     """
     CategoryDetailView
 
@@ -141,6 +141,7 @@ class CategoryDetailView(LoginRequiredMixin, generic.DetailView):
     context_object_name = 'category_detail'
     template_name = 'category_detail.html'
     login_url = '/login/'
+    permission_required = 'canSeeCategoryDetail'
 
     def get_context_data(self, **kwargs):
         """
@@ -183,7 +184,7 @@ class CategoryDetailView(LoginRequiredMixin, generic.DetailView):
 
         return render(request, 'base/templates/category_detail.html', context)
 
-class QuestionDetailView(LoginRequiredMixin, generic.DetailView):
+class QuestionDetailView(LoginRequiredMixin,PermissionRequiredMixin, generic.DetailView):
     """
     QuestionDetailView
 
@@ -207,7 +208,7 @@ class QuestionDetailView(LoginRequiredMixin, generic.DetailView):
     model = Question
     template_name = 'question_detail.html'
     login_url = '/login/'
-
+    permission_required = 'canSeeQuestionDetail'
     def get_context_data(self, **kwargs):
         """
         get_context_data
@@ -230,6 +231,10 @@ class QuestionDetailView(LoginRequiredMixin, generic.DetailView):
         self.object = self.get_object()
         this_question = Question.objects.get(pk=self.object.pk)
         context['this_question'] = this_question
+        my_option_group = this_question.option_group
+        context['my_option_group'] = my_option_group
+        my_input_type = this_question.input_type_fk
+        context['my_input_type'] = my_input_type
         #ObjectDoesNotExist import
         from django.core.exceptions import ObjectDoesNotExist
         #Try catch blocks for queries
@@ -630,7 +635,7 @@ class QuestionUpdate(LoginRequiredMixin, PermissionRequiredMixin, UpdateView):
         my_survey_question = Survey_Question.objects.get(question_fk=self.object.pk)
         my_category = Category.objects.get(pk=my_survey_question.category_fk.pk)
         my_survey = Survey.objects.get(pk=my_survey_question.survey_fk.pk)
-        return reverse('question-detail', kwargs={'questionPk': self.object.pk,
+        return reverse('question-detail', kwargs={'pk': self.object.pk,
                                                     'categoryPk': my_category.pk,
                                                     'surveySlug': my_survey.pk})
 
@@ -677,6 +682,9 @@ class QuestionDelete(LoginRequiredMixin, PermissionRequiredMixin, DeleteView):
                                                     'surveySlug': my_survey.pk})
         
     
+
+
+
 ###############################################################################
 def create_session_hash():
             hash = hashlib.sha1()

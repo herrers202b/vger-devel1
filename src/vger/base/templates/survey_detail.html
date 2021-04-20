@@ -35,12 +35,75 @@
       </div>
       {% endif %}
   {% else %}
+
+
+
     <ul class="list-group-flush">
       {% for Category in categories %}
       <li class="list-group-item">
         <div class="container-fluid row">
           <div class="col-sm-8">
-            <p>{{Category.titleOfCategory}}</p>
+            <div class="box" data-widget="data-widget">
+              {% load static %}
+              <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+              <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+
+                  <!-- link other scripts and stylesheets here -->
+              <link rel="stylesheet" href="{% static 'vger/style.css' %}" type="text/css"/>
+              <link rel="shortcut icon" href="{% static 'vger/favicon.ico' %}" type="image/vnd.microsoft.icon"/>
+              <p>
+                <button class="btn btn-primary" type="button" data-toggle="collapse" data-target="#{{Category.titleOfCategory}}" aria-expanded="false" aria-controls="collapseExample">
+                  {{Category.titleOfCategory}}
+                </button>
+              </p>
+              <ul class="list-group-flush">
+              <div class="collapse" id="{{Category.titleOfCategory}}">
+                <div class="card card-body">
+                  {% for Question in Category.my_questions.all %}
+                    <div class="container-fluid row">
+                      <div class="col-sm-8">
+
+                          <div class="btn-toolbar" role="toolbar">
+                            <div class="btn-group mr-3" role="group">
+                              <p> {{Question.question_fk.question_text}} </p>
+                            </div>
+
+                        {% if perms.canEditQuestion %}
+                          <div class="btn-toolbar" role="toolbar">
+                            <div class="btn-group mr-3" role="group">
+                              <a class="btn btn-info" href="{{ Question.question_fk.get_absolute_url }}">
+                                Edit
+                              </a>
+                            </div>
+
+                            {% if perms.canDeleteQuestion %}
+                            <div class="btn-group mr-3" role="group">
+                              <form action="{{ Question.question_fk.get_absolute_url }}/delete-question">
+                                <button class="btn btn-danger" type="submit">
+                                  Delete</button>
+                              </form>
+                            </div>
+                            {% endif %}
+                          </div>
+                        {% endif %}
+                        <p> </p>
+                      </div>
+                    </div>
+                  {% endfor %}
+                  {% if perms.canCreateQuestion %}
+                    <div class="btn-group mr-2" role="group">
+                      <form action="{%url 'question-create' survey.surveySlug Category.pk%}">
+                        <button class="btn btn-success" type="submit">
+                          Create New Question
+                        </button>
+                      </form>
+                    </div>
+                  {% endif %}
+                  
+                </div>
+              </div>
+              </ul>
+            </div>
           </div>
 
           {% if perms.canEditCategory %}
