@@ -29,8 +29,8 @@ def registerPage(request):
                 Administrator.objects.create(user=user).save()
             else:
                 Student.objects.create(user=user).save()
-            
-            
+
+
             messages.success(request, 'Account was created for ' + username)
 
     context = {
@@ -46,13 +46,18 @@ def profilePage(request):
         return studentProfile(request)
     else:
         return adminProfile(request)
-    
+
 def advisorProfile(request):
-    return render(request, 'profile/advisor_profile.html')
+    advisor = Advisor.objects.get(user = request.user)
+    advised_student_list = Student.objects.filter(advisor = advisor)
+    context = {
+
+        'advised_student_list': advised_student_list,
+    }
+    return render(request, 'profile/advisor_profile.html', context = context)
 
 def studentProfile(request):
     return render(request, 'profile/student_profile.html')
 
 def adminProfile(request):
     return render(request, 'profile/admin_profile.html')
-
