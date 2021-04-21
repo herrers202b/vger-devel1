@@ -43,4 +43,6 @@ class Administrator(models.Model):
                         ('canDeleteUser', 'can delete user'),
                         ('canSeeSurveyDetail', 'can see survey detail view'),
                         ('canSeeCategoryDetail', 'can see category detail view'),
-                        ('canSeeQuestionDetail','can see question detail view'),)
+                        ('canSeeQuestionDetail','can see question detail view'),
+                        ('canCreateOptions', 'can create an options group/choices'),
+                        ('canSeeOptions', 'can see options groups/choices lists'),)

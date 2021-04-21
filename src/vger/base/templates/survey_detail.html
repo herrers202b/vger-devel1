@@ -52,12 +52,12 @@
               <link rel="stylesheet" href="{% static 'vger/style.css' %}" type="text/css"/>
               <link rel="shortcut icon" href="{% static 'vger/favicon.ico' %}" type="image/vnd.microsoft.icon"/>
               <p>
-                <button class="btn btn-primary" type="button" data-toggle="collapse" data-target="#{{Category.titleOfCategory}}" aria-expanded="false" aria-controls="collapseExample">
+                <button class="btn btn-primary" type="button" data-toggle="collapse" data-target="#{{Category.pk}}" aria-expanded="false" aria-controls="collapseExample">
                   {{Category.titleOfCategory}}
                 </button>
               </p>
               <ul class="list-group-flush">
-              <div class="collapse" id="{{Category.titleOfCategory}}">
+              <div class="collapse" id="{{Category.pk}}">
                 <div class="card card-body">
                   {% for Question in Category.my_questions.all %}
                     <div class="container-fluid row">
