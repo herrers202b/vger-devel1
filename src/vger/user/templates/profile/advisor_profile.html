@@ -10,11 +10,10 @@
     <div class="col-sm-4">
       <div class="card border-primary d-flex">
         <div class="card-header bg-primary text-light text-center"> <strong>Your Students</strong></div>
-        <div class="card-title text-center">Select a student to view their survey results.</div>
         <div class="card-body align-items-center d-flex justify-content-center">
           {% for student in advised_student_list %}
           <p>
-            <a role="button" class="btn btn-outline-secondary text-dark" href="{% url 'completed_survey_list' advised_student=student.pk %}">{{student.user}}</a>
+            <a role="button" class="btn btn-outline-secondary text-dark">{{student.user}}</a>
           </p>
         {% endfor %}
         </div>
