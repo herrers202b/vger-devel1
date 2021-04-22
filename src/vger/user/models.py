@@ -1,10 +1,10 @@
 from django.db import models
 from django.contrib.auth.models import User
 from django.apps import apps
-class Advisor(models.Model): 
+class Advisor(models.Model):
     # Advisor model: Can view completed surveys of only their advisees
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='advisorAccount')
-    
+
     class Meta:
         permissions = (('canTakeSurvey', 'can take survey'),
                         ('canViewOwnResults', 'can see own results'),
@@ -20,7 +20,7 @@ class Student(models.Model):
         permissions = (('canTakeSurvey', 'can take survey'),
                         ('canViewOwnResults', 'can see own results'))
 
-                        
+
 class Administrator(models.Model):
     # Administrator model: Model for use for user accounts to have survey edit
     # access, separate from site backend administration
