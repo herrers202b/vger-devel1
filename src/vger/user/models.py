@@ -45,4 +45,6 @@ class Administrator(models.Model):
                         ('canSeeCategoryDetail', 'can see category detail view'),
                         ('canSeeQuestionDetail','can see question detail view'),
                         ('canCreateOptions', 'can create an options group/choices'),
-                        ('canSeeOptions', 'can see options groups/choices lists'),)
+                        ('canSeeOptions', 'can see options groups/choices lists'),
+                        ('canDeleteOptions','can delete options groups/choices'),
+                        ('canEditOptions', 'can edit options groups/choices'),)
