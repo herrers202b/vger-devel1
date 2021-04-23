@@ -4,6 +4,7 @@
   <div class="container-fluid">
     <h2>List of Surveys</h2>
   </div>
+  
   {% if survey_list %}
     <div class="container-fluid">
       <ul class="list-group-flush">
@@ -61,6 +62,13 @@
     <div class="container-fluid">
       <a class="btn btn-success" href="{% url 'survey-create' %}">
         Create New Survey
+      </a>
+    </div>
+  {% endif %}
+  {% if perms.canCreateSurvey %}
+    <div class="container-fluid">
+      <a class="btn btn-success" href="{% url 'option-list' %}">
+        See option groups
       </a>
     </div>
   {% endif %}

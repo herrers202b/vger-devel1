@@ -3,7 +3,7 @@ from django.urls import reverse
 from django.shortcuts import render, HttpResponseRedirect
 from django.contrib.auth.models import User
 from django.template.defaultfilters import slugify
-
+from django.dispatch import receiver
 
 class Survey(models.Model):
     """
@@ -14,6 +14,21 @@ class Survey(models.Model):
 
     TODO: Impliment versioning because the various models
     will depend on the state of this post filling of a survey
+
+    titleOfSurvey : CharField
+        the title of the survey
+    
+    description : CharField
+        a short 100 char length description of this survey
+
+    start_date, end_date : DateTimeField
+        the state and end date, respectivly, of this survey
+
+    is_open : BooleanField 
+        boolean that determines whether or not a survey is live
+
+    surveySlug : SlugField
+        a slugfield derived from the title fo the survey, used for url pathing
     """
     titleOfSurvey = models.CharField(max_length=20)
     description = models.CharField(max_length=100)
@@ -56,6 +71,11 @@ class Category(models.Model):
     Holds the title of the category and a reference to its 
     appropriate survey
 
+    titleOfCategory : CharField
+        title of the category with 100 char limiter
+
+    survey_fk : ForeignKey
+        the foreign key that is used to access a parent survey
     """
     titleOfCategory = models.CharField(max_length=100)
     survey_fk = models.ForeignKey('Survey', on_delete=models.CASCADE)
@@ -72,9 +92,19 @@ class Survey_Question(models.Model):
     This model is to be used for answer referencing holding
     a foriegn key of survey, category, and question
 
+
+    survey_fk : ForeignKey
+        Foreign key used to access a parent survey
+
+    category_fk : ForeignKey
+        Foreign key used to access a parent category
+
+    question_fk : ForeignKey
+        Foreign key used to access a child question
     """
+
     survey_fk = models.ForeignKey('Survey', on_delete=models.CASCADE)
-    category_fk = models.ForeignKey('Category', on_delete=models.CASCADE, null=True)
+    category_fk = models.ForeignKey('Category', related_name = "my_questions", on_delete=models.CASCADE, null=True)
     question_fk = models.ForeignKey('Question', related_name="survey_questions", on_delete=models.CASCADE, null=True)
 
 
@@ -87,6 +117,14 @@ class Answer(models.Model):
     To reference the survey_question foreign key so we can
     evaluate the properties of the question later
 
+    user_fk : ForeignKey
+        Foreign key used to access a user
+
+    survey_question_fk : ForeignKey
+        Foreign key used to access a Survey Question Object
+
+    answer_text : CharField
+        20 chararacter lenght answer text field
     """
     user_fk = models.ForeignKey(User, on_delete=models.CASCADE, null=True)
     survey_question_fk = models.ForeignKey('Survey_Question', on_delete=models.CASCADE)
@@ -122,12 +160,14 @@ class Question(models.Model):
     answer_is_required = models.BooleanField()
     is_multi_option_answer = models.BooleanField()
 
-    def save(self,*args, **kwargs):
-        created = not self.pk
-        super().save(*args, **kwargs)
-        if created:
-            Survey_Question.objects.create(question_fk=self,)
-            
+    def get_absolute_url(self):
+        my_survey_question = Survey_Question.objects.get(question_fk=self.pk)
+        my_category = Category.objects.get(pk=my_survey_question.category_fk.pk)
+        my_survey = Survey.objects.get(pk=my_survey_question.survey_fk.pk)
+        return reverse('question-detail', kwargs={'surveySlug': my_survey.pk,
+                                                    'categoryPk': my_category.pk,
+                                                    'pk': self.pk,})
+    
 
 class Option_Group(models.Model):
     """
@@ -149,7 +189,7 @@ class Option_Choice(models.Model):
     @choice_text: holds the text of the answer to be selected
     or filled
     """
-    option_group = models.ForeignKey('Option_Group', on_delete=models.CASCADE)
+    option_group = models.ForeignKey('Option_Group', related_name="my_choices", on_delete=models.CASCADE)
 
     choice_text = models.CharField(max_length=20)
 
@@ -182,4 +222,21 @@ class User_Survey(models.Model):
     
     user_fk = models.ForeignKey(User, on_delete=models.CASCADE)
     survey_fk = models.ForeignKey('Survey', on_delete=models.CASCADE)
-    
+
+
+#NOT FOR CALLING!
+@receiver(models.signals.post_delete, sender=Survey_Question)
+def delete_reverse(sender, **kwargs):
+    """
+    delete_reverse
+
+    This functions purpose is intended to delete the Question model
+    upon deleting the Survey without using the Survey_Question as
+    a foreign key in the Question model
+
+    """
+    try:
+        if kwargs['instance'].question_fk:
+            kwargs['instance'].question_fk.delete()
+    except:
+        pass

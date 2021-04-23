@@ -1,16 +1,56 @@
 {% extends "base.html" %}
 
 {% block content %}
-  <p>Question: {{question_detail.questionText }}?</p>
-  <p>Question number: {{question_detail.questionNumber}}</p>
+  <p>Question: {{this_question.question_text }}?</p>
   <p> </p>
-  <a href="{{ question_detail.category.get_absolute_url }}">Return</a>
+  
+{% if my_input_type.input_type_name == 'Radio Button'%}
+<div style="display:flex">
+  <ul class="list-group-flush">  
+    <li class="list-group-item">
+    <div class="btn-group btn-group-toggle" data-toggle="buttons">
+      {% for Option_Choice in my_option_group.my_choices.all%} 
+       <label class="btn btn-secondary">
+            <input type="radio" name="{{Option_Choice.choice_text}}" id="option3" autocomplete="off"> {{Option_Choice.choice_text}}
+        </label>     
+      {% endfor %}
+    </li>  
+    </div>
+  </ul>
+</div>
+{% else %}
+<div class="input-group">
+  <div class="input-group-prepend">
+    <span class="input-group-text">Answer</span>
+  </div>
+  <textarea class="form-control" aria-label="With textarea"></textarea>
+</div>{% endif %}
 
-  {% if perms.canUpdateQuestion %}
-    <a href="{{ question_detail.get_absolute_url }}/update-question">Update Question</a>   {% endif %}
-  {% if perms.canDeleteQuestion %}
-    <a href="{{ question_detail.get_absolute_url }}/delete-question">Delete Question</a> 
+ <p> </p>
+
+<div style='display:flex '>
+  {% comment %} Return button {% endcomment %}
+  <form action = "{{ this_category.survey_fk.get_absolute_url }}">
+    <button type = "submit">
+      Return
+    </button>
+  </form>
+  {% comment %} Update Question Button {% endcomment %}
+  {%if perms.canUpdateQuestion%}
+    <form action = "{{ this_question.get_absolute_url }}/update-question">
+      <button type = "submit">
+        Update Question
+      </button>
+    </form>
   {% endif %}
-
+  {% comment %} Delete Category button {% endcomment %}
+  {%if perms.canDeleteQuestion%}
+    <form action = "{{ this_question.get_absolute_url }}/delete-question">
+      <button type = "submit">
+        Delete Question
+      </button>
+    </form>
+  {% endif %}
+</div>
 
 {% endblock %}

@@ -80,65 +80,29 @@ class SurveyListView(LoginRequiredMixin, generic.ListView):
     template_name = 'survey_list.html' 
     login_url = '/login/'
 
-# class SurveyDetailView(LoginRequiredMixin, request):
-#     """
-#     SurveyDetailView
-
-#     This is the class that we will use to show
-#     the details of a specific survey
-
-#     Survey : model
-#         The specific model we will be detailing in this view
-    
-#     'survey_detail' :  context_object_name
-#         this is what we will refer to when trying
-#         to query via HTML
-
-#     'survey_detail.html' : template_name
-#         the name of our html file that contains
-#         the template we will use
-
-#     'surveySlug' : slug_field
-#         slug field for this view
-
-#     'surveySlug' : slug_url_kwarg
-#         slug keyword arguments for this view
-        
-#     '/login/' 
-#         redirect url for login required permission
-#     """
-#     from django.shortcuts import get_object_or_404
-#     model = Survey
-#     context_object_name = 'survey_detail'
-#     template_name = 'survey_detail.html' 
-#     slug_field = 'surveySlug'
-#     slug_url_kwarg = 'surveySlug'
-#     login_url = '/login/'
-    
-
-#     def survey_detail_view(self, request, primary_key):
-#         """
-#         survey_detail_view
-
-#         Method, adapted from Django tutorial, will check
-#         to see if a survey exists.
-
-#         Survey : the obeject we will either retrieve 
-#             or 404 error
-        
-#         method returns the appropriate render
-            
-#         '/login/' 
-#             redirect url for login required permission
-#         """
-#         Survey = get_object_or_404(Survey, slug=slug)
-#         return render(request, 'base/templates/survey_detail.html', context={'survey': Survey})
 from .forms import CategoryCreateForm
-
+@permission_required('canSeeSurveyDetail')
 def SureveyDetailView(request, surveySlug):
+    """
+    Survey Detail View
+
+    This method takes a request and key(surveySlug) and returns
+    a render of the survey detail view
+
+    survey, categories, questions : objects
+        Objects that are returned from queries and then
+        passed as context to HTML templates
+
+    context : context
+        list of queries that will
+         be sent to HTML templates
+
+    """
+    #Login check
     if not request.user.is_authenticated:
          return redirect('/login/')
-    
+    #Permission check
+    permission_required = 'canSeeSurveyDetail'
     survey = Survey.objects.get(surveySlug=surveySlug)
     categories = Category.objects.filter(survey_fk=survey)
     questions = Survey_Question.objects.filter(survey_fk=survey)
@@ -151,8 +115,7 @@ def SureveyDetailView(request, surveySlug):
     
     return render(request, 'survey_detail.html', context)
     
-
-class CategoryDetailView(LoginRequiredMixin, generic.DetailView):
+class CategoryDetailView(LoginRequiredMixin, PermissionRequiredMixin ,generic.DetailView):
     """
     CategoryDetailView
 
@@ -168,12 +131,6 @@ class CategoryDetailView(LoginRequiredMixin, generic.DetailView):
         the name of the template we are using
         to generate this view
 
-    'categorySlug' : slug_field
-        slug field for this view
-
-    'categorySlug' : slug_url_kwarg
-        slug keyword arguments for this view
-    
     '/login/' 
         redirect url for login required permission    
     """
@@ -182,26 +139,51 @@ class CategoryDetailView(LoginRequiredMixin, generic.DetailView):
     model = Category
     context_object_name = 'category_detail'
     template_name = 'category_detail.html'
-    slug_field = 'categorySlug'
-    slug_url_kwarg = 'categorySlug'
     login_url = '/login/'
+    permission_required = 'canSeeCategoryDetail'
+
+    def get_context_data(self, **kwargs):
+        """
+        get_context_data
+        
+        Method overrides base get_context_view method. This
+        method is used to gather objects that are then 
+        cataloged into a context tuple. Said tuple will be 
+        sent to HTML templates
+
+        self.object : object
+            database object 
+
+        this_category : Category
+            A category object that will be passed to HTML
+
+        myQuestions : Queryset
+            a queryset of questions that will be passed to HTML
+        """
+        context = super(CategoryDetailView, self).get_context_data(**kwargs)
+        self.object = self.get_object()
+        this_category = Category.objects.get(pk=self.object.pk)
+        context['categories'] = this_category
+
+        from django.core.exceptions import ObjectDoesNotExist
+
+        try:
+            myQuestions = Question.objects.filter(survey_questions__category_fk=this_category)
+            context['myQuestions'] = myQuestions
+        except Survey_Question.DoesNotExist:
+            myQuestions = None
+        return context
 
     def category_detail_view(request, primary_key):
         """
         category_detail_view
 
-        Method, adapted from Django tutorial, will check
-        to see if a category exists.
-
-        Category : the obeject we will either retrieve 
-            or 404 error
-        
         method returns the appropriate render
         """
-        Category = get_object_or_404(Category, slug=slug)
-        return render(request, 'base/templates/category_detail.html', context={'category': Category})
 
-class QuestionDetailView(LoginRequiredMixin, generic.DetailView):
+        return render(request, 'base/templates/category_detail.html', context)
+
+class QuestionDetailView(LoginRequiredMixin,PermissionRequiredMixin, generic.DetailView):
     """
     QuestionDetailView
 
@@ -217,23 +199,50 @@ class QuestionDetailView(LoginRequiredMixin, generic.DetailView):
         the name of the template we are using
         to generate this view
 
-    'questionSlug' : slug_field
-        slug field for this view
-
-    'questionSlug' : slug_url_kwarg
-        slug keyword arguments for this view
-
     '/login/' 
         redirect url for login required permission 
     """
     from django.shortcuts import get_object_or_404
 
     model = Question
-    context_object_name = 'question_detail'
     template_name = 'question_detail.html'
-    slug_field = 'questionSlug'
-    slug_url_kwarg = 'questionSlug'
     login_url = '/login/'
+    permission_required = 'canSeeQuestionDetail'
+    def get_context_data(self, **kwargs):
+        """
+        get_context_data
+        
+        Method overrides base get_context_view method. This
+        method is used to gather objects that are then 
+        cataloged into a context tuple. Said tuple will be 
+        sent to HTML templates
+
+        self.object : object
+            database object 
+
+        this_question : Question
+            Question object returned from SQL database
+
+        this_category : Category
+            Category object returned from SQL database
+        """
+        context = super(QuestionDetailView, self).get_context_data(**kwargs)
+        self.object = self.get_object()
+        this_question = Question.objects.get(pk=self.object.pk)
+        context['this_question'] = this_question
+        my_option_group = this_question.option_group
+        context['my_option_group'] = my_option_group
+        my_input_type = this_question.input_type_fk
+        context['my_input_type'] = my_input_type
+        #ObjectDoesNotExist import
+        from django.core.exceptions import ObjectDoesNotExist
+        #Try catch blocks for queries
+        try:
+            this_category = Category.objects.get(my_questions__question_fk=this_question)
+            context['this_category'] = this_category
+        except Survey_Question.DoesNotExist:
+            this_category = None
+        return context
 
     def question_detail_view(request, primary_key):
         """
@@ -247,7 +256,7 @@ class QuestionDetailView(LoginRequiredMixin, generic.DetailView):
         
         method returns the appropriate render
         """
-        Question = get_object_or_404(Category, slug=slug)
+        Question = get_object_or_404(Question, pk=primary_key)
         return render(request, 'base/templates/question_detail.html', context={'question': question})
 
 def home(request):
@@ -377,7 +386,6 @@ class SurveyDelete(LoginRequiredMixin, PermissionRequiredMixin, DeleteView):
 
 
 #Class templated for creating, updating, and deleting categories
-#Still needs permissions!
 
 class CategoryCreate(LoginRequiredMixin, PermissionRequiredMixin, CreateView):
     """
@@ -425,9 +433,6 @@ class CategoryCreate(LoginRequiredMixin, PermissionRequiredMixin, CreateView):
         """
         
         form.instance.survey_fk = Survey.objects.get(surveySlug=self.kwargs['surveySlug'])
-        #print(survey)
-        #self.survey_fk = Category.objects.filter(survey_fk=survey)
-        #form.instance.survey = Survey.objects.get(surveySlug=self.kwargs['surveySlug'])
         return super(CategoryCreate, self).form_valid(form)
         
 
@@ -465,7 +470,7 @@ class CategoryUpdate(LoginRequiredMixin, PermissionRequiredMixin, UpdateView):
         to dynamically generate a url to our object
         """
         return reverse('category-detail', kwargs={'surveySlug': self.object.survey_fk.surveySlug,
-                                                    'pk': self.object.pk}) 
+                                                    'pk': self.object.pk})
 
 class CategoryDelete(LoginRequiredMixin, PermissionRequiredMixin, DeleteView):
     """
@@ -508,7 +513,7 @@ from .forms import QuestionCreateForm
 
 class QuestionCreate(LoginRequiredMixin, PermissionRequiredMixin, CreateView):
     """
-    QuestionCreate View
+    QuestionCreate [View]
     
     Method builds off the generics provided by django to
     offer a user the ability to create a question. 
@@ -516,22 +521,67 @@ class QuestionCreate(LoginRequiredMixin, PermissionRequiredMixin, CreateView):
     Question : model
         Question is the model used in this form
 
+    QuestionCreateForm : form_class
+        A form that will be used by this view to get information
+        from the user
+
+    question_form.html : template_name
+        the template we will be using to render 
+        this view and its contextual data
+
+    '/login/' : login_url
+        url link to redirect if one is not logged in
+
+    'canCreateClass' : permission
+        the specific permission necessary to use this view
+
     """    
     model = Question
     form_class = QuestionCreateForm
     template_name = 'question_form.html'
-    """
-    fields = ['question_text',
-                'answer_is_required',
-                'is_multi_option_answer'
-                'input_type_fk',]
-    """
     login_url = '/login/'
     permission_required = 'canCreateQuestion'
 
     def get(self, request, *args, **kwargs):
+        """
+        get
+
+        Method gets context of this render and returns it to the 
+        form template to utilize
+        """
         context = {'form': QuestionCreateForm()}
         return render(request, 'question_form.html', context)
+
+    
+    def form_valid(self, form):
+        """
+        form_valid
+
+        Modified from form_valid, this method now not only cleans data
+        it also generates the go-between Survey_Question object. Using
+        from.instance to get this questions category and survey we then
+        save the form and use the instance to create the Survey_Question 
+        that is the spiritual parent model to Question.
+
+        form.instance.category : Category object
+            the parent category for this Question, queried from kwargs
+
+        form.instance.survey : Survey object 
+            the parent survey for this Question, queried from kwargs
+
+        instance : form
+            this is an instance of this form object that is used to grab the 
+            primary key of Question and pass it to a Survey_Question
+
+        """
+        form.instance.category = Category.objects.get(pk=self.kwargs['pk'])
+        form.instance.survey = Survey.objects.get(pk=form.instance.category.survey_fk.pk)
+        instance = form.save()
+        Survey_Question.objects.create(category_fk= form.instance.category,
+                                        survey_fk=form.instance.survey,
+                                        question_fk=instance)
+        print(form.cleaned_data)
+        return super(QuestionCreate, self).form_valid(form)
 
     def get_success_url(self):
         """
@@ -540,24 +590,13 @@ class QuestionCreate(LoginRequiredMixin, PermissionRequiredMixin, CreateView):
         takes a self paremeter and uses this to find its slug field(and others)
         to dynamically generate a url to our object
         """
-        return reverse('question-detail', kwargs={'sQPk': self.object.survey_questions,
-                                                    'questionPk': self.object.pk})
-    
-    def form_valid(self, form):
-        """
-        form_valid
+        my_survey_question = Survey_Question.objects.get(question_fk=self.object.pk)
+        my_category = Category.objects.get(pk=my_survey_question.category_fk.pk)
+        my_survey = Survey.objects.get(pk=my_survey_question.survey_fk.pk)
+        return reverse('question-detail', kwargs={'pk': self.object.pk,
+                                                    'categoryPk': my_category.pk,
+                                                    'surveySlug': my_survey.pk})
 
-        This method is used on HTTP Post,
-        we will set our 'Parent Category' to that
-        of the survey passed in with our kwargs
-        """
-        form.instance.category = Category.objects.get(pk=self.kwargs['pk'])
-        #survey = Survey.objects.get(pk=form.instance.category.survey_fk)
-
-        #Category.objects.get(categorySlug=self.kwargs['categorySlug'])
-        print(form.cleaned_data)
-        return super(QuestionCreate, self).form_valid(form)
-        
 
 class QuestionUpdate(LoginRequiredMixin, PermissionRequiredMixin, UpdateView):
     """
@@ -580,10 +619,8 @@ class QuestionUpdate(LoginRequiredMixin, PermissionRequiredMixin, UpdateView):
         Permission requirement to use this view
     """
     model = Question
-    slug_field = 'questionSlug'
-    slug_url_kwarg = 'questionSlug'
     template_name = 'question_form.html'
-    fields = ['questionText','answer', 'questionNumber']
+    form_class = QuestionCreateForm
     login_url = '/login/'
     permission_required = 'canUpdateQuestion'
 
@@ -594,9 +631,12 @@ class QuestionUpdate(LoginRequiredMixin, PermissionRequiredMixin, UpdateView):
         takes a self paremeter and uses this to find its slug field(and others)
         to dynamically generate a url to our object
         """
-        return reverse('question-detail', kwargs={'surveySlug': self.object.category.survey.surveySlug,
-                                                    'categorySlug': self.object.category.categorySlug,
-                                                    'questionSlug': self.object.questionSlug})
+        my_survey_question = Survey_Question.objects.get(question_fk=self.object.pk)
+        my_category = Category.objects.get(pk=my_survey_question.category_fk.pk)
+        my_survey = Survey.objects.get(pk=my_survey_question.survey_fk.pk)
+        return reverse('question-detail', kwargs={'pk': self.object.pk,
+                                                    'categoryPk': my_category.pk,
+                                                    'surveySlug': my_survey.pk})
 
 class QuestionDelete(LoginRequiredMixin, PermissionRequiredMixin, DeleteView):
     """
@@ -613,13 +653,7 @@ class QuestionDelete(LoginRequiredMixin, PermissionRequiredMixin, DeleteView):
     question_form_confirm_delete.html : template_name
         The name of the template we want Djagno 
         to use when creating this view.
-    
-    'questionSlug' : slug_field
-        slug field for this view
-
-    'questionSlug' : slug_url_kwarg
-        slug keyword arguments for this view
-
+        
     '/login/' 
         redirect url for login required permission 
 
@@ -633,6 +667,8 @@ class QuestionDelete(LoginRequiredMixin, PermissionRequiredMixin, DeleteView):
     login_url = '/login/'
     permission_required = 'canDeleteQuestion'
 
+
+
     def get_success_url(self):
         """
         get_success_url
@@ -640,9 +676,329 @@ class QuestionDelete(LoginRequiredMixin, PermissionRequiredMixin, DeleteView):
         takes a self paremeter and uses this to find its slug field(and others)
         to dynamically generate a url to our object
         """
-        return reverse('category-detail', kwargs={'surveySlug': self.object.category.survey.surveySlug,
-                                                    'categorySlug': self.object.category.categorySlug})
+        my_survey_question = Survey_Question.objects.get(question_fk=self.object.pk)
+        my_category = Category.objects.get(pk=my_survey_question.category_fk.pk)
+        my_survey = Survey.objects.get(pk=my_survey_question.survey_fk.pk)
+        return reverse('category-detail', kwargs={'pk': my_category.pk,
+                                                    'surveySlug': my_survey.pk})
+        
+from .forms import OptionChoiceForm, OptionGroupForm
+class OptionCreateView(LoginRequiredMixin, PermissionRequiredMixin, generic.CreateView):
+    """
+    OptionCreateView
+
+    View dedicated to creation of new option groups should an admin need to add them
+    """
+    model = Option_Group
+    form_class = OptionGroupForm
+    template_name = 'option_form.html'
+    login_url = '/login/'
+    permission_required = 'canCreateOptions'
+
+
+    def get(self, request, *args, **kwargs):
+        """
+        get
+
     
+        Method gets context of this render and returns it to the 
+        form template to utilize
+        """
+        context = {
+            'Groupform': OptionGroupForm(),
+            'Choiceform': OptionChoiceForm()}
+        return render(request, 'option_form.html', context)
+
+    
+    def form_valid(self, form):
+        """
+        form_valid
+
+        Modified from form_valid, this method now not only cleans data
+        it also generates the go-between Survey_Question object. Using
+        from.instance to get this questions category and survey we then
+        save the form and use the instance to create the Survey_Question 
+        that is the spiritual parent model to Question.
+
+        form.instance.category : Category object
+            the parent category for this Question, queried from kwargs
+
+        form.instance.survey : Survey object 
+            the parent survey for this Question, queried from kwargs
+
+        instance : form
+            this is an instance of this form object that is used to grab the 
+            primary key of Question and pass it to a Survey_Question
+
+        """
+        #form.instance.survey = Survey.objects.get(pk=self.kwargs['pk'])
+        
+        print(form.cleaned_data)
+        return super(OptionCreateView, self).form_valid(form)
+
+    def get_success_url(self):
+        """
+        get_success_url
+
+        takes a self paremeter and uses this to find its slug field(and others)
+        to dynamically generate a url to our object
+        """
+
+        return reverse('option-list')
+
+# class OptionUpdateView(LoginRequiredMixin, PermissionRequiredMixin, UpdateView):
+#     """
+#     OptionUpdate View
+    
+#     View for updating option groups
+
+#     '/login/' 
+#         redirect url for login required permission 
+
+#     'canUpdateOption' : permission_required
+#         Permission requirement to use this view
+#     """
+#     model = Option_Group
+#     fields = ['name_of_group']
+#     template_name = 'option_form.html'
+#     login_url = '/login/' 
+#     permission_required = 'canEditOptions'
+
+#     def get_success_url(self):
+#         """
+#         get_success_url
+
+#         takes a self paremeter and uses this to find its slug field(and others)
+#         to dynamically generate a url to our object
+#         """
+#         return reverse('option-update', kwargs={'name_of_group': self.object.name_of_group})
+
+class OptionDeleteView(LoginRequiredMixin, PermissionRequiredMixin, DeleteView):
+    """
+    Method builds off the generics provided by django to
+    offer a user the ability to delete a survey. 
+    On submission we go back to the survey list page
+    On cancel we return to the previous window
+
+    Option_Group : model
+        Option_Group is the model used in this form
+
+    option_form_confirm_delete.html : template_name
+        The name of the template we want Djagno 
+        to use when creating this view.
+
+    '/login/' 
+        redirect url for login required permission 
+
+    'canDeleteOption' : permission_required
+        Permission requirement to use this view
+    """
+    model = Option_Group
+    template_name = 'option_form_confirm_delete.html'
+    login_url = '/login/'
+    permission_required = 'canDeleteOptions'
+
+    def get_success_url(self):
+        """
+        get_success_url
+
+        takes a self paremeter and uses this to find its slug field(and others)
+        to dynamically generate a url to our object
+        """
+        return reverse('option-detail', kwargs={'name_of_group': self.object.name_of_group})
+    success_url = get_success_url
+
+class OptionDetailView(LoginRequiredMixin, generic.DetailView):
+    """
+    OptionListView
+
+    This class lists all currently registered 
+    Option Groups on the website.
+
+    Parameters
+    ----------
+    Option_Group : model
+        The specific model we're trying to list
+    'option_list' : context_object_name
+        this is what we will refer to when trying
+        to query via HTML
+    'option_list.html'
+        the name of our html file that contains
+        the template we will use
+    '/login/' 
+        redirect url for login required permission
+    """
+    model = Option_Group
+    context_object_name = 'option_detail'
+    template_name = 'option_detail.html' 
+    login_url = '/login/'
+
+#Is linked
+class OptionListView(LoginRequiredMixin, generic.ListView):
+    """
+    SurveyListView
+
+    This class lists all currently registered 
+    surveys on the website.
+
+    Parameters
+    ----------
+    Survey : model
+        The specific model we're trying to list
+    'survey_list' : context_object_name
+        this is what we will refer to when trying
+        to query via HTML
+    'survey_list.html'
+        the name of our html file that contains
+        the template we will use
+    '/login/' 
+        redirect url for login required permission
+    """
+    model = Option_Group
+    context_object_name = 'option_list'
+    template_name = 'option_list.html' 
+    login_url = '/login/'
+
+# Is linked to a page
+class ChoiceCreate(LoginRequiredMixin, PermissionRequiredMixin, CreateView):
+    """
+    ChoiceCreate View
+    
+    Method builds off the generics provided by django to
+    offer a user the ability to create a option choice. 
+
+    Option_Choice : model
+        Option_Choice is the model used in this form
+    
+    option_choice_form.html : template_name
+        The name of the template we want Djagno 
+        to use when creating this view.
+
+    '/login/' 
+        redirect url for login required permission 
+
+    'canCreateOptions' : permission_required
+        Permission requirement to use this view
+    """ 
+    model = Option_Choice
+    template_name = 'option_choice_form.html'
+    fields = ['option_group',]
+    login_url = '/login/'
+    permission_required = 'canCreateOptions'
+
+# class ChoiceUpdate(LoginRequiredMixin, PermissionRequiredMixin, UpdateView):
+#     """
+#     CategoryUpdate View
+    
+#     Method builds off the generics provided by django to
+#     offer a user the ability to update a category
+
+#     Option_Choice : model
+#         Option_Choice is the model used in this form
+    
+#     choice_form.html : template_name
+#         The name of the template we want Djagno 
+#         to use when creating this view.
+
+#     '/login/' 
+#         redirect url for login required permission 
+
+#     'canUpdateOptions' : permission_required
+#         Permission requirement to use this view
+#     """
+#     model = Option_Choice
+#     template_name = 'choice_form.html'
+#     fields = ['choice_text',]
+#     login_url = '/login/'
+#     permission_required = 'canUpdateOptions'
+
+#     def get_success_url(self):
+#         """
+#         get_success_url
+
+#         takes a self paremeter and uses this to find its slug field(and others)
+#         to dynamically generate a url to our object
+#         """
+#         return reverse('choice-detail', kwargs={'choice_text', self.object.choice_text})
+
+# class ChoiceDelete(LoginRequiredMixin, PermissionRequiredMixin, DeleteView):  
+#     """
+#     ChoiceDelete View
+    
+#     Method builds off the generics provided by django to
+#     offer a user the ability to delete an option choice. 
+#     On submission we go back to the survey detail page
+#     On cancel we return to the previous window
+
+#     Option_Choice : model
+#         Category is the model used in this form
+    
+#     option_choice_form_confirm_delete.html : template_name
+#         The name of the template we want Djagno 
+#         to use when creating this view.
+
+#     '/login/' 
+#         redirect url for login required permission 
+    
+#     'canDeleteOptions' : permission_required
+#         Permission requirement to use this view
+#     """  
+#     model = Option_Choice
+#     template_name = 'option_choice_form_confirm_delete.html' 
+#     login_url = '/login/'
+#     permission_required = 'canDeleteOptions'
+
+#     def get_success_url(self):
+#         """
+#         get_success_url
+
+#         takes a self paremeter and uses this to find its slug field(and others)
+#         to dynamically generate a url to our object
+#         """
+#         return reverse('choice-detail', kwargs={'option_group': self.object.option_group})
+#     success_url = get_success_url
+
+# class ChoiceDetailView(LoginRequiredMixin, generic.ListView):
+#     """
+#     SurveyListView
+
+#     This class lists all currently registered 
+#     surveys on the website.
+
+#     Parameters
+#     ----------
+#     Survey : model
+#         The specific model we're trying to list
+#     'survey_list' : context_object_name
+#         this is what we will refer to when trying
+#         to query via HTML
+#     'survey_list.html'
+#         the name of our html file that contains
+#         the template we will use
+#     '/login/' 
+#         redirect url for login required permission
+#     """
+#     model = Option_Choice
+#     context_object_name = 'choice_list'
+#     template_name = 'choice_list.html' 
+#     login_url = '/login/'
+#     permission_required = 'canSeeOptions'
+
+#     def ChoiceDetailView(request):
+#         """
+
+#         """
+#         #Login check
+#         if not request.user.is_authenticated:
+#             return redirect('/login/')
+#         #Permission check
+#         permission_required = 'canSeeOptions'
+#        # option_choice = Option_Choice.objects.get()
+        
+#         context = {
+#         }
+    
+#         return render(request, 'choice_detail.html', context)
 ###############################################################################
 def create_session_hash():
             hash = hashlib.sha1()

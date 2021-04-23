@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+
+{% block content %}
+  <div class="container-fluid">
+    <h2>List of Option Groups</h2>
+  </div>
+  
+  {% if option_list %}
+    <div class="container-fluid">
+      <ul class="list-group-flush">
+        {% for option_group in option_list %}
+          <li class="list-group-item">
+            <div class="container-fluid row">
+              <div class="col-sm-8">
+                <p>{{ option_group.name_of_group }}</p> 
+              </div>
+              <div class="col-sm float-right">
+                <div class="btn-toolbar" role="toolbar">
+                  {% comment %} {% if perms.canEditOption %}
+                  <div class="btn-group mr-2" role="group">
+                    <a class="btn btn-info" href="{{ survey.get_absolute_url }}">
+                      Edit
+                    </a>
+                  </div>
+                  {% endif %} {% endcomment %}
+
+                  {% comment %} {% if perms.canDeleteOption %}
+                  <div class="btn-group mr-2" role="group">
+                    <a class="btn btn-danger" href="{{survey.get_absolute_url }}/delete">
+                      Delete
+                    </a>
+                  </div>
+                  {% endif %} {% endcomment %}
+
+                  {% comment %} {% if perms.canTakeSurvey %}
+                  <div class="btn-group mr-2" role="group">
+                    <a class="btn btn-primary" href="{{ survey.get_welcome_url }}">
+                      Take Survey
+                    </a>
+                  </div>
+                  {% else %}
+                  <div class="btn-group mr-2" role="group">
+                    <a class="btn btn-primary disabled" href="#">
+                      Survey Closed
+                    </a>
+                  </div>
+                  {% endif %} {% endcomment %}
+                </div>
+              </div>
+            </div>
+          </li>
+        {% endfor %}
+      </ul>
+    </div>
+  {% else %}
+    <div class="container-fluid">
+      <p><strong>There are no Groups in the database</strong></p>
+    </div>
+  {% endif %}
+
+  {% if perms.canCreateSurvey %}
+    <div class="container-fluid">
+      <a class="btn btn-success" href="{% url 'option-create' %}">
+        Create New Option Group
+      </a>
+    </div>
+  {% endif %}
+{% endblock %}

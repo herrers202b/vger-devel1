@@ -22,40 +22,40 @@
   </head>
 
   <div class="container">
+    <!-- navbar -->
+    <div class="nav-b shadow">
+      <nav>
+        <div class="logo">
+          <a href="{% url 'home-page' %}">
+            <img src="{% static 'vger/potsdam_red.jpg' %}" alt="SUNY Potsdam VGER"/>
+          </a>
+        </div>
+          <ul class="nav nav-pills nav-bar-links">
+            <li class="nav-item">
+              <a class="nav-link" href="{% url 'home-page' %}">Home</a>
+            </li>
+            {% if user.is_authenticated %}
+            <li class="nav-item">
+              <a class="nav-link" href="{% url 'logout' %}">Logout</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="{% url 'survey' %}">Surveys</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="{% url 'profile' %}">{{ user.username }}</a>
+            </li>
+            {% else %}
+            <li class="nav-item">
+              <a class="nav-link" href="{% url 'login' %}">Login</a>
+            </li>
+            {% endif %}
+          </ul>
+      </nav>
+    </div>
     <div class="card border-0 shadow my-5">
-      <div class="card-body p-5">
+      <div class="card-body">
         <body>
-          <!-- navbar -->
-          <nav class="navbar navbar-default">
-            <span class="navbar-brand mb-0 h1">SUNY Potsdam VGER</span>
-            <ul class="nav nav-pills">
-              <li class="nav-item">
-                <a class="nav-link" href="{% url 'home-page' %}">Home</a>
-              </li>
-              {% if user.is_authenticated %}
-              <li class="nav-item">
-                <a class="nav-link" href="{% url 'logout' %}">Logout</a>
-              </li>
-              {% if perms.canCreateSurvey %}
-                <li class="nav-item">
-                  <a class="nav-link" href="{% url 'survey' %}">Survey</a>
-                </li>
-              {% else %}
-              <li class="nav-item">
-                <a class="nav-link" href="{% url 'survey' %}">Take Survey</a>
-              </li>
-              {% endif %}
-              <li class="nav-item">
-                <a class="nav-link" href="{% url 'profile' %}">{{ user.username }}</a>
-              </li>
-              {% else %}
-              <li class="nav-item">
-                <a class="nav-link" href="{% url 'login' %}">Login</a>
-              </li>
-              {% endif %}
-            </ul>
-          </nav>
-
+          
           <!-- page content -->
           <section style="margin-top: 10px">
             {% block content %}{% endblock %}

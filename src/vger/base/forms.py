@@ -22,6 +22,19 @@ class SurveyCreateForm(forms.ModelForm):
         }
 
 class CategoryCreateForm(forms.Form):
+    """
+    CategoryCreateForm
+
+    Class form used to create a category from a view
+
+    title_of_category : CharField
+        the title of a category with a 100 char max lenght
+
+    More : BooleanField
+
+    type : ChoiceField
+    
+    """
     title_of_category = forms.CharField(max_length=100)
     More = forms.BooleanField(required=False, widget=HiddenInput())
     type = forms.ChoiceField(choices = ((1, 'One'), (2, 'Two')))
@@ -31,16 +44,41 @@ class CategoryCreateForm(forms.Form):
     list2 = forms.CharField()
 
 class QuestionChoiceField(ModelChoiceField):
+    """
+    QuestionChoiceField
 
+    Custom ModelChoiceField used to take an input type for questions
+    and mask the raw object name with its actual type name for usability
+    """
     def label_from_instance(self, obj):
             return f'{obj.input_type_name}'
 
 class OptionChoiceField(ModelChoiceField):
-
+    """
+    OptionChoiceField
+    
+    Custom ModelChoiceField used to take a quesiton group object for
+    questions and mask the raw object name with its actual group name
+    for usability
+    """
     def label_from_instance(self, obj):
             return f'{obj.name_of_group}'
+
 class QuestionCreateForm(forms.ModelForm):
-    
+    """
+    QuiestionCreateForm
+
+    ModelForm that handles creating a question from scratch.
+
+    input_type_fk : QuestionChoiceField
+        form field that takes the input_type foreign key and
+        then uses a method to mask the object name with its
+        type name field.
+
+    option_group : OptionChoiceField
+        same as input_type directly above but for question
+        option groups.
+    """
     input_type_fk = QuestionChoiceField(queryset=Input_Type.objects,
                                             widget=Select(),
                                             label="Question type")
@@ -58,6 +96,19 @@ class QuestionCreateForm(forms.ModelForm):
             'answer_is_required': 'Is an answer required for this question?',
             'is_multi_option_answer': 'Is this a multiple choice question?',
         }
+
+
+class OptionGroupForm(forms.ModelForm):
+    class Meta:
+        model = Option_Group
+        fields = ('name_of_group',)
+        labels = {'name_of_group':'Name of this option group:'}
+
+class OptionChoiceForm(forms.ModelForm):
+    class Meta:
+        model = Option_Choice
+        fields = ('choice_text',)
+        labels = {'choice_text': 'Enter some text for this particular choice.'}
 
 #TODO: Refactor form to approprately gather question answer groups
 class SurveyCategoryForm(forms.Form):
