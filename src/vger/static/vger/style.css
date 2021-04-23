@@ -1,5 +1,10 @@
-body {
-    font-size:1.3em;
+
+html, body {
+    position:fixed;
+    top:0;
+    bottom:0;
+    left:0;
+    right:0;
     color:#000000;
     background-color:#8a1538; 
 }
@@ -11,24 +16,23 @@ h1, h2, h3, h4, h5, h6, a {
     display: block;
     box-shadow: none;
     padding-left: 2%;
-    width: auto;
-    height: 3.5rem;
-    float:left
+    width: 9rem;
+    height: auto;
+    float:left;
 }
 .logo img {
-    height: 100%;
-    width: auto;
+    height: auto;
+    width: 100%;
 }
 .nav-bar-links {
     float: right; 
-    padding-left:30%;
 }
 .nav-b {
     background-color: rgb(255, 255, 255);
     flex: 1 1 auto;
     border-bottom-left-radius: 25px;
     border-bottom-right-radius: 25px;
-    width: 100%;
+    width: auto;
     overflow: hidden;
 }
 
@@ -65,26 +69,3 @@ h1, h2, h3, h4, h5, h6, a {
 .row{margin-top: 10px;}
 
 table{margin-top: 15px;}
-
-/* .tke-srvy {
-    padding-left: 0;
-    display: inline-block"
-} */
-
-/* #parent {
-    list-style: none;
-    width: 100%;
-    height: 90px;
-    margin: 0;
-    padding: 0;
-    white-space: nowrap;
-    overflow-x: auto;
-    overflow-y: hidden;
-}
-
-#parent > li {
-    display: inline-block;
-    width: 50%;
-    height: 100%;
-    background-color: red;
-} */
