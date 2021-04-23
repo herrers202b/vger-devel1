@@ -5,6 +5,7 @@ from django.contrib.auth.models import User
 from django.contrib import messages
 from .forms import UserTypeForm
 from .models import Advisor, Student, Administrator
+from base.models import User_Survey
 
 
 # Create your views here.
@@ -57,7 +58,10 @@ def advisorProfile(request):
     return render(request, 'profile/advisor_profile.html', context = context)
 
 def studentProfile(request):
-    return render(request, 'profile/student_profile.html')
+    user = request.user
+    surveys = User_Survey.objects.filter(user_fk=user)
+
+    return render(request, 'profile/student_profile.html', context={'surveys' : surveys})
 
 def adminProfile(request):
     return render(request, 'profile/admin_profile.html')

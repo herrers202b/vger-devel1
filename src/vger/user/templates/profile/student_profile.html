@@ -2,5 +2,7 @@
 {% block profile_content %}
 
 <p>Student Profile</p>
-
+{% for survey in surveys%}
+<a href="{{ survey.survey_fk.get_result_url }}">{{survey.survey_fk.titleOfSurvey}}</a>
+{% endfor %}
 {% endblock %}
