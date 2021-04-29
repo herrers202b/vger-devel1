@@ -687,10 +687,23 @@ class OptionCreateView(LoginRequiredMixin, PermissionRequiredMixin, generic.Crea
     """
     OptionCreateView
 
-    View dedicated to creation of new option groups should an admin need to add them
+    Method builds off the generics provided by django to
+    offer a user the ability to create a survey
+
+    Option_Group : model
+        Survey is the model used in this form
+
+    option_form.html : template_name
+        The name of the template we want Djagno 
+        to use when creating this view.
+
+    '/login/' 
+        redirect url for login required permission 
+    
+    'canCreateOptions' : permission_required
+        Permission requirement to use this view
     """
     model = Option_Group
-    # form_class = OptionGroupForm
     template_name = 'option_form.html'
     fields = ['name_of_group']
     login_url = '/login/'
@@ -698,13 +711,6 @@ class OptionCreateView(LoginRequiredMixin, PermissionRequiredMixin, generic.Crea
 
 
     def get(self, request, *args, **kwargs):
-        """
-        get
-
-    
-        Method gets context of this render and returns it to the 
-        form template to utilize
-        """
         context = {
             'Groupform': OptionGroupForm(),
             'Choiceform': OptionChoiceForm()}
@@ -712,28 +718,6 @@ class OptionCreateView(LoginRequiredMixin, PermissionRequiredMixin, generic.Crea
 
     
     def form_valid(self, form):
-        """
-        form_valid
-
-        Modified from form_valid, this method now not only cleans data
-        it also generates the go-between Survey_Question object. Using
-        from.instance to get this questions category and survey we then
-        save the form and use the instance to create the Survey_Question 
-        that is the spiritual parent model to Question.
-
-        form.instance.category : Category object
-            the parent category for this Question, queried from kwargs
-
-        form.instance.survey : Survey object 
-            the parent survey for this Question, queried from kwargs
-
-        instance : form
-            this is an instance of this form object that is used to grab the 
-            primary key of Question and pass it to a Survey_Question
-
-        """
-        #form.instance.option_group = Option_Group.objects.get(pk=self.kwargs['pk'])
-        
         print(form.cleaned_data)
         return super(OptionCreateView, self).form_valid(form)
 
@@ -741,8 +725,8 @@ class OptionCreateView(LoginRequiredMixin, PermissionRequiredMixin, generic.Crea
         """
         get_success_url
 
-        takes a self paremeter and uses this to find its slug field(and others)
-        to dynamically generate a url to our object
+        If creation is successful, then the user will be 
+        returned to the option list
         """
 
         return reverse('option-list')
@@ -783,28 +767,6 @@ class OptionUpdateView(LoginRequiredMixin, PermissionRequiredMixin, UpdateView):
         return render(request, 'option_form.html', context)
 
     def form_valid(self, form):
-        """
-        form_valid
-
-        Modified from form_valid, this method now not only cleans data
-        it also generates the go-between Survey_Question object. Using
-        from.instance to get this questions category and survey we then
-        save the form and use the instance to create the Survey_Question 
-        that is the spiritual parent model to Question.
-    
-        form.instance.category : Category object
-             the parent category for this Question, queried from kwargs
-
-        form.instance.survey : Survey object 
-            the parent survey for this Question, queried from kwargs
-
-        instance : form
-            this is an instance of this form object that is used to grab the 
-            primary key of Question and pass it to a Survey_Question
-
-        """
-        #form.instance.survey = Survey.objects.get(pk=self.kwargs['pk'])
-            
         print(form.cleaned_data)
         return super(OptionUpdateView, self).form_valid(form)
 
@@ -820,8 +782,8 @@ class OptionUpdateView(LoginRequiredMixin, PermissionRequiredMixin, UpdateView):
 class OptionDeleteView(LoginRequiredMixin, PermissionRequiredMixin, DeleteView):
     """
     Method builds off the generics provided by django to
-    offer a user the ability to delete a survey. 
-    On submission we go back to the survey list page
+    offer a user the ability to delete an option group. 
+    On submission we go back to the option group list page
     On cancel we return to the previous window
 
     Option_Group : model
@@ -846,8 +808,8 @@ class OptionDeleteView(LoginRequiredMixin, PermissionRequiredMixin, DeleteView):
         """
         get_success_url
 
-        takes a self paremeter and uses this to find its slug field(and others)
-        to dynamically generate a url to our object
+        If the option group is successfully deleted, then the user
+        will be returned to the option group list
         """
         return reverse('option-list')
     success_url = get_success_url
@@ -889,11 +851,11 @@ class OptionDetailView(LoginRequiredMixin, generic.DetailView):
         self.object : object
             database object 
 
-        this_category : Category
+        this_group : Option_Group
             A category object that will be passed to HTML
 
-        myQuestions : Queryset
-            a queryset of questions that will be passed to HTML
+        myChoices : Queryset
+            a queryset of option choices that will be passed to HTML
         """
         context = super(OptionDetailView, self).get_context_data(**kwargs)
         self.object = self.get_object()
@@ -921,19 +883,19 @@ class OptionDetailView(LoginRequiredMixin, generic.DetailView):
 #Is linked
 class OptionListView(LoginRequiredMixin, generic.ListView):
     """
-    SurveyListView
+    OptionListView
 
     This class lists all currently registered 
-    surveys on the website.
+    option groups on the website.
 
     Parameters
     ----------
-    Survey : model
+    Option_Group : model
         The specific model we're trying to list
-    'survey_list' : context_object_name
+    'option_list' : context_object_name
         this is what we will refer to when trying
         to query via HTML
-    'survey_list.html'
+    'option_list.html'
         the name of our html file that contains
         the template we will use
     '/login/' 
@@ -966,8 +928,8 @@ class ChoiceCreate(LoginRequiredMixin, PermissionRequiredMixin, CreateView):
         Permission requirement to use this view
     """ 
     model = Option_Choice
+    form_class = OptionChoiceForm
     template_name = 'option_choice_form.html'
-    fields = ['option_group',]
     login_url = '/login/'
     permission_required = 'canCreateOptions'
 
@@ -989,22 +951,11 @@ class ChoiceCreate(LoginRequiredMixin, PermissionRequiredMixin, CreateView):
         """
         form_valid
 
-        Modified from form_valid, this method now not only cleans data
-        it also generates the go-between Survey_Question object. Using
-        from.instance to get this questions category and survey we then
-        save the form and use the instance to create the Survey_Question 
-        that is the spiritual parent model to Question.
+        Modified from form_valid. Using from.instance to get 
+        this choices option group we then save the form.
 
-        form.instance.category : Category object
+        form.instance.option_group : Option_Group object
             the parent category for this Question, queried from kwargs
-
-        form.instance.survey : Survey object 
-            the parent survey for this Question, queried from kwargs
-
-        instance : form
-            this is an instance of this form object that is used to grab the 
-            primary key of Question and pass it to a Survey_Question
-
         """
         form.instance.option_group = Option_Group.objects.get(pk=self.kwargs['pk'])
         instance = form.save()
@@ -1015,47 +966,46 @@ class ChoiceCreate(LoginRequiredMixin, PermissionRequiredMixin, CreateView):
         """
         get_success_url
 
+        If creation is successful, then the user will be 
+        returned to the option detail
+        """
+
+        return reverse('option-detail', kwargs={'pk': self.object.option_group.pk})
+
+class ChoiceUpdate(LoginRequiredMixin, PermissionRequiredMixin, UpdateView):
+    """
+    CategoryUpdate View
+    
+    Method builds off the generics provided by django to
+    offer a user the ability to update a category
+
+    Option_Choice : model
+        Option_Choice is the model used in this form
+    
+    choice_form.html : template_name
+        The name of the template we want Djagno 
+        to use when creating this view.
+
+    '/login/' 
+        redirect url for login required permission 
+
+    'canUpdateOptions' : permission_required
+        Permission requirement to use this view
+    """
+    model = Option_Choice
+    template_name = 'choice_form.html'
+    fields = ['choice_text',]
+    login_url = '/login/'
+    permission_required = 'canUpdateOptions'
+
+    def get_success_url(self):
+        """
+        get_success_url
+
         takes a self paremeter and uses this to find its slug field(and others)
         to dynamically generate a url to our object
         """
-
-        return reverse('option-list', kwargs={'option_group_fk': self.object.option_group_fk.pk,
-                                                    'pk': self.object.pk})
-
-# class ChoiceUpdate(LoginRequiredMixin, PermissionRequiredMixin, UpdateView):
-#     """
-#     CategoryUpdate View
-    
-#     Method builds off the generics provided by django to
-#     offer a user the ability to update a category
-
-#     Option_Choice : model
-#         Option_Choice is the model used in this form
-    
-#     choice_form.html : template_name
-#         The name of the template we want Djagno 
-#         to use when creating this view.
-
-#     '/login/' 
-#         redirect url for login required permission 
-
-#     'canUpdateOptions' : permission_required
-#         Permission requirement to use this view
-#     """
-#     model = Option_Choice
-#     template_name = 'choice_form.html'
-#     fields = ['choice_text',]
-#     login_url = '/login/'
-#     permission_required = 'canUpdateOptions'
-
-#     def get_success_url(self):
-#         """
-#         get_success_url
-
-#         takes a self paremeter and uses this to find its slug field(and others)
-#         to dynamically generate a url to our object
-#         """
-#         return reverse('choice-detail', kwargs={'choice_text', self.object.choice_text})
+        return reverse('choice-detail', kwargs={'choice_text', self.object.choice_text})
 
 # class ChoiceDelete(LoginRequiredMixin, PermissionRequiredMixin, DeleteView):  
 #     """
@@ -1115,12 +1065,20 @@ class ChoiceCreate(LoginRequiredMixin, PermissionRequiredMixin, CreateView):
 #         redirect url for login required permission
 #     """
 #     model = Option_Choice
-#     context_object_name = 'choice_list'
-#     template_name = 'choice_list.html' 
+#     template_name = 'option_choice_detail.html' 
 #     login_url = '/login/'
 #     permission_required = 'canSeeOptions'
 
-#     def ChoiceDetailView(request):
+#     def get_context_data(self, **kwargs):
+#         """
+
+#         """
+#         context = super(ChoiceDetailView, self).get_context_data(**kwargs)
+#         self.object = self.get_object()
+#         this_choice = Option_Choice.objects.get(pk=self.object.pk)
+
+
+#     def choice_detail_view(request):
 #         """
 
 #         """
@@ -1129,11 +1087,8 @@ class ChoiceCreate(LoginRequiredMixin, PermissionRequiredMixin, CreateView):
 #             return redirect('/login/')
 #         #Permission check
 #         permission_required = 'canSeeOptions'
-#        # option_choice = Option_Choice.objects.get()
-        
-#         context = {
-#         }
-    
+
+
 #         return render(request, 'choice_detail.html', context)
 ###############################################################################
 def create_session_hash():

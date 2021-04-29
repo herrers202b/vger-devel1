@@ -7,9 +7,49 @@
   {% for Option_Choice in myChoices %}
     <div style="margin-left:20px;margin-top:20px">
       {% if perms.canCreateOptions %}
-        <a href="{{ Option_Choice.get_absolute_url }}">Option Choice: {{Option_Choice.choice_text}}?</a> 
+        <a href="{{ Option_Choice.get_absolute_url }}">Option Choice: {{Option_Choice.choice_text}}</a> 
+        <li class="list-group-item">
+            <div class="container-fluid row">
+              <div class="col-sm-8">
+                <p>{{ option_group.name_of_group }}</p> 
+              </div>
+              <div class="col-sm float-right">
+                <div class="btn-toolbar" role="toolbar">
+                  {% if perms.canEditOption %}
+                  <div class="btn-group mr-2" role="group">
+                    <a class="btn btn-info" href="detail/{{ option_group.pk }}">
+                      Edit
+                    </a>
+                  </div>
+                  {% endif %}
+
+                  {% if perms.canDeleteOption %}
+                  <div class="btn-group mr-2" role="group">
+                    <a class="btn btn-danger" href="delete/{{ option_group.pk }}">
+                      Delete
+                    </a>
+                  </div>
+                  {% endif %}
+
+                  {% comment %} {% if perms.canTakeSurvey %}
+                  <div class="btn-group mr-2" role="group">
+                    <a class="btn btn-primary" href="{{ survey.get_welcome_url }}">
+                      Take Survey
+                    </a>
+                  </div>
+                  {% else %}
+                  <div class="btn-group mr-2" role="group">
+                    <a class="btn btn-primary disabled" href="#">
+                      Survey Closed
+                    </a>
+                  </div>
+                  {% endif %} {% endcomment %}
+                </div>
+              </div>
+            </div>
+          </li>
       {% else %}
-        <p>Option Choice: {{Option_Choice.choice_text}}?</p>
+        <p>Option Choice: {{Option_Choice.choice_text}}</p>
       {% endif %}
     </div>
   {% endfor %}
@@ -27,14 +67,6 @@
     <form action = "/options/update/{{ option_detail.pk }}">
       <button type = "submit">
         Update Option Group
-      </button>
-    </form>
-  {% endif %}
-{% comment %} Delete Category button {% endcomment %}
-  {%if perms.canDeleteCategory%}
-    <form action = "{{ category_detail.get_absolute_url }}/delete-category">
-      <button type = "submit">
-        Delete Option Group
       </button>
     </form>
   {% endif %}
