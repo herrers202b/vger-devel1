@@ -1,20 +1,15 @@
 {% extends "base.html" %}
-{% load crispy_forms_tags %}
+
 {% block content %}
-<div class="container-fluid">
-  <form action="" method="post">
-    {% csrf_token %}
-    {{ Groupform|crispy }}
-    {{ Choiceform|crispy }}
-    <div class="btn-toolbar" role="toolbar">
-      <div class="btn-group mr-2" role="group">
-        <input class="btn btn-success" type="submit" value="Submit">
-      </div>
-      <div class="btn-group mr-2" role="group">
-        <button class="btn btn-primary" onclick="window.history.back();"
-          class="btn btn-default" type="button">Cancel</button>
-      </div>
-    </div>
-  </form>
-</div>
+
+<h1>Delete Option Group</h1>
+
+<p>Are you sure you want to delete {{ option_group.name_of_group }}?</p>
+
+<form action="" method="POST">
+  {% csrf_token %}
+  <input type="submit" value="Yes, delete.">
+  <button onclick="window.history.back();" class="btn btn-default" type="button">Cancel</button
+</form>
+
 {% endblock %}

@@ -690,8 +690,9 @@ class OptionCreateView(LoginRequiredMixin, PermissionRequiredMixin, generic.Crea
     View dedicated to creation of new option groups should an admin need to add them
     """
     model = Option_Group
-    form_class = OptionGroupForm
+    # form_class = OptionGroupForm
     template_name = 'option_form.html'
+    fields = ['name_of_group']
     login_url = '/login/'
     permission_required = 'canCreateOptions'
 
@@ -731,7 +732,7 @@ class OptionCreateView(LoginRequiredMixin, PermissionRequiredMixin, generic.Crea
             primary key of Question and pass it to a Survey_Question
 
         """
-        #form.instance.survey = Survey.objects.get(pk=self.kwargs['pk'])
+        #form.instance.option_group = Option_Group.objects.get(pk=self.kwargs['pk'])
         
         print(form.cleaned_data)
         return super(OptionCreateView, self).form_valid(form)
@@ -746,32 +747,75 @@ class OptionCreateView(LoginRequiredMixin, PermissionRequiredMixin, generic.Crea
 
         return reverse('option-list')
 
-# class OptionUpdateView(LoginRequiredMixin, PermissionRequiredMixin, UpdateView):
-#     """
-#     OptionUpdate View
+class OptionUpdateView(LoginRequiredMixin, PermissionRequiredMixin, UpdateView):
+    """
+    OptionUpdate View
     
-#     View for updating option groups
+    View for updating option groups
 
-#     '/login/' 
-#         redirect url for login required permission 
+    '/login/' 
+        redirect url for login required permission 
 
-#     'canUpdateOption' : permission_required
-#         Permission requirement to use this view
-#     """
-#     model = Option_Group
-#     fields = ['name_of_group']
-#     template_name = 'option_form.html'
-#     login_url = '/login/' 
-#     permission_required = 'canEditOptions'
+    'canUpdateOption' : permission_required
+        Permission requirement to use this view
+    """
+    model = Option_Group
+    fields = ['name_of_group']
+    template_name = 'option_form.html'
+    login_url = '/login/' 
+    permission_required = 'canEditOptions'
+    context = {
+            'Groupform': OptionGroupForm(),
+            'Choiceform': OptionChoiceForm()
+        }
 
-#     def get_success_url(self):
-#         """
-#         get_success_url
+    def get(self, request, *args, **kwargs):
+        """
+        get
 
-#         takes a self paremeter and uses this to find its slug field(and others)
-#         to dynamically generate a url to our object
-#         """
-#         return reverse('option-update', kwargs={'name_of_group': self.object.name_of_group})
+    
+        Method gets context of this render and returns it to the 
+        form template to utilize
+        """
+        context = {
+            'Groupform': OptionGroupForm(),
+            'Choiceform': OptionChoiceForm()}
+        return render(request, 'option_form.html', context)
+
+    def form_valid(self, form):
+        """
+        form_valid
+
+        Modified from form_valid, this method now not only cleans data
+        it also generates the go-between Survey_Question object. Using
+        from.instance to get this questions category and survey we then
+        save the form and use the instance to create the Survey_Question 
+        that is the spiritual parent model to Question.
+    
+        form.instance.category : Category object
+             the parent category for this Question, queried from kwargs
+
+        form.instance.survey : Survey object 
+            the parent survey for this Question, queried from kwargs
+
+        instance : form
+            this is an instance of this form object that is used to grab the 
+            primary key of Question and pass it to a Survey_Question
+
+        """
+        #form.instance.survey = Survey.objects.get(pk=self.kwargs['pk'])
+            
+        print(form.cleaned_data)
+        return super(OptionUpdateView, self).form_valid(form)
+
+    def get_success_url(self):
+        """
+        get_success_url
+
+        takes a self paremeter and uses this to find its slug field(and others)
+        to dynamically generate a url to our object
+        """
+        return reverse('option-detail', kwargs={'pk': self.object.pk})
 
 class OptionDeleteView(LoginRequiredMixin, PermissionRequiredMixin, DeleteView):
     """
@@ -805,7 +849,7 @@ class OptionDeleteView(LoginRequiredMixin, PermissionRequiredMixin, DeleteView):
         takes a self paremeter and uses this to find its slug field(and others)
         to dynamically generate a url to our object
         """
-        return reverse('option-detail', kwargs={'name_of_group': self.object.name_of_group})
+        return reverse('option-list')
     success_url = get_success_url
 
 class OptionDetailView(LoginRequiredMixin, generic.DetailView):
@@ -832,6 +876,47 @@ class OptionDetailView(LoginRequiredMixin, generic.DetailView):
     context_object_name = 'option_detail'
     template_name = 'option_detail.html' 
     login_url = '/login/'
+
+    def get_context_data(self, **kwargs):
+        """
+        get_context_data
+        
+        Method overrides base get_context_view method. This
+        method is used to gather objects that are then 
+        cataloged into a context tuple. Said tuple will be 
+        sent to HTML templates
+
+        self.object : object
+            database object 
+
+        this_category : Category
+            A category object that will be passed to HTML
+
+        myQuestions : Queryset
+            a queryset of questions that will be passed to HTML
+        """
+        context = super(OptionDetailView, self).get_context_data(**kwargs)
+        self.object = self.get_object()
+        this_group = Option_Group.objects.get(pk=self.object.pk)
+        context['option_groups'] = this_group
+
+        from django.core.exceptions import ObjectDoesNotExist
+
+        try:
+            myChoices = Option_Choice.objects.filter(option_group_id=this_group)
+            context['myChoices'] = myChoices
+        except Option_Group.DoesNotExist:
+            myChoices = None
+        return context
+
+    def category_detail_view(request, primary_key):
+        """
+        category_detail_view
+
+        method returns the appropriate render
+        """
+
+        return render(request, 'base/templates/option_detail.html', context)
 
 #Is linked
 class OptionListView(LoginRequiredMixin, generic.ListView):
@@ -885,6 +970,57 @@ class ChoiceCreate(LoginRequiredMixin, PermissionRequiredMixin, CreateView):
     fields = ['option_group',]
     login_url = '/login/'
     permission_required = 'canCreateOptions'
+
+    def get(self, request, *args, **kwargs):
+        """
+        get
+
+    
+        Method gets context of this render and returns it to the 
+        form template to utilize
+        """
+        context = {
+            'Groupform': OptionGroupForm(),
+            'Choiceform': OptionChoiceForm()}
+        return render(request, 'option_choice_form.html', context)
+
+    
+    def form_valid(self, form):
+        """
+        form_valid
+
+        Modified from form_valid, this method now not only cleans data
+        it also generates the go-between Survey_Question object. Using
+        from.instance to get this questions category and survey we then
+        save the form and use the instance to create the Survey_Question 
+        that is the spiritual parent model to Question.
+
+        form.instance.category : Category object
+            the parent category for this Question, queried from kwargs
+
+        form.instance.survey : Survey object 
+            the parent survey for this Question, queried from kwargs
+
+        instance : form
+            this is an instance of this form object that is used to grab the 
+            primary key of Question and pass it to a Survey_Question
+
+        """
+        form.instance.option_group = Option_Group.objects.get(pk=self.kwargs['pk'])
+        instance = form.save()
+        print(form.cleaned_data)
+        return super(ChoiceCreate, self).form_valid(form)
+
+    def get_success_url(self):
+        """
+        get_success_url
+
+        takes a self paremeter and uses this to find its slug field(and others)
+        to dynamically generate a url to our object
+        """
+
+        return reverse('option-list', kwargs={'option_group_fk': self.object.option_group_fk.pk,
+                                                    'pk': self.object.pk})
 
 # class ChoiceUpdate(LoginRequiredMixin, PermissionRequiredMixin, UpdateView):
 #     """

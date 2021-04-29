@@ -16,21 +16,21 @@
               </div>
               <div class="col-sm float-right">
                 <div class="btn-toolbar" role="toolbar">
-                  {% comment %} {% if perms.canEditOption %}
+                  {% if perms.canEditOption %}
                   <div class="btn-group mr-2" role="group">
-                    <a class="btn btn-info" href="{{ survey.get_absolute_url }}">
+                    <a class="btn btn-info" href="detail/{{ option_group.pk }}">
                       Edit
                     </a>
                   </div>
-                  {% endif %} {% endcomment %}
+                  {% endif %}
 
-                  {% comment %} {% if perms.canDeleteOption %}
+                  {% if perms.canDeleteOption %}
                   <div class="btn-group mr-2" role="group">
-                    <a class="btn btn-danger" href="{{survey.get_absolute_url }}/delete">
+                    <a class="btn btn-danger" href="delete/{{ option_group.pk }}">
                       Delete
                     </a>
                   </div>
-                  {% endif %} {% endcomment %}
+                  {% endif %}
 
                   {% comment %} {% if perms.canTakeSurvey %}
                   <div class="btn-group mr-2" role="group">
