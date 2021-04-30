@@ -679,8 +679,7 @@ class QuestionDelete(LoginRequiredMixin, PermissionRequiredMixin, DeleteView):
         my_survey_question = Survey_Question.objects.get(question_fk=self.object.pk)
         my_category = Category.objects.get(pk=my_survey_question.category_fk.pk)
         my_survey = Survey.objects.get(pk=my_survey_question.survey_fk.pk)
-        return reverse('category-detail', kwargs={'pk': my_category.pk,
-                                                    'surveySlug': my_survey.pk})
+        return reverse('survey-detail', kwargs={'surveySlug': my_survey.surveySlug})
         
 from .forms import OptionChoiceForm, OptionGroupForm
 class OptionCreateView(LoginRequiredMixin, PermissionRequiredMixin, generic.CreateView):
