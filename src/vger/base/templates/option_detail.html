@@ -17,7 +17,7 @@
                 <div class="btn-toolbar" role="toolbar">
                   {% if perms.canEditOption %}
                   <div class="btn-group mr-2" role="group">
-                    <a class="btn btn-info" href="detail/{{ option_group.pk }}">
+                    <a class="btn btn-info" href="detail/{{ Option_Choice.pk }}">
                       Edit
                     </a>
                   </div>
@@ -25,18 +25,13 @@
 
                   {% if perms.canDeleteOption %}
                   <div class="btn-group mr-2" role="group">
-                    <a class="btn btn-danger" href="delete/{{ option_group.pk }}">
+                    <a class="btn btn-danger" href="delete/{{ Option_Choice.pk }}">
                       Delete
                     </a>
                   </div>
                   {% endif %}
 
                   {% comment %} {% if perms.canTakeSurvey %}
-                  <div class="btn-group mr-2" role="group">
-                    <a class="btn btn-primary" href="{{ survey.get_welcome_url }}">
-                      Take Survey
-                    </a>
-                  </div>
                   {% else %}
                   <div class="btn-group mr-2" role="group">
                     <a class="btn btn-primary disabled" href="#">

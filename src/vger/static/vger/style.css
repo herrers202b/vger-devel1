@@ -51,10 +51,17 @@ h1, h2, h3, h4, h5, h6, a {
 
 .row{margin-top:10px;}
 
+.btn-new {
+    color: white;
+    background-color:#b10af3;
+    border-color:#ffffff;
+}
+
 .btn-primary {
     background-color:#8a1538;
     border-color:#8a1538;
 }
+
 
 .btn-primary:hover {
     background-color:#660f29;

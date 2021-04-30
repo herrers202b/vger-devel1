@@ -881,7 +881,7 @@ class OptionDetailView(LoginRequiredMixin, generic.DetailView):
         return render(request, 'base/templates/option_detail.html', context)
 
 #Is linked
-class OptionListView(LoginRequiredMixin, generic.ListView):
+def OptionListView(request):
     """
     OptionListView
 
@@ -901,10 +901,12 @@ class OptionListView(LoginRequiredMixin, generic.ListView):
     '/login/' 
         redirect url for login required permission
     """
-    model = Option_Group
-    context_object_name = 'option_list'
-    template_name = 'option_list.html' 
-    login_url = '/login/'
+    if not request.user.is_authenticated:
+         return redirect('/login/')
+
+    context = {'option_list' : Option_Group.objects.all(),
+                'option_choices' : Option_Choice.objects.all()} 
+    return render(request, 'option_list.html', context)
 
 # Is linked to a page
 class ChoiceCreate(LoginRequiredMixin, PermissionRequiredMixin, CreateView):
@@ -993,7 +995,7 @@ class ChoiceUpdate(LoginRequiredMixin, PermissionRequiredMixin, UpdateView):
         Permission requirement to use this view
     """
     model = Option_Choice
-    template_name = 'choice_form.html'
+    template_name = 'choice_update.html'
     fields = ['choice_text',]
     login_url = '/login/'
     permission_required = 'canUpdateOptions'
@@ -1005,44 +1007,43 @@ class ChoiceUpdate(LoginRequiredMixin, PermissionRequiredMixin, UpdateView):
         takes a self paremeter and uses this to find its slug field(and others)
         to dynamically generate a url to our object
         """
-        return reverse('choice-detail', kwargs={'choice_text', self.object.choice_text})
+        return reverse('option-list')
 
-# class ChoiceDelete(LoginRequiredMixin, PermissionRequiredMixin, DeleteView):  
-#     """
-#     ChoiceDelete View
+class ChoiceDelete(LoginRequiredMixin, PermissionRequiredMixin, DeleteView):  
+    """
+    ChoiceDelete View
     
-#     Method builds off the generics provided by django to
-#     offer a user the ability to delete an option choice. 
-#     On submission we go back to the survey detail page
-#     On cancel we return to the previous window
+    Method builds off the generics provided by django to
+    offer a user the ability to delete an option choice. 
+    On submission we go back to the survey detail page
+    On cancel we return to the previous window
 
-#     Option_Choice : model
-#         Category is the model used in this form
+    Option_Choice : model
+        Category is the model used in this form
     
-#     option_choice_form_confirm_delete.html : template_name
-#         The name of the template we want Djagno 
-#         to use when creating this view.
+    option_choice_form_confirm_delete.html : template_name
+        The name of the template we want Djagno 
+        to use when creating this view.
 
-#     '/login/' 
-#         redirect url for login required permission 
+    '/login/' 
+        redirect url for login required permission 
     
-#     'canDeleteOptions' : permission_required
-#         Permission requirement to use this view
-#     """  
-#     model = Option_Choice
-#     template_name = 'option_choice_form_confirm_delete.html' 
-#     login_url = '/login/'
-#     permission_required = 'canDeleteOptions'
+    'canDeleteOptions' : permission_required
+        Permission requirement to use this view
+    """  
+    model = Option_Choice
+    template_name = 'choice_delete.html' 
+    login_url = '/login/'
+    permission_required = 'canDeleteOptions'
 
-#     def get_success_url(self):
-#         """
-#         get_success_url
+    def get_success_url(self):
+        """
+        get_success_url
 
-#         takes a self paremeter and uses this to find its slug field(and others)
-#         to dynamically generate a url to our object
-#         """
-#         return reverse('choice-detail', kwargs={'option_group': self.object.option_group})
-#     success_url = get_success_url
+        takes a self paremeter and uses this to find its slug field(and others)
+        to dynamically generate a url to our object
+        """
+        return reverse('option-list')
 
 # class ChoiceDetailView(LoginRequiredMixin, generic.ListView):
 #     """
