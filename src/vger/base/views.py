@@ -972,7 +972,7 @@ class ChoiceCreate(LoginRequiredMixin, PermissionRequiredMixin, CreateView):
         returned to the option detail
         """
 
-        return reverse('option-detail', kwargs={'pk': self.object.option_group.pk})
+        return reverse('option-list')
 
 class ChoiceUpdate(LoginRequiredMixin, PermissionRequiredMixin, UpdateView):
     """
