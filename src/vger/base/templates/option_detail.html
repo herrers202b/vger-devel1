@@ -1,15 +1,14 @@
 {% extends "base.html" %}
 
 {% block content %}
-  <div class="container-fluid">
-    <h2>List of Option Groups</h2>
-  </div>
-  
-  {% if option_list %}
-    <div class="container-fluid">
-      <ul class="list-group-flush">
-        {% for option_group in option_list %}
-          <li class="list-group-item">
+  <h1>Title: {{option_detail.name_of_group }}</h1>
+
+  <h4>Option Choices:</h4>
+  {% for Option_Choice in myChoices %}
+    <div style="margin-left:20px;margin-top:20px">
+      {% if perms.canCreateOptions %}
+        <a href="{{ Option_Choice.get_absolute_url }}">Option Choice: {{Option_Choice.choice_text}}</a> 
+        <li class="list-group-item">
             <div class="container-fluid row">
               <div class="col-sm-8">
                 <p>{{ option_group.name_of_group }}</p> 
@@ -49,20 +48,34 @@
               </div>
             </div>
           </li>
-        {% endfor %}
-      </ul>
+      {% else %}
+        <p>Option Choice: {{Option_Choice.choice_text}}</p>
+      {% endif %}
     </div>
-  {% else %}
-    <div class="container-fluid">
-      <p><strong>There are no Groups in the database</strong></p>
-    </div>
-  {% endif %}
+  {% endfor %}
+  <p> </p>
 
-  {% if perms.canCreateSurvey %}
-    <div class="container-fluid">
-      <a class="btn btn-success" href="{% url 'option-create' %}">
-        Create New Option Group
-      </a>
-    </div>
+<div style='display:flex'>
+{% comment %} Return button {% endcomment %}
+  <form action = "/options/list">
+    <button type = "submit">
+      Return
+    </button>
+  </form>
+{% comment %} Update Category button {% endcomment %}
+  {%if perms.canUpdateCategory%}
+    <form action = "/options/update/{{ option_detail.pk }}">
+      <button type = "submit">
+        Update Option Group
+      </button>
+    </form>
   {% endif %}
+  {%if perms.canCreateQuestion%}
+    <form action = "{{ option_detail.get_absolute_url }}/choice-create">
+      <button type = "submit">
+        Create Choices
+      </button>
+    </form>
+  {% endif %}
+</div>
 {% endblock %}

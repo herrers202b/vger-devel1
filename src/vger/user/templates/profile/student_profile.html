@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 {% extends "profile/profile.html" %}
 {% block profile_content %}
 
@@ -6,3 +7,13 @@
 <a href="{{ survey.survey_fk.get_result_url }}">{{survey.survey_fk.titleOfSurvey}}</a>
 {% endfor %}
 {% endblock %}
+=======
+{% extends "profile/profile.html" %}
+{% block profile_content %}
+
+<p>Student Profile</p>
+{% for survey in surveys%}
+<a href="{{ survey.survey_fk.get_result_url }}">{{survey.survey_fk.titleOfSurvey}}</a>
+{% endfor %}
+{% endblock %}
+>>>>>>> 766384e783b35003d7cf7ca38e5fb83f186c3c4d

@@ -178,6 +178,9 @@ class Option_Group(models.Model):
     """
     name_of_group = models.CharField(max_length=20)
 
+    def get_absolute_url(self):
+        """Returns the url to access a detailed record for this survey"""
+        return reverse("option-detail", kwargs={'pk': self.pk})
 
 class Option_Choice(models.Model):
     """
