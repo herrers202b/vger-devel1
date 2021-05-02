@@ -1,6 +1,8 @@
 from django.db import models
 from django.contrib.auth.models import User
 from django.apps import apps
+import datetime
+
 class Advisor(models.Model):
     # Advisor model: Can view completed surveys of only their advisees
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='advisorAccount')
