@@ -1,0 +1,76 @@
+{% extends "base.html" %}
+
+{% block content %}
+  <h1>Title: {{option_detail.name_of_group }}</h1>
+
+  <h4>Option Choices:</h4>
+  {% for Option_Choice in myChoices %}
+    <div style="margin-left:20px;margin-top:20px">
+      {% if perms.canCreateOptions %}
+        <a href="{{ Option_Choice.get_absolute_url }}">Option Choice: {{Option_Choice.choice_text}}</a> 
+        <li class="list-group-item">
+            <div class="container-fluid row">
+              <div class="col-sm-8">
+                <p>{{ option_group.name_of_group }}</p> 
+              </div>
+              <div class="col-sm float-right">
+                <div class="btn-toolbar" role="toolbar">
+                  {% if perms.canEditOption %}
+                  <div class="btn-group mr-2" role="group">
+                    <a class="btn btn-info" href="detail/{{ Option_Choice.pk }}">
+                      Edit
+                    </a>
+                  </div>
+                  {% endif %}
+
+                  {% if perms.canDeleteOption %}
+                  <div class="btn-group mr-2" role="group">
+                    <a class="btn btn-danger" href="delete/{{ Option_Choice.pk }}">
+                      Delete
+                    </a>
+                  </div>
+                  {% endif %}
+
+                  {% comment %} {% if perms.canTakeSurvey %}
+                  {% else %}
+                  <div class="btn-group mr-2" role="group">
+                    <a class="btn btn-primary disabled" href="#">
+                      Survey Closed
+                    </a>
+                  </div>
+                  {% endif %} {% endcomment %}
+                </div>
+              </div>
+            </div>
+          </li>
+      {% else %}
+        <p>Option Choice: {{Option_Choice.choice_text}}</p>
+      {% endif %}
+    </div>
+  {% endfor %}
+  <p> </p>
+
+<div style='display:flex'>
+{% comment %} Return button {% endcomment %}
+  <form action = "/options/list">
+    <button type = "submit">
+      Return
+    </button>
+  </form>
+{% comment %} Update Category button {% endcomment %}
+  {%if perms.canUpdateCategory%}
+    <form action = "/options/update/{{ option_detail.pk }}">
+      <button type = "submit">
+        Update Option Group
+      </button>
+    </form>
+  {% endif %}
+  {%if perms.canCreateQuestion%}
+    <form action = "{{ option_detail.get_absolute_url }}/choice-create">
+      <button type = "submit">
+        Create Choices
+      </button>
+    </form>
+  {% endif %}
+</div>
+{% endblock %}

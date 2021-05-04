@@ -4,7 +4,7 @@
 <div class="container-fluid">
   <form action="" method="post">
     {% csrf_token %}
-    {{ Groupform|crispy }}
+    {{ form|crispy }}
     <div class="btn-toolbar" role="toolbar">
       <div class="btn-group mr-2" role="group">
         <input class="btn btn-success" type="submit" value="Submit">

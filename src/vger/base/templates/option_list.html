@@ -8,44 +8,99 @@
   {% if option_list %}
     <div class="container-fluid">
       <ul class="list-group-flush">
+        
         {% for option_group in option_list %}
           <li class="list-group-item">
+            {% load static %}
+              <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+              <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+
+                  <!-- link other scripts and stylesheets here -->
+              <link rel="stylesheet" href="{% static 'vger/style.css' %}" type="text/css"/>
+              <link rel="shortcut icon" href="{% static 'vger/favicon.ico' %}" type="image/vnd.microsoft.icon"/>
+            <p><button class="btn btn-primary" type="button" data-toggle="collapse" data-target="#{{option_group.pk}}" aria-expanded="false" aria-controls="collapseExample">
+              {{ option_group.name_of_group }}
+            </button></p> 
             <div class="container-fluid row">
               <div class="col-sm-8">
-                <p>{{ option_group.name_of_group }}</p> 
+                
               </div>
-              <div class="col-sm float-right">
-                <div class="btn-toolbar" role="toolbar">
-                  {% comment %} {% if perms.canEditOption %}
-                  <div class="btn-group mr-2" role="group">
-                    <a class="btn btn-info" href="{{ survey.get_absolute_url }}">
-                      Edit
-                    </a>
-                  </div>
-                  {% endif %} {% endcomment %}
 
-                  {% comment %} {% if perms.canDeleteOption %}
-                  <div class="btn-group mr-2" role="group">
-                    <a class="btn btn-danger" href="{{survey.get_absolute_url }}/delete">
-                      Delete
-                    </a>
-                  </div>
-                  {% endif %} {% endcomment %}
-
-                  {% comment %} {% if perms.canTakeSurvey %}
-                  <div class="btn-group mr-2" role="group">
-                    <a class="btn btn-primary" href="{{ survey.get_welcome_url }}">
-                      Take Survey
-                    </a>
-                  </div>
-                  {% else %}
-                  <div class="btn-group mr-2" role="group">
-                    <a class="btn btn-primary disabled" href="#">
-                      Survey Closed
-                    </a>
-                  </div>
-                  {% endif %} {% endcomment %}
+              <div class="btn-toolbar" role="toolbar" style="padding-bottom: 2%;">
+                {% if perms.canEditOption %}
+                <div class="btn-group mr-2" role="group">
+                  <a class="btn btn-info" href="detail/{{ option_group.pk }}">
+                    Edit
+                  </a>
                 </div>
+                {% endif %}
+
+                {% if perms.canDeleteOption %}
+                <div class="btn-group mr-2" role="group">
+                  <a class="btn btn-danger" href="delete/{{ option_group.pk }}">
+                    Delete
+                  </a>
+                </div>
+                {% endif %}
+                {% if perms.canDeleteOption %}
+                <div class="btn-group mr-2" role="group">
+                  <a class="btn btn-new" href="{{ option_group.get_absolute_url }}/choice-create">
+                    Create Choice
+                  </a>
+                </div>
+                {% endif %}
+              </div>
+
+              <div class="col-sm float-right"><ul class="list-group-flush">
+                <div class="collapse" id="{{option_group.pk}}">
+                  <div class="card card-body">
+                    {% for option_choice in option_choices %}
+                    {% if option_choice.option_group == option_group %}
+                      <div style="margin-left:20px;margin-top:20px; overflow: hidden;">
+                        {% if perms.canCreateOptions %}
+                        <div style="float: left; width: auto;">
+                          {{option_choice.choice_text}}
+                        </div>  
+                          
+                                <div class="col-sm float-right" style="float: left;">
+                                  <div class="btn-toolbar" role="toolbar">
+                                    {% if perms.canEditOption %}
+                                    <div class="btn-group mr-2" role="group">
+                                      <a class="btn btn-info" href="choice-update/{{ option_choice.pk }}">
+                                        Edit
+                                      </a>
+                                    </div>
+                                    {% endif %}
+
+                                    {% if perms.canDeleteOption %}
+                                    <div class="btn-group mr-2" role="group">
+                                      <a class="btn btn-danger" href="choice-delete/{{ option_choice.pk }}">
+                                        Delete
+                                      </a>
+                                    </div>
+                                    {% endif %}
+
+                                    {% comment %} {% if perms.canTakeSurvey %}
+                                    {% else %}
+                                    <div class="btn-group mr-2" role="group">
+                                      <a class="btn btn-primary disabled" href="#">
+                                        Survey Closed
+                                      </a>
+                                    </div>
+                                    {% endif %} {% endcomment %}
+                                  
+                                </div>
+                              </div>
+                            
+                        {% else %}
+                          <p>Option Choice: {{Option_Choice.choice_text}}</p>
+                        {% endif %}
+                      </div>
+                    {% endif %} 
+                    {% endfor %}
+                  </div>
+                </div>
+                </ul>
               </div>
             </div>
           </li>

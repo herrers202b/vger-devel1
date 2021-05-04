@@ -48,20 +48,26 @@ def profilePage(request):
     else:
         return adminProfile(request)
 
-def advisorProfile(request):
+def advisorProfile(request, advised_student = None):
     advisor = Advisor.objects.get(user = request.user)
     advised_student_list = Student.objects.filter(advisor = advisor)
+    user = request.user
+    surveys = User_Survey.objects.filter(user_fk = user)
     context = {
-
+        'surveys': surveys,
         'advised_student_list': advised_student_list,
     }
     return render(request, 'profile/advisor_profile.html', context = context)
 
 def studentProfile(request):
     user = request.user
-    surveys = User_Survey.objects.filter(user_fk=user)
+    surveys = User_Survey.objects.filter(user_fk = user)
+    context = {
 
-    return render(request, 'profile/student_profile.html', context={'surveys' : surveys})
+        'surveys': surveys
+    }
+
+    return render(request, 'profile/student_profile.html', context = context)
 
 def adminProfile(request):
     return render(request, 'profile/admin_profile.html')

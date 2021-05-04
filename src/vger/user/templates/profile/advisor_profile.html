@@ -3,6 +3,17 @@
 
 <p>Advisor Profile</p>
 <div>
+  <h2>Surveys</h2>
+</div>
+<div>
+  <p>Click on any of the listed surveys below to see your past results</p>
+</div>
+<div>
+  {% for survey in surveys %}
+  <a href="{{ survey.survey_fk.get_result_url }}">{{survey.survey_fk.titleOfSurvey}}</a>
+  {% endfor %}
+  </div>
+  <div>
     <h2>Students</h2>
   </div>
   <div class="row pt-3">

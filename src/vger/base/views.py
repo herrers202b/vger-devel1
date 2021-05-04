@@ -679,22 +679,78 @@ class QuestionDelete(LoginRequiredMixin, PermissionRequiredMixin, DeleteView):
         my_survey_question = Survey_Question.objects.get(question_fk=self.object.pk)
         my_category = Category.objects.get(pk=my_survey_question.category_fk.pk)
         my_survey = Survey.objects.get(pk=my_survey_question.survey_fk.pk)
-        return reverse('category-detail', kwargs={'pk': my_category.pk,
-                                                    'surveySlug': my_survey.pk})
+        return reverse('survey-detail', kwargs={'surveySlug': my_survey.surveySlug})
         
 from .forms import OptionChoiceForm, OptionGroupForm
 class OptionCreateView(LoginRequiredMixin, PermissionRequiredMixin, generic.CreateView):
     """
     OptionCreateView
 
-    View dedicated to creation of new option groups should an admin need to add them
+    Method builds off the generics provided by django to
+    offer a user the ability to create a survey
+
+    Option_Group : model
+        Survey is the model used in this form
+
+    option_form.html : template_name
+        The name of the template we want Djagno 
+        to use when creating this view.
+
+    '/login/' 
+        redirect url for login required permission 
+    
+    'canCreateOptions' : permission_required
+        Permission requirement to use this view
     """
     model = Option_Group
-    form_class = OptionGroupForm
     template_name = 'option_form.html'
+    fields = ['name_of_group']
     login_url = '/login/'
     permission_required = 'canCreateOptions'
 
+
+    def get(self, request, *args, **kwargs):
+        context = {
+            'Groupform': OptionGroupForm(),
+            'Choiceform': OptionChoiceForm()}
+        return render(request, 'option_form.html', context)
+
+    
+    def form_valid(self, form):
+        print(form.cleaned_data)
+        return super(OptionCreateView, self).form_valid(form)
+
+    def get_success_url(self):
+        """
+        get_success_url
+
+        If creation is successful, then the user will be 
+        returned to the option list
+        """
+
+        return reverse('option-list')
+
+class OptionUpdateView(LoginRequiredMixin, PermissionRequiredMixin, UpdateView):
+    """
+    OptionUpdate View
+    
+    View for updating option groups
+
+    '/login/' 
+        redirect url for login required permission 
+
+    'canUpdateOption' : permission_required
+        Permission requirement to use this view
+    """
+    model = Option_Group
+    fields = ['name_of_group']
+    template_name = 'option_form.html'
+    login_url = '/login/' 
+    permission_required = 'canEditOptions'
+    context = {
+            'Groupform': OptionGroupForm(),
+            'Choiceform': OptionChoiceForm()
+        }
 
     def get(self, request, *args, **kwargs):
         """
@@ -709,32 +765,9 @@ class OptionCreateView(LoginRequiredMixin, PermissionRequiredMixin, generic.Crea
             'Choiceform': OptionChoiceForm()}
         return render(request, 'option_form.html', context)
 
-    
     def form_valid(self, form):
-        """
-        form_valid
-
-        Modified from form_valid, this method now not only cleans data
-        it also generates the go-between Survey_Question object. Using
-        from.instance to get this questions category and survey we then
-        save the form and use the instance to create the Survey_Question 
-        that is the spiritual parent model to Question.
-
-        form.instance.category : Category object
-            the parent category for this Question, queried from kwargs
-
-        form.instance.survey : Survey object 
-            the parent survey for this Question, queried from kwargs
-
-        instance : form
-            this is an instance of this form object that is used to grab the 
-            primary key of Question and pass it to a Survey_Question
-
-        """
-        #form.instance.survey = Survey.objects.get(pk=self.kwargs['pk'])
-        
         print(form.cleaned_data)
-        return super(OptionCreateView, self).form_valid(form)
+        return super(OptionUpdateView, self).form_valid(form)
 
     def get_success_url(self):
         """
@@ -743,41 +776,13 @@ class OptionCreateView(LoginRequiredMixin, PermissionRequiredMixin, generic.Crea
         takes a self paremeter and uses this to find its slug field(and others)
         to dynamically generate a url to our object
         """
-
-        return reverse('option-list')
-
-# class OptionUpdateView(LoginRequiredMixin, PermissionRequiredMixin, UpdateView):
-#     """
-#     OptionUpdate View
-    
-#     View for updating option groups
-
-#     '/login/' 
-#         redirect url for login required permission 
-
-#     'canUpdateOption' : permission_required
-#         Permission requirement to use this view
-#     """
-#     model = Option_Group
-#     fields = ['name_of_group']
-#     template_name = 'option_form.html'
-#     login_url = '/login/' 
-#     permission_required = 'canEditOptions'
-
-#     def get_success_url(self):
-#         """
-#         get_success_url
-
-#         takes a self paremeter and uses this to find its slug field(and others)
-#         to dynamically generate a url to our object
-#         """
-#         return reverse('option-update', kwargs={'name_of_group': self.object.name_of_group})
+        return reverse('option-detail', kwargs={'pk': self.object.pk})
 
 class OptionDeleteView(LoginRequiredMixin, PermissionRequiredMixin, DeleteView):
     """
     Method builds off the generics provided by django to
-    offer a user the ability to delete a survey. 
-    On submission we go back to the survey list page
+    offer a user the ability to delete an option group. 
+    On submission we go back to the option group list page
     On cancel we return to the previous window
 
     Option_Group : model
@@ -802,10 +807,10 @@ class OptionDeleteView(LoginRequiredMixin, PermissionRequiredMixin, DeleteView):
         """
         get_success_url
 
-        takes a self paremeter and uses this to find its slug field(and others)
-        to dynamically generate a url to our object
+        If the option group is successfully deleted, then the user
+        will be returned to the option group list
         """
-        return reverse('option-detail', kwargs={'name_of_group': self.object.name_of_group})
+        return reverse('option-list')
     success_url = get_success_url
 
 class OptionDetailView(LoginRequiredMixin, generic.DetailView):
@@ -833,31 +838,74 @@ class OptionDetailView(LoginRequiredMixin, generic.DetailView):
     template_name = 'option_detail.html' 
     login_url = '/login/'
 
+    def get_context_data(self, **kwargs):
+        """
+        get_context_data
+        
+        Method overrides base get_context_view method. This
+        method is used to gather objects that are then 
+        cataloged into a context tuple. Said tuple will be 
+        sent to HTML templates
+
+        self.object : object
+            database object 
+
+        this_group : Option_Group
+            A category object that will be passed to HTML
+
+        myChoices : Queryset
+            a queryset of option choices that will be passed to HTML
+        """
+        context = super(OptionDetailView, self).get_context_data(**kwargs)
+        self.object = self.get_object()
+        this_group = Option_Group.objects.get(pk=self.object.pk)
+        context['option_groups'] = this_group
+
+        from django.core.exceptions import ObjectDoesNotExist
+
+        try:
+            myChoices = Option_Choice.objects.filter(option_group_id=this_group)
+            context['myChoices'] = myChoices
+        except Option_Group.DoesNotExist:
+            myChoices = None
+        return context
+
+    def category_detail_view(request, primary_key):
+        """
+        category_detail_view
+
+        method returns the appropriate render
+        """
+
+        return render(request, 'base/templates/option_detail.html', context)
+
 #Is linked
-class OptionListView(LoginRequiredMixin, generic.ListView):
+def OptionListView(request):
     """
-    SurveyListView
+    OptionListView
 
     This class lists all currently registered 
-    surveys on the website.
+    option groups on the website.
 
     Parameters
     ----------
-    Survey : model
+    Option_Group : model
         The specific model we're trying to list
-    'survey_list' : context_object_name
+    'option_list' : context_object_name
         this is what we will refer to when trying
         to query via HTML
-    'survey_list.html'
+    'option_list.html'
         the name of our html file that contains
         the template we will use
     '/login/' 
         redirect url for login required permission
     """
-    model = Option_Group
-    context_object_name = 'option_list'
-    template_name = 'option_list.html' 
-    login_url = '/login/'
+    if not request.user.is_authenticated:
+         return redirect('/login/')
+
+    context = {'option_list' : Option_Group.objects.all(),
+                'option_choices' : Option_Choice.objects.all()} 
+    return render(request, 'option_list.html', context)
 
 # Is linked to a page
 class ChoiceCreate(LoginRequiredMixin, PermissionRequiredMixin, CreateView):
@@ -881,82 +929,120 @@ class ChoiceCreate(LoginRequiredMixin, PermissionRequiredMixin, CreateView):
         Permission requirement to use this view
     """ 
     model = Option_Choice
+    form_class = OptionChoiceForm
     template_name = 'option_choice_form.html'
-    fields = ['option_group',]
     login_url = '/login/'
     permission_required = 'canCreateOptions'
 
-# class ChoiceUpdate(LoginRequiredMixin, PermissionRequiredMixin, UpdateView):
-#     """
-#     CategoryUpdate View
+    def get(self, request, *args, **kwargs):
+        """
+        get
+
     
-#     Method builds off the generics provided by django to
-#     offer a user the ability to update a category
+        Method gets context of this render and returns it to the 
+        form template to utilize
+        """
+        context = {
+            'Groupform': OptionGroupForm(),
+            'Choiceform': OptionChoiceForm()}
+        return render(request, 'option_choice_form.html', context)
 
-#     Option_Choice : model
-#         Option_Choice is the model used in this form
     
-#     choice_form.html : template_name
-#         The name of the template we want Djagno 
-#         to use when creating this view.
+    def form_valid(self, form):
+        """
+        form_valid
 
-#     '/login/' 
-#         redirect url for login required permission 
+        Modified from form_valid. Using from.instance to get 
+        this choices option group we then save the form.
 
-#     'canUpdateOptions' : permission_required
-#         Permission requirement to use this view
-#     """
-#     model = Option_Choice
-#     template_name = 'choice_form.html'
-#     fields = ['choice_text',]
-#     login_url = '/login/'
-#     permission_required = 'canUpdateOptions'
+        form.instance.option_group : Option_Group object
+            the parent category for this Question, queried from kwargs
+        """
+        form.instance.option_group = Option_Group.objects.get(pk=self.kwargs['pk'])
+        instance = form.save()
+        print(form.cleaned_data)
+        return super(ChoiceCreate, self).form_valid(form)
 
-#     def get_success_url(self):
-#         """
-#         get_success_url
+    def get_success_url(self):
+        """
+        get_success_url
 
-#         takes a self paremeter and uses this to find its slug field(and others)
-#         to dynamically generate a url to our object
-#         """
-#         return reverse('choice-detail', kwargs={'choice_text', self.object.choice_text})
+        If creation is successful, then the user will be 
+        returned to the option detail
+        """
 
-# class ChoiceDelete(LoginRequiredMixin, PermissionRequiredMixin, DeleteView):  
-#     """
-#     ChoiceDelete View
+        return reverse('option-list')
+
+class ChoiceUpdate(LoginRequiredMixin, PermissionRequiredMixin, UpdateView):
+    """
+    CategoryUpdate View
     
-#     Method builds off the generics provided by django to
-#     offer a user the ability to delete an option choice. 
-#     On submission we go back to the survey detail page
-#     On cancel we return to the previous window
+    Method builds off the generics provided by django to
+    offer a user the ability to update a category
 
-#     Option_Choice : model
-#         Category is the model used in this form
+    Option_Choice : model
+        Option_Choice is the model used in this form
     
-#     option_choice_form_confirm_delete.html : template_name
-#         The name of the template we want Djagno 
-#         to use when creating this view.
+    choice_form.html : template_name
+        The name of the template we want Djagno 
+        to use when creating this view.
 
-#     '/login/' 
-#         redirect url for login required permission 
+    '/login/' 
+        redirect url for login required permission 
+
+    'canUpdateOptions' : permission_required
+        Permission requirement to use this view
+    """
+    model = Option_Choice
+    template_name = 'choice_update.html'
+    fields = ['choice_text',]
+    login_url = '/login/'
+    permission_required = 'canUpdateOptions'
+
+    def get_success_url(self):
+        """
+        get_success_url
+
+        takes a self paremeter and uses this to find its slug field(and others)
+        to dynamically generate a url to our object
+        """
+        return reverse('option-list')
+
+class ChoiceDelete(LoginRequiredMixin, PermissionRequiredMixin, DeleteView):  
+    """
+    ChoiceDelete View
     
-#     'canDeleteOptions' : permission_required
-#         Permission requirement to use this view
-#     """  
-#     model = Option_Choice
-#     template_name = 'option_choice_form_confirm_delete.html' 
-#     login_url = '/login/'
-#     permission_required = 'canDeleteOptions'
+    Method builds off the generics provided by django to
+    offer a user the ability to delete an option choice. 
+    On submission we go back to the survey detail page
+    On cancel we return to the previous window
 
-#     def get_success_url(self):
-#         """
-#         get_success_url
+    Option_Choice : model
+        Category is the model used in this form
+    
+    option_choice_form_confirm_delete.html : template_name
+        The name of the template we want Djagno 
+        to use when creating this view.
 
-#         takes a self paremeter and uses this to find its slug field(and others)
-#         to dynamically generate a url to our object
-#         """
-#         return reverse('choice-detail', kwargs={'option_group': self.object.option_group})
-#     success_url = get_success_url
+    '/login/' 
+        redirect url for login required permission 
+    
+    'canDeleteOptions' : permission_required
+        Permission requirement to use this view
+    """  
+    model = Option_Choice
+    template_name = 'choice_delete.html' 
+    login_url = '/login/'
+    permission_required = 'canDeleteOptions'
+
+    def get_success_url(self):
+        """
+        get_success_url
+
+        takes a self paremeter and uses this to find its slug field(and others)
+        to dynamically generate a url to our object
+        """
+        return reverse('option-list')
 
 # class ChoiceDetailView(LoginRequiredMixin, generic.ListView):
 #     """
@@ -979,12 +1065,20 @@ class ChoiceCreate(LoginRequiredMixin, PermissionRequiredMixin, CreateView):
 #         redirect url for login required permission
 #     """
 #     model = Option_Choice
-#     context_object_name = 'choice_list'
-#     template_name = 'choice_list.html' 
+#     template_name = 'option_choice_detail.html' 
 #     login_url = '/login/'
 #     permission_required = 'canSeeOptions'
 
-#     def ChoiceDetailView(request):
+#     def get_context_data(self, **kwargs):
+#         """
+
+#         """
+#         context = super(ChoiceDetailView, self).get_context_data(**kwargs)
+#         self.object = self.get_object()
+#         this_choice = Option_Choice.objects.get(pk=self.object.pk)
+
+
+#     def choice_detail_view(request):
 #         """
 
 #         """
@@ -993,11 +1087,8 @@ class ChoiceCreate(LoginRequiredMixin, PermissionRequiredMixin, CreateView):
 #             return redirect('/login/')
 #         #Permission check
 #         permission_required = 'canSeeOptions'
-#        # option_choice = Option_Choice.objects.get()
-        
-#         context = {
-#         }
-    
+
+
 #         return render(request, 'choice_detail.html', context)
 ###############################################################################
 def create_session_hash():
