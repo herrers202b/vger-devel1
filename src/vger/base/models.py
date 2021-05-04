@@ -36,7 +36,8 @@ class Survey(models.Model):
     end_date = models.DateTimeField()
     is_open = models.BooleanField(default=True)
     surveySlug = models.SlugField(null=False, unique=True)
-
+    version_number = models.IntegerField(default = 1.00)
+    
 
     def save(self, *args, **kwargs):
         """Saves the surveySlug as the titleOfSurvey"""

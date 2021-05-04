@@ -17,10 +17,12 @@
     <link rel="stylesheet" href="{% static 'vger/style.css' %}" type="text/css"/>
     <link rel="shortcut icon" href="{% static 'vger/favicon.ico' %}" type="image/vnd.microsoft.icon"/>
 
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
     <title>{% block title %}{% endblock %}</title>
     {% block head %}{% endblock %}
   </head>
-
+<div class ="scroll">
   <div class="container">
     <!-- navbar -->
     <div class="nav-b shadow">
@@ -67,4 +69,5 @@
         </footer>
      </div>
   </div>
+</div>
 </html>
