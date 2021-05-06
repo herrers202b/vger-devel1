@@ -61,9 +61,9 @@ class Survey(models.Model):
         """Returns the take survey view to send the user from the welcome page to the first page of the survey"""
         return reverse("take-survey", kwargs={'surveySlug' : self.surveySlug, 'page' : 0})
 
-    def get_result_url(self):
+    def get_result_url(self, user_survey_pk):
         """Returns the results page view to send the user from the take survey page to the results page"""
-        return reverse("results-page", kwargs={'surveySlug' : self.surveySlug})
+        return reverse("results-page", kwargs={'surveySlug' : self.surveySlug, 'pk': user_survey_pk})
 
 class Category(models.Model):
     """
@@ -127,7 +127,7 @@ class Answer(models.Model):
     answer_text : CharField
         20 chararacter lenght answer text field
     """
-    user_fk = models.ForeignKey(User, on_delete=models.CASCADE, null=True)
+    user_survey_fk = models.ForeignKey('User_Survey', on_delete=models.CASCADE, null=True)
     survey_question_fk = models.ForeignKey('Survey_Question', on_delete=models.CASCADE)
     
     answer_text = models.CharField(max_length=20)
@@ -154,9 +154,9 @@ class Question(models.Model):
 
     @is_multi_option_answer is used for question evalutation (TODO impl usage) 
     """
+    
+    option_group = models.ForeignKey('Option_Group', on_delete=models.PROTECT, null=True)
     input_type_fk = models.ForeignKey('Input_Type', on_delete=models.PROTECT)
-    option_group = models.ForeignKey('Option_Group', on_delete=models.PROTECT)
-
     question_text = models.CharField(max_length=200)
     answer_is_required = models.BooleanField()
     is_multi_option_answer = models.BooleanField()
@@ -177,8 +177,9 @@ class Option_Group(models.Model):
     @name_of_group: group that holds each of the option_choices in
     a foriegn key
     """
+    
     name_of_group = models.CharField(max_length=20)
-
+    
     def get_absolute_url(self):
         """Returns the url to access a detailed record for this survey"""
         return reverse("option-detail", kwargs={'pk': self.pk})
@@ -205,7 +206,12 @@ class Input_Type(models.Model):
     @input_type_name: holds the type of input like text
     or radio
     """
-    input_type_name = models.CharField(max_length=20)
+    INPUT_TYPE_CHOICES = ( 
+        ('text', "Text"),
+        ('range', "Range"),
+        ( 'tf',"True/False")
+    )
+    input_type_name = models.CharField(max_length=20, choices=INPUT_TYPE_CHOICES)
 
 
 class User_Survey(models.Model):
@@ -223,7 +229,6 @@ class User_Survey(models.Model):
     @survey_fk: Holds the survey the user is taking
     """
     finished = models.BooleanField(default=False)     
-    
     user_fk = models.ForeignKey(User, on_delete=models.CASCADE)
     survey_fk = models.ForeignKey('Survey', on_delete=models.CASCADE)
 
@@ -244,3 +249,4 @@ def delete_reverse(sender, **kwargs):
             kwargs['instance'].question_fk.delete()
     except:
         pass
+

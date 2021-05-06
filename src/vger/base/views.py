@@ -1126,6 +1126,7 @@ def generateNewSurvey(request, surveySlug):
 
     u_s = User_Survey.objects.create(user_fk=request.user, survey_fk=survey)
     u_s.save()
+    request.session['User_Survey_pk'] = u_s.pk
     return redirect(survey.get_take_url())
 
 def welcomeSurvey(request, surveySlug):
@@ -1173,23 +1174,22 @@ def takeSurvey(request, surveySlug, page):
     totalPage = request.session.get('totalPage', 0)
     survey = Survey.objects.get(surveySlug=request.session.get('surveySlug')) 
     list_of_categories = Category.objects.filter(survey_fk=survey)[::1]
-    
-    if currPage == totalPage:
-            return redirect(survey.get_result_url())
 
     form = SurveyCategoryForm(request.POST, instance=list_of_categories[currPage].pk)
     if form.is_valid():
-            
+        u_s = User_Survey.objects.get(pk=request.session.get('User_Survey_pk'))
         for (q, a) in form.category_answers():
             answer = Answer.objects.create(
-                user_fk = request.user,
+                user_survey_fk = u_s,
                 survey_question_fk = Survey_Question.objects.get(pk=q),
                 answer_text = a
             )
             answer.save()
 
         request.session['currPage'] = currPage + 1
-
+        currPage += 1
+    if currPage == totalPage:
+            return redirect(survey.get_result_url(request.session.get('User_Survey_pk')))
     form = SurveyCategoryForm(instance=list_of_categories[currPage].pk)
     
     context = {
@@ -1198,17 +1198,26 @@ def takeSurvey(request, surveySlug, page):
     }
     return render(request, 'take_survey.html', context)
 
-def results(request, surveySlug):
+def results(request, surveySlug, pk):
     """
     """ 
     survey = Survey.objects.get(surveySlug=surveySlug)
     categories = Category.objects.filter(survey_fk=survey)
-
-
+    u_s = User_Survey.objects.get(pk=pk)
+    answers = Answer.objects.filter(user_survey_fk = u_s)
+    survey_questions = Survey_Question.objects.filter(survey_fk=survey)
+    questions = Question.objects.all()
+    for answer in answers:
+        for survey_question in survey_questions:
+            if answer.survey_question_fk == survey_question:
+                print("cool")
     context = {
         'surveySlug': surveySlug,
         'survey_name': survey.titleOfSurvey,
         'categories': categories,
+        'answers' : answers,
+        'questions' : questions,
+        'survey_questions' : survey_questions
     }
 
     return render(request, 'results.html', context)

@@ -25,7 +25,7 @@ urlpatterns = [
     path('options/detail/<int:pk>/choice-create', views.ChoiceCreate.as_view(), name='choice-create'),
     path('options/choice-update/<int:pk>', views.ChoiceUpdate.as_view(), name='choice-update'),
     path('options/choice-delete/<int:pk>', views.ChoiceDelete.as_view(), name='choice-create'),
-    path('survey/results/<slug:surveySlug>', views.results, name='results-page'),
+    path('survey/results/<slug:surveySlug>/<int:pk>', views.results, name='results-page'),
     path('survey/take/<slug:surveySlug>', views.generateNewSurvey, name='gen-survey'),
     path('survey/welcome/<slug:surveySlug>', views.welcomeSurvey, name='welcome-to-survey'),
     path('survey/take/<slug:surveySlug>/page=<int:page>', views.takeSurvey, name='take-survey')

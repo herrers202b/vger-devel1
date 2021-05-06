@@ -83,7 +83,7 @@ class QuestionCreateForm(forms.ModelForm):
                                             widget=Select(),
                                             label="Question type")
     option_group = OptionChoiceField(queryset=Option_Group.objects,
-                                            widget=Select())
+                                            widget=Select(), required=False)
                                             
     class Meta:
         model = Question
@@ -136,11 +136,27 @@ class SurveyCategoryForm(forms.Form):
             options = ((o_c.choice_text, o_c.choice_text) for o_c in option_choices)
             #This is for multi field questions
             name = 'custom_%s' % i
-            self.fields[name + ' ' + str(survey_question.pk)] = forms.ChoiceField(
-                widget=forms.RadioSelect,
-                choices=options,
-                label=question.question_text
-            )
+            print(question.input_type_fk.input_type_name)
+            if question.input_type_fk.input_type_name == 'range':
+                self.fields[name + ' ' + str(survey_question.pk)] = forms.ChoiceField(
+                    widget=forms.RadioSelect,
+                    choices=options,
+                    label=question.question_text
+                )
+            elif question.input_type_fk.input_type_name == 'text':
+                self.fields[name + ' ' + str(survey_question.pk)] = forms.CharField(
+                    label=question.question_text
+                )
+            
+            else:
+                self.fields[name + ' ' + str(survey_question.pk)] = forms.ChoiceField(
+                    widget=forms.RadioSelect,
+                    choices=( 
+                        ('t', "True"),
+                        ('f', "False")
+                    ),
+                    label=question.question_text
+                )
             
         
     def category_answers(self):   

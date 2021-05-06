@@ -9,14 +9,25 @@
 
  {% for category in categories %}
 <p>Category: {{category.titleOfCategory}}
-    {% comment %} <br>
-    {% for question in questions %}
-    {% if question.category == category %}
-    <li>For: {{question.questionText}}</li>
-    <li>You answered: {{question.answer}}</li>
-    {% endif %}
-    {% endfor %}
-    <br>{% endcomment %}
+    {% for survey_question in survey_questions %}
+
+        {% if survey_question.category_fk == category %}
+
+        {% for question in questions %}
+        
+            {% if survey_question.question_fk == question %}
+
+            {% for answer in answers %}
+                {{ answer.survey_qestion_fk.pk }}
+                {% if answer.survey_qestion_fk == survey_question %}
+                nope
+                <p>{{ answer.answer_text }}</p>
+                {% endif %}
+            {% endfor %}
+            {% endif %}    
+        {% endfor %}
+        {% endif %}
+    {% endfor s%}
 {% endfor %} 
 
 <!--<p>Would you like to take this survey again?</p>

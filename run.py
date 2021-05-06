@@ -13,7 +13,10 @@ def usage():
             "\tinspectdb \t- inspects the django database setups\n" + 
             "\town \t\t- changes current user to new owner of all subdirectors\n" + 
             "\tstartapp 'name'\t- creates a new app subdirectory with given name (required)\n" +
-            "\ttest \t\t- runs all test files in project apps, optional app name to test specific app\n")
+            "\ttest \t\t- runs all test files in project apps, optional app name to test specific app\n" + 
+            "\tpab \t\t- pulls all remote branches\n" +
+            "\tkill \t\t- kills all running docker containers\n" +
+            "\tdbflush \t- flushes the current database froom the system\n")
 
 import sys
 import os
