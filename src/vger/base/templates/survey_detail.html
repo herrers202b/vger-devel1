@@ -24,20 +24,8 @@
 
 <div class="container-fluid">
   {% if not categories %}
-    <p><strong>There do not appear to be any categories</strong></p>
-    {% if perms.canCreateCategory %}
-      <div class="btn-group mr-2" role="group">
-        <form action="{%url 'category-create' survey.surveySlug %}">
-          <button class="btn btn-success" type="submit">
-            Create New Category
-          </button>
-        </form>
-      </div>
-      {% endif %}
+    <p>There do not appear to be any categories for this survey.</p>
   {% else %}
-
-
-
     <ul class="list-group-flush">
       {% for Category in categories %}
       <li class="list-group-item">
@@ -131,7 +119,8 @@
       </li>
       {% endfor %}
     </ul>
-</div>
+  </div>
+  {% endif %}
 
   <div class="container-fluid">
     <div class="btn-toolbar" role="toolbar">
@@ -139,19 +128,20 @@
       <div class="btn-group mr-2" role="group">
         <form action="{%url 'category-create' survey.surveySlug %}">
           <button class="btn btn-success" type="submit">
-            Create New Category
+            New Category
           </button>
         </form>
       </div>
       {% endif %}
+      {% if categories %}
       <div class="btn-group mr-2" role="group">
         <a class="btn btn-primary" href="{{survey.get_welcome_url}}">
           Take Survey
         </a>
       </div>
+      {% endif %}
     </div>
   </div>
-  {% endif %}
 
 <br />
 
