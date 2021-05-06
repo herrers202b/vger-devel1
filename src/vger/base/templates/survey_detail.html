@@ -24,42 +24,31 @@
 
 <div class="container-fluid">
   {% if not categories %}
-    <p><strong>There do not appear to be any categories</strong></p>
-    {% if perms.canCreateCategory %}
-      <div class="btn-group mr-2" role="group">
-        <form action="{%url 'category-create' survey.surveySlug %}">
-          <button class="btn btn-success" type="submit">
-            Create New Category
-          </button>
-        </form>
-      </div>
-      {% endif %}
+    <p>There do not appear to be any categories for this survey.</p>
   {% else %}
-
-
-
     <ul class="list-group-flush">
       {% for Category in categories %}
       <li class="list-group-item">
         <div class="container-fluid row">
           <div class="col-sm-8">
             <div class="box" data-widget="data-widget">
-              {% load static %}
+              {% comment %} {% load static %}
               <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
               <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
 
                   <!-- link other scripts and stylesheets here -->
               <link rel="stylesheet" href="{% static 'vger/style.css' %}" type="text/css"/>
-              <link rel="shortcut icon" href="{% static 'vger/favicon.ico' %}" type="image/vnd.microsoft.icon"/>
-              <p>
-                <button class="btn btn-primary" type="button" data-toggle="collapse" data-target="#{{Category.pk}}" aria-expanded="false" aria-controls="collapseExample">
+              <link rel="shortcut icon" href="{% static 'vger/favicon.ico' %}" type="image/vnd.microsoft.icon"/> {% endcomment %}
+              <div class="btn-toolbar" role="toolbar">
+                <button class="btn btn-primary" type="button" data-toggle="collapse" data-target="#{{Category.pk}}" aria-expanded="false" aria-controls="{{Category.pk}}">
                   {{Category.titleOfCategory}}
                 </button>
-              </p>
-              <ul class="list-group-flush">
+              </div>
               <div class="collapse" id="{{Category.pk}}">
+              <ul class="list-group-flush">
                 <div class="card card-body">
                   {% for Question in Category.my_questions.all %}
+                  <li class="list-group-item">
                     <div class="container-fluid row">
                       <div class="col-sm-8">
 
@@ -89,6 +78,7 @@
                         <p> </p>
                       </div>
                     </div>
+                  </li>
                   {% endfor %}
                   {% if perms.canCreateQuestion %}
                     <div class="btn-group mr-2" role="group">
@@ -99,10 +89,9 @@
                       </form>
                     </div>
                   {% endif %}
-                  
                 </div>
-              </div>
               </ul>
+              </div>
             </div>
           </div>
 
@@ -130,7 +119,8 @@
       </li>
       {% endfor %}
     </ul>
-</div>
+  </div>
+  {% endif %}
 
   <div class="container-fluid">
     <div class="btn-toolbar" role="toolbar">
@@ -138,19 +128,20 @@
       <div class="btn-group mr-2" role="group">
         <form action="{%url 'category-create' survey.surveySlug %}">
           <button class="btn btn-success" type="submit">
-            Create New Category
+            New Category
           </button>
         </form>
       </div>
       {% endif %}
+      {% if categories %}
       <div class="btn-group mr-2" role="group">
         <a class="btn btn-primary" href="{{survey.get_welcome_url}}">
           Take Survey
         </a>
       </div>
+      {% endif %}
     </div>
   </div>
-  {% endif %}
 
 <br />
 

@@ -53,16 +53,18 @@
 
   {% if perms.canCreateSurvey %}
     <div class="container-fluid">
-      <a class="btn btn-success" href="{% url 'survey-create' %}">
-        Create New Survey
-      </a>
-    </div>
-  {% endif %}
-  {% if perms.canCreateSurvey %}
-    <div class="container-fluid">
-      <a class="btn btn-success" href="{% url 'option-list' %}">
-        See option groups
-      </a>
+      <div class="btn-toolbar" role="toolbar">
+        <div class="btn-group mr-2" role="group">
+          <a class="btn btn-success" href="{% url 'survey-create' %}">
+            Create New Survey
+          </a>
+        </div>
+        <div class="btn-group mr-2" role="toolbar">
+          <a class="btn btn-success" href="{% url 'option-list' %}">
+            See option groups
+          </a>
+        </div>
+      </div>
     </div>
   {% endif %}
 {% endblock %}
