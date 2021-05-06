@@ -47,35 +47,104 @@ this is to help navigate project functionality.
 
   **migrate**   
 > makes migrations and applies them
+
+```shell
+command: 
+
+python3 run.py migrate
+
+```
   
 **up [-d]**   
 > spins up the djangosite [runs quietly]
 
+```shell
+command: 
+
+python3 run.py up -d
+
+```
 **down** 
 > brings the docker container down
+
+```shell
+command: 
+
+python3 run.py down
+
+```
 
 **build** 
 > builds docker-compose images
 
+```shell
+command: 
+
+python3 run.py build
+
+```
+
 **admin ** 
 > creates a new superuser
+
+```shell
+command: 
+
+python3 run.py admin
+
+```
 
 **inspectdb** 
 > inspects the django database setups
 
+```shell
+command: 
+
+python3 run.py inspectdb
+
+```
+
 **own** 
 > changes current user to new owner of all subdirectors
+
+```shell
+command: 
+
+python3 run.py own
+
+```
 
 **startapp 'name'** 
 > creates a new app subdirectory with given name (required)
 
+```shell
+command: 
+
+python3 run.py startapp 'name'
+
+```
+
 **test** 
 > runs all test files in project apps, optional app name to test specific app
+
+```shell
+command: 
+
+python3 run.py tests
+
+```
 
 ---
 
 ### ``runInitial.py`` usage
 > Initial Install Script: initializes/installs the database, in order to start running the product
+
+```shell
+command: 
+
+python3 run.py runInitial.py
+
+```
 
 ---
 
@@ -86,6 +155,13 @@ this is to help navigate project functionality.
 
 > To spin the system back down make sure you either run 'docker-compose down' or you run 'closeVger.py'
 
+```shell
+command: 
+
+python3 run.py runVger.py
+
+```
+
 ---
 
 ### ``runTests.py`` usage
@@ -93,10 +169,24 @@ this is to help navigate project functionality.
 
 > Run Tests Script: runs all test files in project apps for all Operating Systems
 
+```shell
+command: 
+
+python3 run.py runTests.py
+
+```
+
 ---
 
 ### ``closeVger.py`` usage
 > spins the system down, preferably used after 'runVger.py'
+
+```shell
+command: 
+
+python3 run.py closeVger.py
+
+```
 
 
 
