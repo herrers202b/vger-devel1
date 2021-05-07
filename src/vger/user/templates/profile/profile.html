@@ -1,8 +1,21 @@
 {% extends "base.html" %}
 
 {% block content %}
-    <h1>This is the base profile page for all info on all profiles</h1>
+    
 
 
     {% block profile_content %}{% endblock %}
+    <h2>Surveys</h2>
+    <div>
+        <p>Click on any of the listed surveys below to see your past results</p>
+    </div>
+
+    <div>
+        {% for survey in surveys %}
+        <div>
+        <a href="{{ survey.get_result_url }}">
+            {{survey.survey_fk.titleOfSurvey}}</a>
+        </div>
+        {% endfor %}
+    </div>
 {% endblock %}

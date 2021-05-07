@@ -681,54 +681,8 @@ class QuestionDelete(LoginRequiredMixin, PermissionRequiredMixin, DeleteView):
         my_survey = Survey.objects.get(pk=my_survey_question.survey_fk.pk)
         return reverse('survey-detail', kwargs={'surveySlug': my_survey.surveySlug})
         
-from .forms import OptionChoiceForm, OptionGroupForm
-class OptionCreateView(LoginRequiredMixin, PermissionRequiredMixin, generic.CreateView):
-    """
-    OptionCreateView
+from .forms import OptionChoiceForm, OptionGroupForm, OptionGroupChoiceForm
 
-    Method builds off the generics provided by django to
-    offer a user the ability to create a survey
-
-    Option_Group : model
-        Survey is the model used in this form
-
-    option_form.html : template_name
-        The name of the template we want Djagno 
-        to use when creating this view.
-
-    '/login/' 
-        redirect url for login required permission 
-    
-    'canCreateOptions' : permission_required
-        Permission requirement to use this view
-    """
-    model = Option_Group
-    template_name = 'option_form.html'
-    fields = ['name_of_group']
-    login_url = '/login/'
-    permission_required = 'canCreateOptions'
-
-
-    def get(self, request, *args, **kwargs):
-        context = {
-            'Groupform': OptionGroupForm(),
-            'Choiceform': OptionChoiceForm()}
-        return render(request, 'option_form.html', context)
-
-    
-    def form_valid(self, form):
-        print(form.cleaned_data)
-        return super(OptionCreateView, self).form_valid(form)
-
-    def get_success_url(self):
-        """
-        get_success_url
-
-        If creation is successful, then the user will be 
-        returned to the option list
-        """
-
-        return reverse('option-list')
 
 class OptionUpdateView(LoginRequiredMixin, PermissionRequiredMixin, UpdateView):
     """
@@ -870,7 +824,7 @@ class OptionDetailView(LoginRequiredMixin, generic.DetailView):
             myChoices = None
         return context
 
-    def category_detail_view(request, primary_key):
+    def category_detail_view(self, request, primary_key):
         """
         category_detail_view
 
@@ -908,70 +862,31 @@ def OptionListView(request):
     return render(request, 'option_list.html', context)
 
 # Is linked to a page
-class ChoiceCreate(LoginRequiredMixin, PermissionRequiredMixin, CreateView):
-    """
-    ChoiceCreate View
+def CreateChoice(request):
+
+    if request.method == "POST":
+        form = OptionGroupChoiceForm(request.POST)
+        if form.is_valid():
+            name_of_group = form.cleaned_data.get('name_of_group')
+            option_group = Option_Group.objects.create(
+                name_of_group=name_of_group
+            )
+            option_group.save()
+
+            for (i, text) in form.option_choice():
+                Option_Choice.objects.create(
+                    option_group=option_group,
+                    choice_text=text,
+                    weight=int(i)
+                )
+            print('hello')
+            return redirect('option-list')
     
-    Method builds off the generics provided by django to
-    offer a user the ability to create a option choice. 
-
-    Option_Choice : model
-        Option_Choice is the model used in this form
+    return render(request, 'option_form.html', {'Groupform' : OptionGroupChoiceForm()})
     
-    option_choice_form.html : template_name
-        The name of the template we want Djagno 
-        to use when creating this view.
 
-    '/login/' 
-        redirect url for login required permission 
 
-    'canCreateOptions' : permission_required
-        Permission requirement to use this view
-    """ 
-    model = Option_Choice
-    form_class = OptionChoiceForm
-    template_name = 'option_choice_form.html'
-    login_url = '/login/'
-    permission_required = 'canCreateOptions'
-
-    def get(self, request, *args, **kwargs):
-        """
-        get
-
-    
-        Method gets context of this render and returns it to the 
-        form template to utilize
-        """
-        context = {
-            'Groupform': OptionGroupForm(),
-            'Choiceform': OptionChoiceForm()}
-        return render(request, 'option_choice_form.html', context)
-
-    
-    def form_valid(self, form):
-        """
-        form_valid
-
-        Modified from form_valid. Using from.instance to get 
-        this choices option group we then save the form.
-
-        form.instance.option_group : Option_Group object
-            the parent category for this Question, queried from kwargs
-        """
-        form.instance.option_group = Option_Group.objects.get(pk=self.kwargs['pk'])
-        instance = form.save()
-        print(form.cleaned_data)
-        return super(ChoiceCreate, self).form_valid(form)
-
-    def get_success_url(self):
-        """
-        get_success_url
-
-        If creation is successful, then the user will be 
-        returned to the option detail
-        """
-
-        return reverse('option-list')
+        
 
 class ChoiceUpdate(LoginRequiredMixin, PermissionRequiredMixin, UpdateView):
     """
@@ -1044,52 +959,7 @@ class ChoiceDelete(LoginRequiredMixin, PermissionRequiredMixin, DeleteView):
         """
         return reverse('option-list')
 
-# class ChoiceDetailView(LoginRequiredMixin, generic.ListView):
-#     """
-#     SurveyListView
 
-#     This class lists all currently registered 
-#     surveys on the website.
-
-#     Parameters
-#     ----------
-#     Survey : model
-#         The specific model we're trying to list
-#     'survey_list' : context_object_name
-#         this is what we will refer to when trying
-#         to query via HTML
-#     'survey_list.html'
-#         the name of our html file that contains
-#         the template we will use
-#     '/login/' 
-#         redirect url for login required permission
-#     """
-#     model = Option_Choice
-#     template_name = 'option_choice_detail.html' 
-#     login_url = '/login/'
-#     permission_required = 'canSeeOptions'
-
-#     def get_context_data(self, **kwargs):
-#         """
-
-#         """
-#         context = super(ChoiceDetailView, self).get_context_data(**kwargs)
-#         self.object = self.get_object()
-#         this_choice = Option_Choice.objects.get(pk=self.object.pk)
-
-
-#     def choice_detail_view(request):
-#         """
-
-#         """
-#         #Login check
-#         if not request.user.is_authenticated:
-#             return redirect('/login/')
-#         #Permission check
-#         permission_required = 'canSeeOptions'
-
-
-#         return render(request, 'choice_detail.html', context)
 ###############################################################################
 def create_session_hash():
             hash = hashlib.sha1()
@@ -1176,8 +1046,9 @@ def takeSurvey(request, surveySlug, page):
     list_of_categories = Category.objects.filter(survey_fk=survey)[::1]
 
     form = SurveyCategoryForm(request.POST, instance=list_of_categories[currPage].pk)
+    u_s = User_Survey.objects.get(pk=request.session.get('User_Survey_pk'))
     if form.is_valid():
-        u_s = User_Survey.objects.get(pk=request.session.get('User_Survey_pk'))
+        
         for (q, a) in form.category_answers():
             answer = Answer.objects.create(
                 user_survey_fk = u_s,
@@ -1189,7 +1060,8 @@ def takeSurvey(request, surveySlug, page):
         request.session['currPage'] = currPage + 1
         currPage += 1
     if currPage == totalPage:
-            return redirect(survey.get_result_url(request.session.get('User_Survey_pk')))
+            return redirect(u_s.get_result_url())
+    
     form = SurveyCategoryForm(instance=list_of_categories[currPage].pk)
     
     context = {
@@ -1207,11 +1079,35 @@ def results(request, surveySlug, pk):
     answers = Answer.objects.filter(user_survey_fk = u_s)
     survey_questions = Survey_Question.objects.filter(survey_fk=survey)
     questions = Question.objects.all()
+    true_score = 0
+    false_score = 0
+    range_average = []
+    #Lord help this code :(
+    #TODO: LEARN BETTER QUERYING
+    #MY EYES!
+    #Maybe isolation would help this?
     for answer in answers:
         for survey_question in survey_questions:
             if answer.survey_question_fk == survey_question:
-                print("cool")
+                for question in questions:
+                    if survey_question.question_fk == question:
+                        if question.input_type_fk.input_type_name == 'range':
+                            option_choice = Option_Choice.objects.get(choice_text=answer.answer_text)
+                            range_average.append(option_choice.weight + 1)
+                        elif question.input_type_fk.input_type_name == 'tf':
+                            if answer.answer_text == 'f':
+                                false_score += 1
+                            else:
+                                true_score += 1
+                                
+    if len(range_average) != 0:
+        range_average = sum(range_average) / len(range_average)
+    else:
+        range_average = 0
     context = {
+        'true_score' : true_score,
+        'false_score' : false_score,
+        'range_average' : range_average,
         'surveySlug': surveySlug,
         'survey_name': survey.titleOfSurvey,
         'categories': categories,
@@ -1222,27 +1118,4 @@ def results(request, surveySlug, pk):
 
     return render(request, 'results.html', context)
 
-# def results(request, session_hash):
-#     """
-#     results
 
-#     num_instances : the object will return the number of 
-#         times user has taken survey 
-#     """
-#     context_object_name = 'results-page'
-#     template_name = 'results.html'
-
-#     si = SurveyInstance.objects.get(session_hash=session_hash)
-#     survey_name = si.survey.titleOfSurvey
-#     categories = Category.objects.filter(survey=si.survey)
-#     questions = []
-#     for category in categories: 
-#         questions += list(Question.objects.filter(category=category))
-
-#     context = {
-#         'Name_of_survey': survey_name,
-#         'instance_hash': si,
-#         'categories': categories,
-#         'questions': questions,
-#     }
-#     return render(request, 'results.html', context=context)

@@ -41,33 +41,26 @@ def registerPage(request):
     return render(request,'register.html', context)
 
 def profilePage(request):
-    if hasattr(request.user, 'advisorAccount'):
-        return advisorProfile(request)
-    elif hasattr(request.user, 'studentAccount'):
-        return studentProfile(request)
-    else:
-        return adminProfile(request)
+    surveys = User_Survey.objects.filter(user_fk = request.user)
 
-def advisorProfile(request, advised_student = None):
+    if hasattr(request.user, 'advisorAccount'):
+        return advisorProfile(request, surveys)
+    elif hasattr(request.user, 'studentAccount'):
+        return studentProfile(request, surveys)
+    else:
+        return adminProfile(request, surveys)
+
+def advisorProfile(request, surveys):
     advisor = Advisor.objects.get(user = request.user)
     advised_student_list = Student.objects.filter(advisor = advisor)
-    user = request.user
-    surveys = User_Survey.objects.filter(user_fk = user)
     context = {
         'surveys': surveys,
         'advised_student_list': advised_student_list,
     }
     return render(request, 'profile/advisor_profile.html', context = context)
 
-def studentProfile(request):
-    user = request.user
-    surveys = User_Survey.objects.filter(user_fk = user)
-    context = {
+def studentProfile(request, surveys):
+    return render(request, 'profile/student_profile.html', {'surveys' : surveys})
 
-        'surveys': surveys
-    }
-
-    return render(request, 'profile/student_profile.html', context = context)
-
-def adminProfile(request):
-    return render(request, 'profile/admin_profile.html')
+def adminProfile(request, surveys):
+    return render(request, 'profile/admin_profile.html', {'surveys' : surveys})

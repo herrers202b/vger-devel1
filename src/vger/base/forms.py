@@ -110,6 +110,26 @@ class OptionChoiceForm(forms.ModelForm):
         fields = ('choice_text',)
         labels = {'choice_text': 'Enter some text for this particular choice.'}
 
+
+class OptionGroupChoiceForm(forms.Form):
+
+    def __init__(self, *args, **kwargs):
+        super(OptionGroupChoiceForm, self).__init__(*args, **kwargs)
+        self.fields['name_of_group'] = forms.CharField(
+            label='Name of this option group:'
+        )
+
+        for i in range(5):
+            name = 'custom_%s' % i
+            self.fields[name] = forms.CharField(
+                label=i
+            )
+
+    def option_choice(self):   
+        for name, value in self.cleaned_data.items():
+            print(name.split('_'), value)
+            if name.startswith('custom_'):
+                yield (name.split('_')[1], value)
 #TODO: Refactor form to approprately gather question answer groups
 class SurveyCategoryForm(forms.Form):
     """
@@ -129,7 +149,7 @@ class SurveyCategoryForm(forms.Form):
         
         for i, survey_question in enumerate(survey_questions):
             question = survey_question.question_fk
-            #TODO: Design logic here for answer formatting in field types
+            
 
             option_choices = Option_Choice.objects.filter(option_group=question.option_group)
 

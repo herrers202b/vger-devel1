@@ -2,7 +2,7 @@
 
 {% block content %}
   <div class="container-fluid">
-    <h2>List of Option Groups</h2>
+    <h2>List of Ranges</h2>
   </div>
   
   {% if option_list %}
@@ -42,13 +42,7 @@
                   </a>
                 </div>
                 {% endif %}
-                {% if perms.canDeleteOption %}
-                <div class="btn-group mr-2" role="group">
-                  <a class="btn btn-new" href="{{ option_group.get_absolute_url }}/choice-create">
-                    Create Choice
-                  </a>
-                </div>
-                {% endif %}
+
               </div>
 
               <div class="col-sm float-right"><ul class="list-group-flush">
@@ -59,10 +53,12 @@
                       <div style="margin-left:20px;margin-top:20px; overflow: hidden;">
                         {% if perms.canCreateOptions %}
                         <div style="float: left; width: auto;">
+                          
                           {{option_choice.choice_text}}
                         </div>  
-                          
+                       
                                 <div class="col-sm float-right" style="float: left;">
+                                  Weight: {{option_choice.weight }}
                                   <div class="btn-toolbar" role="toolbar">
                                     {% if perms.canEditOption %}
                                     <div class="btn-group mr-2" role="group">
@@ -107,7 +103,7 @@
   {% if perms.canCreateSurvey %}
     <div class="container-fluid">
       <a class="btn btn-success" href="{% url 'option-create' %}">
-        Create New Option Group
+        Create New Range
       </a>
     </div>
   {% endif %}

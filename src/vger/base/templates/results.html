@@ -18,17 +18,29 @@
             {% if survey_question.question_fk == question %}
 
             {% for answer in answers %}
-                {{ answer.survey_qestion_fk.pk }}
-                {% if answer.survey_qestion_fk == survey_question %}
-                nope
-                <p>{{ answer.answer_text }}</p>
+                {% if answer.survey_question_fk == survey_question %}
+                    <h3>{{ question.question_text }}</h3>
+                    {% if answer.answer_text == 'f' or answer.answer_text == 't' %}
+                        {% if answer.answer_text == 't'%}
+                            <p>True</p>
+                        {% endif%}
+                        {% if answer.answer_text == 'f'%}
+                            <p>False</p>
+                        {% endif%}
+                    {% else %}
+                    <p>{{ answer.answer_text }}</p>
+                    {% endif %}
                 {% endif %}
             {% endfor %}
             {% endif %}    
         {% endfor %}
         {% endif %}
     {% endfor s%}
-{% endfor %} 
+{% endfor %}
+
+<p>Average Range Score {{range_average}}</p>
+<p>True Score {{true_score}}</p>
+<p>False Score {{false_score}}</p>
 
 <!--<p>Would you like to take this survey again?</p>
     <a href="{{ survey.get_absolute_url }}">{{ survey.titleOfSurvey }}</a> 

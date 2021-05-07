@@ -2,12 +2,5 @@
 {% block profile_content %}
 
 <p>Student Profile</p>
-<div>
-  <h2>Surveys</h2>
-<div>
-  <p>Click on any of the listed surveys below to see your past results</p>
-<div>
-{% for survey in surveys %}
-<a href="{{ survey.survey_fk.get_result_url }}">{{survey.survey_fk.titleOfSurvey}}</a>
-{% endfor %}
+
 {% endblock %}

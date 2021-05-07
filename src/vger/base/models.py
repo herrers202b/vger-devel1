@@ -61,9 +61,6 @@ class Survey(models.Model):
         """Returns the take survey view to send the user from the welcome page to the first page of the survey"""
         return reverse("take-survey", kwargs={'surveySlug' : self.surveySlug, 'page' : 0})
 
-    def get_result_url(self, user_survey_pk):
-        """Returns the results page view to send the user from the take survey page to the results page"""
-        return reverse("results-page", kwargs={'surveySlug' : self.surveySlug, 'pk': user_survey_pk})
 
 class Category(models.Model):
     """
@@ -194,10 +191,17 @@ class Option_Choice(models.Model):
     @choice_text: holds the text of the answer to be selected
     or filled
     """
+    OPTION_CHOICE_WEIGHTS = ( 
+        (1, "1"),
+        (2, "2"),
+        (3, "3"),
+        (4, "4"),
+        (5, "5")
+    )
     option_group = models.ForeignKey('Option_Group', related_name="my_choices", on_delete=models.CASCADE)
 
     choice_text = models.CharField(max_length=20)
-
+    weight = models.IntegerField(choices=OPTION_CHOICE_WEIGHTS)
 
 class Input_Type(models.Model):
     """
@@ -231,6 +235,10 @@ class User_Survey(models.Model):
     finished = models.BooleanField(default=False)     
     user_fk = models.ForeignKey(User, on_delete=models.CASCADE)
     survey_fk = models.ForeignKey('Survey', on_delete=models.CASCADE)
+
+    def get_result_url(self):
+        """Returns the results page view to send the user from the take survey page to the results page"""
+        return reverse("results-page", kwargs={'surveySlug' : self.survey_fk.surveySlug, 'pk': self.pk})
 
 
 #NOT FOR CALLING!
