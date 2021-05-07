@@ -15,8 +15,9 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-datetimepicker/2.5.20/jquery.datetimepicker.full.min.js" integrity="sha256-FEqEelWI3WouFOo2VWP/uJfs1y8KJ++FLh2Lbqc8SJk=" crossorigin="anonymous"></script>
 </head>
 <!--^^^^This Section of code is used for the DateTimePicker widget impl^^^^-->
-  
-<form action="" method="post">
+
+<div class="container-fluid">  
+  <form action="" method="post">
     {% csrf_token %}
     <fieldset>
       <div class="form-row">
@@ -44,7 +45,8 @@
       </div>    
     </fieldset>
     <p style="font-size: 15px;color: #000; color: rgba(0,0,0,0.5); font-family: Arial, sans-serif;">* is required</p>
-    <input type="submit" value="Submit" class="spacer">
-    <button onclick="window.history.back();" class="btn btn-default" type="button">Cancel</button>
+    <input class="btn btn-success" type="submit" value="Submit" class="spacer">
+    <button onclick="window.history.back();" class="btn btn-primary" type="button">Cancel</button>
   </form>
+</div>
 {% endblock %}

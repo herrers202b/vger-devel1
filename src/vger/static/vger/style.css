@@ -35,6 +35,9 @@ h1, h2, h3, h4, h5, h6, a {
     overflow: hidden;
 }
 
+#main-card {
+    border-radius: 25px;
+}
 
 .nav-link {
     color:#000000;
