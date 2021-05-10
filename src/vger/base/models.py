@@ -36,7 +36,7 @@ class Survey(models.Model):
     end_date = models.DateTimeField()
     is_open = models.BooleanField(default=True)
     surveySlug = models.SlugField(null=False, unique=True)
-    version_number = models.IntegerField(default = 1.00, unique=True, help_text="Survey Number")
+    version_number = models.DecimalField(max_digits=5, decimal_places=2, default=0, unique=True)
 
     def __str__(self):
         return "V" + str(self.version_number)
@@ -63,7 +63,6 @@ class Survey(models.Model):
         """Returns the take survey view to send the user from the welcome page to the first page of the survey"""
         return reverse("take-survey", kwargs={'surveySlug' : self.surveySlug, 'page' : 0})
 
-
 class Category(models.Model):
     """
     Category Model
@@ -83,7 +82,6 @@ class Category(models.Model):
     def get_absolute_url(self):
         return reverse("category-detail", kwargs={'surveySlug': self.survey_fk.surveySlug,
                                                     'pk': self.pk})
-
 
 class Survey_Question(models.Model):
     """
@@ -130,7 +128,6 @@ class Answer(models.Model):
     survey_question_fk = models.ForeignKey('Survey_Question', on_delete=models.CASCADE)
 
     answer_text = models.CharField(max_length=20)
-
 
 class Question(models.Model):
     """

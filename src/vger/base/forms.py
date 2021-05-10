@@ -15,12 +15,13 @@ class SurveyCreateForm(forms.ModelForm):
     """
     class Meta:
         model = Survey
-        fields = ('titleOfSurvey', 'description', 'start_date', 'end_date', 'version_number')
+        fields = ('titleOfSurvey', 'version_number', 'description', 'start_date', 'end_date')
         widgets = {
             'start_date': XDSoftDateTimePickerInput(),
             'end_date': XDSoftDateTimePickerInput(),
         }
 
+        
 class CategoryCreateForm(forms.Form):
     """
     CategoryCreateForm

@@ -1073,7 +1073,7 @@ def takeSurvey(request, surveySlug, page):
 def results(request, surveySlug, pk):
     """
     """
-    version_number = Survey.objects.get()
+    version_number = Survey.objects.all().first()
     survey = Survey.objects.get(surveySlug=surveySlug)
     categories = Category.objects.filter(survey_fk=survey)
     u_s = User_Survey.objects.get(pk=pk)
