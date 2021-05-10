@@ -1073,7 +1073,6 @@ def takeSurvey(request, surveySlug, page):
 def results(request, surveySlug, pk):
     """
     """
-    version_number = Survey.objects.all().first()
     survey = Survey.objects.get(surveySlug=surveySlug)
     categories = Category.objects.filter(survey_fk=survey)
     u_s = User_Survey.objects.get(pk=pk)
@@ -1106,7 +1105,7 @@ def results(request, surveySlug, pk):
     else:
         range_average = 0
     context = {
-        'version_number' : version_number,
+        'version_number' : survey.version_number,
         'true_score' : true_score,
         'false_score' : false_score,
         'range_average' : range_average,
