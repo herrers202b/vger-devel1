@@ -9,7 +9,7 @@ class Survey(models.Model):
     """
     Survey Model
 
-    This model is used to represent the metadata about a 
+    This model is used to represent the metadata about a
     whole survey
 
     TODO: Impliment versioning because the various models
@@ -17,14 +17,14 @@ class Survey(models.Model):
 
     titleOfSurvey : CharField
         the title of the survey
-    
+
     description : CharField
         a short 100 char length description of this survey
 
     start_date, end_date : DateTimeField
         the state and end date, respectivly, of this survey
 
-    is_open : BooleanField 
+    is_open : BooleanField
         boolean that determines whether or not a survey is live
 
     surveySlug : SlugField
@@ -36,19 +36,21 @@ class Survey(models.Model):
     end_date = models.DateTimeField()
     is_open = models.BooleanField(default=True)
     surveySlug = models.SlugField(null=False, unique=True)
-    version_number = models.IntegerField(default = 1.00)
-    
+    version_number = models.IntegerField(default = 1.00, unique=True, help_text="Survey Number")
+
+    def __str__(self):
+        return "V" + str(self.version_number)
 
     def save(self, *args, **kwargs):
         """Saves the surveySlug as the titleOfSurvey"""
         if not self.surveySlug:
             self.surveySlug = slugify(self.titleOfSurvey)
         return super().save(*args, **kwargs)
-    
+
     def get_absolute_url(self):
         """Returns the url to access a detailed record for this survey"""
         return reverse("survey-detail", kwargs={'surveySlug': self.surveySlug})
-    
+
     def get_welcome_url(self):
         """Returns the url to access the welcome page for this survey"""
         return reverse("welcome-to-survey", kwargs={'surveySlug' : self.surveySlug})
@@ -56,7 +58,7 @@ class Survey(models.Model):
     def get_gen_url(self):
         """Returns the generate survey view to prep the users info before taking the survey"""
         return reverse("gen-survey", kwargs={'surveySlug' : self.surveySlug})
-    
+
     def get_take_url(self):
         """Returns the take survey view to send the user from the welcome page to the first page of the survey"""
         return reverse("take-survey", kwargs={'surveySlug' : self.surveySlug, 'page' : 0})
@@ -66,7 +68,7 @@ class Category(models.Model):
     """
     Category Model
 
-    Holds the title of the category and a reference to its 
+    Holds the title of the category and a reference to its
     appropriate survey
 
     titleOfCategory : CharField
@@ -77,11 +79,11 @@ class Category(models.Model):
     """
     titleOfCategory = models.CharField(max_length=100)
     survey_fk = models.ForeignKey('Survey', on_delete=models.CASCADE)
-    
+
     def get_absolute_url(self):
         return reverse("category-detail", kwargs={'surveySlug': self.survey_fk.surveySlug,
                                                     'pk': self.pk})
-    
+
 
 class Survey_Question(models.Model):
     """
@@ -126,7 +128,7 @@ class Answer(models.Model):
     """
     user_survey_fk = models.ForeignKey('User_Survey', on_delete=models.CASCADE, null=True)
     survey_question_fk = models.ForeignKey('Survey_Question', on_delete=models.CASCADE)
-    
+
     answer_text = models.CharField(max_length=20)
 
 
@@ -135,23 +137,23 @@ class Question(models.Model):
     Question Model
 
     used for holding the question_text for the question
-    in general. 
+    in general.
 
     @input_type: used for distinguishing the how
     the answer in the question is to be used for evaluation.
     Ex: Text, Radio, Range?
-    
+
     @option_group: used for a collection of options pre-established
     options based on the input type
 
     @question_text holds the general question
 
     @answer_is_required is used to declare wether or not
-    the answer is required (TODO impl usage) 
+    the answer is required (TODO impl usage)
 
-    @is_multi_option_answer is used for question evalutation (TODO impl usage) 
+    @is_multi_option_answer is used for question evalutation (TODO impl usage)
     """
-    
+
     option_group = models.ForeignKey('Option_Group', on_delete=models.PROTECT, null=True)
     input_type_fk = models.ForeignKey('Input_Type', on_delete=models.PROTECT)
     question_text = models.CharField(max_length=200)
@@ -165,7 +167,7 @@ class Question(models.Model):
         return reverse('question-detail', kwargs={'surveySlug': my_survey.pk,
                                                     'categoryPk': my_category.pk,
                                                     'pk': self.pk,})
-    
+
 
 class Option_Group(models.Model):
     """
@@ -174,9 +176,9 @@ class Option_Group(models.Model):
     @name_of_group: group that holds each of the option_choices in
     a foriegn key
     """
-    
+
     name_of_group = models.CharField(max_length=20)
-    
+
     def get_absolute_url(self):
         """Returns the url to access a detailed record for this survey"""
         return reverse("option-detail", kwargs={'pk': self.pk})
@@ -191,7 +193,7 @@ class Option_Choice(models.Model):
     @choice_text: holds the text of the answer to be selected
     or filled
     """
-    OPTION_CHOICE_WEIGHTS = ( 
+    OPTION_CHOICE_WEIGHTS = (
         (1, "1"),
         (2, "2"),
         (3, "3"),
@@ -210,7 +212,7 @@ class Input_Type(models.Model):
     @input_type_name: holds the type of input like text
     or radio
     """
-    INPUT_TYPE_CHOICES = ( 
+    INPUT_TYPE_CHOICES = (
         ('text', "Text"),
         ('range', "Range"),
         ( 'tf',"True/False")
@@ -232,7 +234,7 @@ class User_Survey(models.Model):
 
     @survey_fk: Holds the survey the user is taking
     """
-    finished = models.BooleanField(default=False)     
+    finished = models.BooleanField(default=False)
     user_fk = models.ForeignKey(User, on_delete=models.CASCADE)
     survey_fk = models.ForeignKey('Survey', on_delete=models.CASCADE)
 
@@ -257,4 +259,3 @@ def delete_reverse(sender, **kwargs):
             kwargs['instance'].question_fk.delete()
     except:
         pass
-

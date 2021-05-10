@@ -17,7 +17,7 @@
 <!--This Section of code is used for the DateTimePicker widget impl-->
 
 <!--^^^^This Section of code is used for the DateTimePicker widget impl^^^^-->
-  
+
 <form action="" method="post">
     {% csrf_token %}
     <fieldset>
@@ -43,7 +43,12 @@
         <div class="form-group col-md-6 mb-0">
           {{ form.end_date|as_crispy_field }}
         </div>
-      </div>    
+      </div>
+      <div class="form-row">
+        <div class="form-group col-md-6 mb-0">
+          {{ form.version_number|as_crispy_field }}
+        </div>
+      </div>
     </fieldset>
     <p style="font-size: 15px;color: #000; color: rgba(0,0,0,0.5); font-family: Arial, sans-serif;">* is required</p>
     <input type="submit" value="Submit" class="spacer">

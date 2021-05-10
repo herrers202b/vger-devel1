@@ -11,11 +11,11 @@ class SurveyCreateForm(forms.ModelForm):
     SurveyCreateForm
 
     This form is for creating a survey and is currently unfinished
-    
+
     """
     class Meta:
         model = Survey
-        fields = ('titleOfSurvey', 'description', 'start_date', 'end_date')
+        fields = ('titleOfSurvey', 'description', 'start_date', 'end_date', 'version_number')
         widgets = {
             'start_date': XDSoftDateTimePickerInput(),
             'end_date': XDSoftDateTimePickerInput(),
@@ -33,7 +33,7 @@ class CategoryCreateForm(forms.Form):
     More : BooleanField
 
     type : ChoiceField
-    
+
     """
     title_of_category = forms.CharField(max_length=100)
     More = forms.BooleanField(required=False, widget=HiddenInput())
@@ -56,7 +56,7 @@ class QuestionChoiceField(ModelChoiceField):
 class OptionChoiceField(ModelChoiceField):
     """
     OptionChoiceField
-    
+
     Custom ModelChoiceField used to take a quesiton group object for
     questions and mask the raw object name with its actual group name
     for usability
@@ -84,7 +84,7 @@ class QuestionCreateForm(forms.ModelForm):
                                             label="Question type")
     option_group = OptionChoiceField(queryset=Option_Group.objects,
                                             widget=Select(), required=False)
-                                            
+
     class Meta:
         model = Question
         fields = ('question_text',
@@ -125,7 +125,7 @@ class OptionGroupChoiceForm(forms.Form):
                 label=i
             )
 
-    def option_choice(self):   
+    def option_choice(self):
         for name, value in self.cleaned_data.items():
             print(name.split('_'), value)
             if name.startswith('custom_'):
@@ -146,10 +146,10 @@ class SurveyCategoryForm(forms.Form):
         super(SurveyCategoryForm, self).__init__(*args, **kwargs)
         category = Category.objects.get(pk=toc)
         survey_questions = Survey_Question.objects.filter(category_fk=category)
-        
+
         for i, survey_question in enumerate(survey_questions):
             question = survey_question.question_fk
-            
+
 
             option_choices = Option_Choice.objects.filter(option_group=question.option_group)
 
@@ -167,31 +167,31 @@ class SurveyCategoryForm(forms.Form):
                 self.fields[name + ' ' + str(survey_question.pk)] = forms.CharField(
                     label=question.question_text
                 )
-            
+
             else:
                 self.fields[name + ' ' + str(survey_question.pk)] = forms.ChoiceField(
                     widget=forms.RadioSelect,
-                    choices=( 
+                    choices=(
                         ('t', "True"),
                         ('f', "False")
                     ),
                     label=question.question_text
                 )
-            
-        
-    def category_answers(self):   
+
+
+    def category_answers(self):
         for name, value in self.cleaned_data.items():
             if name.startswith('custom_'):
                 yield (name.split()[1], value)
-  
-
-   
 
 
-    
-    
 
-    
+
+
+
+
+
+
 
 # #This will forgo cleaning data for the time being
 # class SurveyModelFrom(ModelForm):
@@ -213,7 +213,7 @@ class SurveyCategoryForm(forms.Form):
 #         labels = {'titleOfSurvey': ('Survey Title')}
 #         help_texts = {
 #             'titleOfSurvey': ('Please enter a name for the survey'),
-#             'directions': ('Please enter any directions to take the survey') 
+#             'directions': ('Please enter any directions to take the survey')
 #         }
 
 # class CategoryModelForm(ModelForm):
@@ -235,7 +235,7 @@ class SurveyCategoryForm(forms.Form):
 #         labels = {'titleOfCategory': ('Category Title')}
 #         help_texts = {'titleOfCategory': ('Please enter a name for the category')}
 #     #survey = forms.ModelChoiceField(queryset=Survey.objects.filter(id=0))
-    
+
 
 # class QuestionModelForm(ModelForm):
 #     """

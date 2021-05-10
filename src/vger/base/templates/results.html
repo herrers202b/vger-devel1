@@ -5,7 +5,7 @@
 <body>
 <h1>Results</h1>
 <p>Here's your survey results</p>
-<p> The survey is {{ survey_name }}</p>
+<p> The survey is {{ survey_name }} {{ version_number }}</p>
 
  {% for category in categories %}
 <p>Category: {{category.titleOfCategory}}
@@ -14,7 +14,7 @@
         {% if survey_question.category_fk == category %}
 
         {% for question in questions %}
-        
+
             {% if survey_question.question_fk == question %}
 
             {% for answer in answers %}
@@ -32,7 +32,7 @@
                     {% endif %}
                 {% endif %}
             {% endfor %}
-            {% endif %}    
+            {% endif %}
         {% endfor %}
         {% endif %}
     {% endfor s%}
@@ -43,7 +43,7 @@
 <p>False Score {{false_score}}</p>
 
 <!--<p>Would you like to take this survey again?</p>
-    <a href="{{ survey.get_absolute_url }}">{{ survey.titleOfSurvey }}</a> 
+    <a href="{{ survey.get_absolute_url }}">{{ survey.titleOfSurvey }}</a>
     <form method="get" action="{{ survey.get_creation_url }}">
         <button type="submit">Take Survey Again</button>
     </form>-->
