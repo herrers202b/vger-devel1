@@ -44,14 +44,14 @@
                   {% for Question in Category.my_questions.all %}
                   <li class="list-group-item">
                     <div class="container-fluid row">
-                      <div class="col-sm-8">
+                      <div class="col-sm-6">
                         <p> {{Question.question_fk.question_text}} </p>
                       </div>
 
                       <div class="col-sm float-right">
                         <div class="btn-toolbar" role="toolbar">
                           {% if perms.canEditQuestion %}
-                          <div class="btn-group mr-3" role="group">
+                          <div class="btn-group mr-2" role="group">
                             <a class="btn btn-info" href="{{ Question.question_fk.get_absolute_url }}">
                             Edit
                             </a>
@@ -59,7 +59,7 @@
                           {% endif %}
 
                           {% if perms.canDeleteQuestion %}
-                          <div class="btn-group mr-3" role="group">
+                          <div class="btn-group mr-2" role="group">
                             <form action="{{ Question.question_fk.get_absolute_url }}/delete-question">
                               <button class="btn btn-danger" type="submit">
                                 Delete</button>
@@ -71,6 +71,8 @@
                     </div>
                   </li>
                   {% endfor %}
+
+                  <br />
 
                   {% if perms.canCreateQuestion %}
                   <div class="btn-group mr-2" role="group">
@@ -125,6 +127,7 @@
         </form>
       </div>
       {% endif %}
+
       {% if categories %}
       <div class="btn-group mr-2" role="group">
         <a class="btn btn-primary" href="{{survey.get_welcome_url}}">
