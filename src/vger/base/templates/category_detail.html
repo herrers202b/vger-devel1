@@ -1,18 +1,48 @@
 {% extends "base.html" %}
 
 {% block content %}
-  <h1>Title: {{category_detail.titleOfCategory }}</h1>
+<div class="container-fluid">
+  <h2>Category: {{category_detail.titleOfCategory }}</h2>
+</div>
 
-  <h4>Questions:</h4>
-  {% for Question in myQuestions %}
-    <div style="margin-left:20px;margin-top:20px">
-      {% if perms.canCreateQuestion %}
-        <a href="{{ Question.get_absolute_url }}">Question: {{Question.question_text}}?</a> 
-      {% else %}
-        <p>Question: {{Question.questionText}}?</p>
-      {% endif %}
-    </div>
-  {% endfor %}
+<br />
+
+<div class="container-fluid">
+  <h2>Questions</h2>
+</div>
+
+<div class="container-fluid">
+  <ul class="list-group-flush">
+    {% for Question in myQuestions %}
+    <li class="list-group-item">
+      <div class="container-fluid row">
+        <div class="col-sm-8">
+          <p>{{Question.question_text}}</p>
+        </div>
+   
+        <div class="col-sm float-right">
+          <div class="btn-toolbar" role="toolbar">
+            {% if perms.canEditQuestion %}
+            <div class="btn-group mr-2" role="group">
+              <a class="btn btn-info" 
+                  href="{{Question.get_absolute_url}}">Edit</a>
+            </div>
+            {% endif %}
+   
+            {% if perms.canDeleteQuestion %}
+            <div class="btn-group mr-2" role="group">
+              <a class="btn btn-danger"
+                  href="{{Question.get_absolute_url}}/delete-question">
+              Delete</a>
+            </div>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+    </li>
+    {% endfor %}
+  </ul>
+</div>
 
 <div style='display:flex'>
 {% comment %} Return button {% endcomment %}
