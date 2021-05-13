@@ -12,9 +12,14 @@
     <li class="list-group-item">
       <div class="container-fluid row">
         <div class="col-sm-8">
-          <p><button class="btn btn-primary" type="button" data-toggle="collapse" data-target="#{{option_group.pk}}" aria-expanded="false" aria-controls="collapseExample">
-            {{ option_group.name_of_group }}
-          </button></p> 
+          <div class="btn btn-toolbar" role="btn-toolbar">
+            <div class="btn-group mr-2" role="group">
+              <button class="btn btn-primary" type="button"
+                  data-toggle="collapse" data-target="#{{option_group.pk}}">
+                {{ option_group.name_of_group }}
+              </button> 
+            </div>
+          </div>
         </div>
 
         <div class="col-sm float-right">
