@@ -11,16 +11,15 @@
         
         {% for option_group in option_list %}
           <li class="list-group-item">
-            {% load static %}
+            <div class="container-fluid row">
+              <div class="col-sm-8">
             <p><button class="btn btn-primary" type="button" data-toggle="collapse" data-target="#{{option_group.pk}}" aria-expanded="false" aria-controls="collapseExample">
               {{ option_group.name_of_group }}
             </button></p> 
-            <div class="container-fluid row">
-              <div class="col-sm-8">
-                
               </div>
 
-              <div class="btn-toolbar" role="toolbar" style="padding-bottom: 2%;">
+            <div class="col-sm float-right">
+              <div class="btn-toolbar" role="toolbar">
                 {% if perms.canEditOption %}
                 <div class="btn-group mr-2" role="group">
                   <a class="btn btn-info" href="detail/{{ option_group.pk }}">
@@ -43,6 +42,7 @@
                 <div class="collapse" id="{{option_group.pk}}">
                   <div class="card card-body">
                     {% for option_choice in option_choices %}
+                    <li class="list-group-item">
                     {% if option_choice.option_group == option_group %}
                       <div style="margin-left:20px;margin-top:20px; overflow: hidden;">
                         {% if perms.canCreateOptions %}
@@ -78,11 +78,13 @@
                         {% endif %}
                       </div>
                     {% endif %} 
+                    </li>
                     {% endfor %}
                   </div>
                 </div>
                 </ul>
               </div>
+            </div>
             </div>
           </li>
         {% endfor %}
