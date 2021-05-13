@@ -44,35 +44,23 @@
   </ul>
 </div>
 
-<div style='display:flex'>
+<div class="container-fluid">
+  {%if perms.canCreateQuestion%}
+  <form action="{{ category_detail.get_absolute_url }}/create-question">
+    <button class="btn btn-success" type="submit">
+      Create Question
+    </button>
+  </form>
+  {% endif %}
+</div>
+
+<br />
+
+<div class="container-fluid">
 {% comment %} Return button {% endcomment %}
   <form action = "{{ category_detail.survey_fk.get_absolute_url }}">
-    <button type = "submit">
+    <button class="btn btn-primary" type = "submit">
       Return
     </button>
   </form>
-{% comment %} Update Category button {% endcomment %}
-  {%if perms.canUpdateCategory%}
-    <form action = "{{ category_detail.get_absolute_url }}/update-category">
-      <button type = "submit">
-        Update Category
-      </button>
-    </form>
-  {% endif %}
-{% comment %} Delete Category button {% endcomment %}
-  {%if perms.canDeleteCategory%}
-    <form action = "{{ category_detail.get_absolute_url }}/delete-category">
-      <button type = "submit">
-        Delete Category
-      </button>
-    </form>
-  {% endif %}
-  {%if perms.canCreateQuestion%}
-    <form action = "{{ category_detail.get_absolute_url }}/create-question">
-      <button type = "submit">
-        Create Question
-      </button>
-    </form>
-  {% endif %}
-</div>
 {% endblock %}
