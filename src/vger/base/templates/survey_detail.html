@@ -13,6 +13,7 @@
 
 <div class="container-fluid">
   <p><strong>Description:</strong> {{survey.description }}</p>
+  <p><strong>Version:</strong> {{survey.version_number }}</p>
 </div>
 
 {% comment %} {% if perms.canDeleteSurvey %}
@@ -118,6 +119,15 @@
 
   <div class="container-fluid">
     <div class="btn-toolbar" role="toolbar">
+
+      {% if perms.canEditSurvey %}
+      <div class="btn-group mr-2" role="group">
+        <a class="btn btn-info" href="{{ survey.get_new_version_url }}">
+          New Version
+        </a>
+      </div>
+      {% endif %}
+
       {% if perms.canCreateCategory %}
       <div class="btn-group mr-2" role="group">
         <form action="{%url 'category-create' survey.surveySlug %}">

@@ -44,8 +44,11 @@ class Survey(models.Model):
     def save(self, *args, **kwargs):
         """Saves the surveySlug as the titleOfSurvey"""
         if not self.surveySlug:
-            self.surveySlug = slugify(self.titleOfSurvey)
+            self.surveySlug = slugify(self.titleOfSurvey + str(self.version_number))
         return super().save(*args, **kwargs)
+
+    def get_new_version_url(self):
+        return reverse("new-version", kwargs={'surveySlug': self.surveySlug, 'version_number' : str(self.version_number)})
 
     def get_absolute_url(self):
         """Returns the url to access a detailed record for this survey"""
@@ -257,3 +260,8 @@ def delete_reverse(sender, **kwargs):
             kwargs['instance'].question_fk.delete()
     except:
         pass
+
+
+
+       
+    

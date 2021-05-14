@@ -6,6 +6,11 @@ from .models import Survey, Category, Question, Survey_Question, Option_Choice, 
 from django.forms import HiddenInput, Select
 from django.forms.models import ModelChoiceField, ModelChoiceIterator
 
+
+class NewVersionForm(forms.Form):
+    
+    version_number = forms.DecimalField(max_digits=5, decimal_places=2)
+
 class SurveyCreateForm(forms.ModelForm):
     """
     SurveyCreateForm

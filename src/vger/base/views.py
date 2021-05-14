@@ -55,30 +55,49 @@ def check_permissions(request, accountType, url):
                 return render(request, url)
         return HttpResponseNotAllowed('<h1>You do not have permission to access this page</h1>')
 
-class SurveyListView(LoginRequiredMixin, generic.ListView):
-    """
-    SurveyListView
+def SurveyListView(request):
 
-    This class lists all currently registered
-    surveys on the website.
+    context = {
+        'survey_list' : Survey.objects.all()
+    }
 
-    Parameters
-    ----------
-    Survey : model
-        The specific model we're trying to list
-    'survey_list' : context_object_name
-        this is what we will refer to when trying
-        to query via HTML
-    'survey_list.html'
-        the name of our html file that contains
-        the template we will use
-    '/login/'
-        redirect url for login required permission
-    """
-    model = Survey
-    context_object_name = 'survey_list'
-    template_name = 'survey_list.html'
-    login_url = '/login/'
+    return render(request, "survey_list.html", context)
+
+from .forms import NewVersionForm
+
+def newVersion(request, surveySlug, version_number):
+    survey = Survey.objects.get(surveySlug=surveySlug)
+    if request.method == 'POST':
+        form = NewVersionForm(request.POST)
+        if form.is_valid():
+            new_version_number = form.cleaned_data.get('version_number')
+            version_numbers = Survey.objects.filter(titleOfSurvey=survey.titleOfSurvey)
+            for number in version_numbers:
+                if number.version_number == new_version_number:
+                    form = NewVersionForm()
+                    context = {
+                    'form' : form,
+                    'version_numbers': version_numbers
+                    }
+                    return render(request, "new_version.html", context)
+            survey.surveySlug = survey.titleOfSurvey + str(new_version_number).split('.')[0] + str(new_version_number).split('.')[1]
+            survey.version_number = new_version_number
+            survey.pk = None
+            
+            survey.save()
+
+            
+    else:
+        form = NewVersionForm()
+        
+
+        version_numbers = Survey.objects.filter(titleOfSurvey=survey.titleOfSurvey)
+
+    context = {
+        'form' : form,
+        'version_numbers': version_numbers
+    }
+    return render(request, "new_version.html", context)
 
 from .forms import CategoryCreateForm
 @permission_required('canSeeSurveyDetail')
@@ -1118,3 +1137,4 @@ def results(request, surveySlug, pk):
     }
 
     return render(request, 'results.html', context)
+

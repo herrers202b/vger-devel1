@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% load crispy_forms_tags %}
+{% block content %}
+<div class="container-fluid">
+  <form action="" method="post">
+    {% csrf_token %}
+    {{ form|crispy }}
+    <h3>Taken Numbers</h3>
+    <div>
+    {% for number in version_numbers %}
+    <p>{{ number.version_number }}</p>
+    {% endfor%}
+    </div>  
+    <div class="btn-toolbar" role="toolbar">
+      <div class="btn-group mr-2" role="group">
+        <input class="btn btn-success" type="submit" value="Submit">
+      </div>
+      <div class="btn-group mr-2" role="group">
+        <button class="btn btn-primary" onclick="window.history.back();"
+          class="btn btn-default" type="button">Cancel</button>
+      </div>
+    </div>
+  </form>
+</div>
+{% endblock %}
