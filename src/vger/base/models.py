@@ -234,6 +234,7 @@ class User_Survey(models.Model):
     finished = models.BooleanField(default=False)
     user_fk = models.ForeignKey(User, on_delete=models.CASCADE)
     survey_fk = models.ForeignKey('Survey', on_delete=models.CASCADE)
+    time_stamp = models.DateTimeField(auto_now_add=True)
 
     def get_result_url(self):
         """Returns the results page view to send the user from the take survey page to the results page"""
