@@ -19,23 +19,23 @@ def linuxInstall():
     os.system('python3 run.py build')
 
     print("*************** Making Migrations ***************")
-    os.system('python3 run.py migrate --run-syncdb')
+    os.system('sudo docker-compose run django python3 manage.py migrate --run-syncdb')
 
     print("*************** Set up a Root User ***************")
-    os.system('python3 run.py admin')
+    os.system('sudo docker-compose run django python3 manage.py createsuperuser')
 
     print("*************** Spin up the Server ***************")
     os.system('python3 run.py up')
 
     print("*************** Spin the Server Down ***************")
     os.system('python3 run.py down')
-    
+
     verifiedFile = open('verifiedInstall.txt', 'w+')
     dateTime = datetime.datetime.now()
     verifiedFile.write("You installed at: ")
     verifiedFile.write(str(dateTime))
     verifiedFile.close()
-    
+
     print(" ")
     print("*************** Initial Install was ran on your Linux OS and your site is back down ***************")
 
@@ -44,10 +44,10 @@ def macInstall():
     os.system('python3 run.py build')
 
     print("*************** Making Migrations ***************")
-    os.system('python3 run.py migrate --run-syncdb')
+    os.system('sudo docker-compose run django python3 manage.py migrate --run-syncdb')
 
     print("*************** Set up a Root User ***************")
-    os.system('python3 run.py admin')
+    os.system('sudo docker-compose run django python3 manage.py createsuperuser')
 
     print("*************** Spin up the Server ***************")
     os.system('python3 run.py up')
