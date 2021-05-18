@@ -19,12 +19,66 @@ The only dependecy required before running is docker which will subsequently bui
 
     * Mariadb
 
-  
+---
+
+### For first time users; detailed documentation on how to install the product and how to generally navigate the website is provided in the documentation folder. Please make sure to check that out!
+
+### ``runInitial.py`` usage
+> Initial Install Script: initializes/installs the database, in order to start running the product
+
+```shell
+command: 
+
+python3 run.py runInitial.py
+
+```
+
+---
+
+### ``runVger.py`` usage
+> NOTE: it is REQUIRED that the initialization script has been run before the start script
+
+> Run System Start Script: starts the system. 
+
+> To spin the system back down make sure you either run 'docker-compose down' or you run 'closeVger.py'
+
+```shell
+command: 
+
+python3 run.py runVger.py
+
+```
+
+---
+
+### ``runTests.py`` usage
+> NOTE: it is REQUIRED that the initialization script has been run before the tests script
+
+> Run Tests Script: runs all test files in project apps for all Operating Systems
+
+```shell
+command: 
+
+python3 run.py runTests.py
+
+```
+
+---
+
+### ``closeVger.py`` usage
+> spins the system down, preferably used after 'runVger.py'
+
+```shell
+command: 
+
+python3 run.py closeVger.py
+
+```
 
 ## Usage
 
   
-
+  
 ### How to spin up the server
 
 ```shell
@@ -133,60 +187,3 @@ command:
 python3 run.py tests
 
 ```
-
----
-
-### ``runInitial.py`` usage
-> Initial Install Script: initializes/installs the database, in order to start running the product
-
-```shell
-command: 
-
-python3 run.py runInitial.py
-
-```
-
----
-
-### ``runVger.py`` usage
-> NOTE: it is REQUIRED that the initialization script has been run before the start script
-
-> Run System Start Script: starts the system. 
-
-> To spin the system back down make sure you either run 'docker-compose down' or you run 'closeVger.py'
-
-```shell
-command: 
-
-python3 run.py runVger.py
-
-```
-
----
-
-### ``runTests.py`` usage
-> NOTE: it is REQUIRED that the initialization script has been run before the tests script
-
-> Run Tests Script: runs all test files in project apps for all Operating Systems
-
-```shell
-command: 
-
-python3 run.py runTests.py
-
-```
-
----
-
-### ``closeVger.py`` usage
-> spins the system down, preferably used after 'runVger.py'
-
-```shell
-command: 
-
-python3 run.py closeVger.py
-
-```
-
-
-
